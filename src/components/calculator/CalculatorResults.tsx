@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { DollarSign, Wrench, Clock, TrendingUp, ArrowRight, ShoppingCart, FileText, MessageCircle, Calendar } from "lucide-react";
 import { products, flooringTypes } from "@/data/products";
-import { getShadeById } from "@/data/shades";
+import { packageTiers } from "@/data/packageTiers";
 import { useCart } from "@/contexts/CartContext";
-import type { CalcInputs } from "./CalculatorForm";
+import type { WizardInputs } from "./CalculatorWizard";
 
 import typeTile from "@/assets/type-tile.jpg";
 import typeStone from "@/assets/type-stone.jpg";
@@ -20,26 +20,29 @@ const typeImages: Record<string, string> = {
   resin: typeResin, carpet: typeCarpet, outdoor: typeOutdoor, rubber: typeRubber,
 };
 
-const priceMultiplier: Record<string, number> = {
-  tile: 0.8, stone: 1.5, wood: 1.2, vinyl: 0.6, resin: 0.5, carpet: 0.7, outdoor: 0.9, rubber: 0.4,
+const basePricePerSqft: Record<string, number> = {
+  tile: 140, stone: 320, wood: 280, vinyl: 95, resin: 80, carpet: 110, outdoor: 130, rubber: 70,
 };
 
 interface CalculatorResultsProps {
-  inputs: CalcInputs;
+  inputs: WizardInputs;
   onBack: () => void;
 }
 
 const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
   const { addToCart } = useCart();
-  const { spaceType, area, floorType, traffic, budget, shade, shadeName } = inputs;
+  const { spaceType, floorType, floorTypeName, design, packageTier, packageName, area, budget } = inputs;
 
-  const materialCost = area * budget * (priceMultiplier[floorType] || 1);
-  const installCost = area * 25;
-  const totalLow = Math.round(materialCost * 0.85) + installCost;
-  const totalHigh = Math.round(materialCost * 1.15) + installCost;
+  const pkg = packageTiers.find((p) => p.id === packageTier);
+  const priceMultiplier = pkg?.priceMultiplier || 1;
 
-  const selectedType = flooringTypes.find((t) => t.id === floorType);
-  const selectedShade = shade ? getShadeById(shade) : null;
+  const basePrice = basePricePerSqft[floorType] || 150;
+  const materialCost = area * basePrice * priceMultiplier;
+  const installCost = area * (packageTier === "luxury" ? 40 : packageTier === "premium" ? 30 : packageTier === "standard" ? 25 : 15);
+  const totalLow = Math.round(materialCost * 0.9) + installCost;
+  const totalHigh = Math.round(materialCost * 1.1) + installCost;
+
+  const timelineDays = Math.ceil(area / (packageTier === "luxury" ? 25 : packageTier === "premium" ? 35 : 45));
 
   // Get recommended products
   const recommended = products
@@ -48,10 +51,10 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
     .slice(0, 4);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8">
       {/* Back button */}
       <button onClick={onBack} className="text-sm font-body text-muted-foreground hover:text-accent transition-colors flex items-center gap-1">
-        ← Modify inputs
+        ← Start Over
       </button>
 
       {/* Selection Summary */}
@@ -60,22 +63,25 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
             { label: "Space", value: spaceType },
+            { label: "Type", value: floorTypeName },
+            { label: "Package", value: packageName, icon: pkg?.icon },
             { label: "Area", value: `${area} sqft` },
-            { label: "Type", value: selectedType?.name || floorType },
-            { label: "Traffic", value: traffic },
             { label: "Budget", value: `AED ${budget}/sqft` },
           ].map((item) => (
             <div key={item.label} className="bg-secondary rounded-lg px-3 py-2">
               <p className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">{item.label}</p>
-              <p className="text-sm font-body font-semibold text-foreground">{item.value}</p>
+              <p className="text-sm font-body font-semibold text-foreground flex items-center gap-1">
+                {item.icon && <span>{item.icon}</span>}
+                {item.value}
+              </p>
             </div>
           ))}
-          {selectedShade && (
+          {design && (
             <div className="bg-secondary rounded-lg px-3 py-2 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-sm shrink-0" style={{ background: selectedShade.gradient }} />
+              <div className="w-8 h-8 rounded-md shrink-0" style={{ background: design.gradient }} />
               <div>
-                <p className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">Shade</p>
-                <p className="text-sm font-body font-semibold text-foreground">{shadeName}</p>
+                <p className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">Design</p>
+                <p className="text-sm font-body font-semibold text-foreground">{design.name}</p>
               </div>
             </div>
           )}
@@ -91,8 +97,10 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
               <DollarSign className="w-5 h-5 text-accent" />
             </div>
             <div className="flex-1 flex justify-between">
-              <span className="text-sm font-body text-muted-foreground">Material Cost</span>
-              <span className="font-body font-bold text-foreground">AED {Math.round(materialCost * 0.85).toLocaleString()} – {Math.round(materialCost * 1.15).toLocaleString()}</span>
+              <span className="text-sm font-body text-muted-foreground">Material Cost ({packageName})</span>
+              <span className="font-body font-bold text-foreground">
+                AED {Math.round(materialCost * 0.9).toLocaleString()} – {Math.round(materialCost * 1.1).toLocaleString()}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -113,17 +121,17 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
         </div>
       </div>
 
-      {/* Timeline & Maintenance */}
+      {/* Timeline & Package Info */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-card rounded-xl border border-border p-5 shadow-luxury">
           <Clock className="w-6 h-6 text-accent mb-2" />
-          <p className="text-sm font-body text-muted-foreground">Timeline</p>
-          <p className="font-display font-bold text-foreground">{Math.ceil(area / 50)} – {Math.ceil(area / 30)} Days</p>
+          <p className="text-sm font-body text-muted-foreground">Estimated Timeline</p>
+          <p className="font-display font-bold text-foreground">{timelineDays} – {timelineDays + 3} Days</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-5 shadow-luxury">
           <TrendingUp className="w-6 h-6 text-accent mb-2" />
-          <p className="text-sm font-body text-muted-foreground">Maintenance</p>
-          <p className="font-display font-bold text-foreground">{traffic === "High" || traffic === "Very High" ? "Weekly" : "Monthly"}</p>
+          <p className="text-sm font-body text-muted-foreground">Package Tier</p>
+          <p className="font-display font-bold text-foreground">{pkg?.icon} {packageName}</p>
         </div>
       </div>
 
