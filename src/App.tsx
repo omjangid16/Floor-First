@@ -13,8 +13,10 @@ import Cart from "./pages/Cart";
 import About from "./pages/About";
 import Services from "./pages/Services";
 import Inspiration from "./pages/Inspiration";
+import InspirationDetail from "./pages/InspirationDetail";
 import Calculator from "./pages/Calculator";
 import OurWorks from "./pages/OurWorks";
+import ProjectDetail from "./pages/ProjectDetail";
 import GetQuote from "./pages/GetQuote";
 import HelpCenter from "./pages/HelpCenter";
 import Contact from "./pages/Contact";
@@ -38,10 +40,10 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
             <Route path="/inspiration" element={<Inspiration />} />
-            <Route path="/inspiration/:id" element={<Inspiration />} />
+            <Route path="/inspiration/:id" element={<InspirationDetail />} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="/our-works" element={<OurWorks />} />
-            <Route path="/our-works/:id" element={<OurWorks />} />
+            <Route path="/our-works/:id" element={<ProjectDetail />} />
             <Route path="/get-quote" element={<GetQuote />} />
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/contact" element={<Contact />} />
