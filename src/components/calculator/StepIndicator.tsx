@@ -1,9 +1,9 @@
 import { Check } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface Step {
   id: number;
   label: string;
+  icon: React.ReactNode;
 }
 
 interface StepIndicatorProps {
@@ -13,50 +13,43 @@ interface StepIndicatorProps {
 
 const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
   return (
-    <div className="flex items-center justify-between w-full max-w-2xl mx-auto mb-8">
+    <div className="flex items-center justify-between w-full mb-8">
       {steps.map((step, index) => {
         const isComplete = currentStep > step.id;
         const isActive = currentStep === step.id;
 
         return (
           <div key={step.id} className="flex items-center flex-1 last:flex-none">
-            {/* Circle */}
             <div className="flex flex-col items-center">
-              <motion.div
-                initial={false}
-                animate={{
-                  scale: isActive ? 1.1 : 1,
-                  backgroundColor: isComplete
-                    ? "hsl(24 85% 50%)"
+              <div
+                className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-body font-bold transition-all duration-300 ${
+                  isComplete
+                    ? "bg-accent text-accent-foreground shadow-lg"
                     : isActive
-                    ? "hsl(24 85% 50%)"
-                    : "hsl(36 33% 90%)",
-                }}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-body font-bold transition-colors"
+                    ? "bg-accent text-accent-foreground shadow-lg ring-4 ring-accent/20"
+                    : "bg-secondary text-muted-foreground"
+                }`}
               >
                 {isComplete ? (
-                  <Check className="w-4 h-4 text-accent-foreground" />
+                  <Check className="w-5 h-5" />
                 ) : (
-                  <span className={isActive ? "text-accent-foreground" : "text-muted-foreground"}>
-                    {step.id}
-                  </span>
+                  <span className="text-xs">{step.icon}</span>
                 )}
-              </motion.div>
+              </div>
               <span
-                className={`text-[10px] font-body mt-1.5 whitespace-nowrap ${
-                  isActive ? "text-accent font-semibold" : isComplete ? "text-foreground" : "text-muted-foreground"
+                className={`text-[10px] font-body mt-2 whitespace-nowrap font-semibold ${
+                  isActive ? "text-accent" : isComplete ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {step.label}
               </span>
             </div>
 
-            {/* Connector line */}
             {index < steps.length - 1 && (
-              <div className="flex-1 h-0.5 mx-2 mt-[-16px]">
+              <div className="flex-1 h-[2px] mx-3 mt-[-16px]">
                 <div
-                  className={`h-full rounded-full transition-colors duration-300 ${
-                    isComplete ? "bg-accent" : "bg-secondary"
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    isComplete ? "bg-accent" : "bg-border"
                   }`}
                 />
               </div>
