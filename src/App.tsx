@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -20,6 +21,9 @@ import ProjectDetail from "./pages/ProjectDetail";
 import GetQuote from "./pages/GetQuote";
 import HelpCenter from "./pages/HelpCenter";
 import Contact from "./pages/Contact";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,24 +36,30 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/inspiration" element={<Inspiration />} />
-            <Route path="/inspiration/:id" element={<InspirationDetail />} />
-            <Route path="/calculator" element={<Calculator />} />
-            <Route path="/our-works" element={<OurWorks />} />
-            <Route path="/our-works/:id" element={<ProjectDetail />} />
-            <Route path="/get-quote" element={<GetQuote />} />
-            <Route path="/help-center" element={<HelpCenter />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="pb-16 lg:pb-0">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/inspiration" element={<Inspiration />} />
+              <Route path="/inspiration/:id" element={<InspirationDetail />} />
+              <Route path="/calculator" element={<Calculator />} />
+              <Route path="/our-works" element={<OurWorks />} />
+              <Route path="/our-works/:id" element={<ProjectDetail />} />
+              <Route path="/get-quote" element={<GetQuote />} />
+              <Route path="/help-center" element={<HelpCenter />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
           <Footer />
+          <MobileBottomNav />
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>

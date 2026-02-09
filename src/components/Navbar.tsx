@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, Menu, X, Phone, ChevronDown } from "lucide-react";
+import { ShoppingCart, Menu, X, Phone, ChevronDown, User } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -109,6 +109,10 @@ const Navbar = () => {
                 {totalItems}
               </span>
             )}
+          </Link>
+
+          <Link to="/sign-in" className="hidden md:flex items-center gap-1.5 px-3 py-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm font-body font-medium">
+            <User className="w-4 h-4" /> Sign In
           </Link>
 
           <a href="tel:+971551667112" className="hidden md:flex p-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors">

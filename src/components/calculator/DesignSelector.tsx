@@ -15,17 +15,17 @@ const DesignSelector = ({ flooringType, selectedDesign, onSelect }: DesignSelect
   const designs = getDesignsByTypeAndShade(flooringType, activeShade);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Shade Filter Tabs */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {shadeCategories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveShade(cat.id)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-body font-semibold transition-all ${
+            className={`px-4 py-2 rounded-full text-xs font-body font-semibold transition-all duration-200 ${
               activeShade === cat.id
-                ? "gradient-accent text-accent-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-sand-dark"
+                ? "gradient-accent text-accent-foreground shadow-md"
+                : "bg-card border border-border text-foreground hover:border-accent/40"
             }`}
           >
             {cat.name}
@@ -38,7 +38,7 @@ const DesignSelector = ({ flooringType, selectedDesign, onSelect }: DesignSelect
         key={`${flooringType}-${activeShade}`}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.2 }}
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
       >
         {designs.map((design) => {
@@ -47,28 +47,22 @@ const DesignSelector = ({ flooringType, selectedDesign, onSelect }: DesignSelect
             <button
               key={design.id}
               onClick={() => onSelect(design)}
-              className={`group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200 border-2 ${
+              className={`group relative rounded-xl overflow-hidden transition-all duration-200 border-2 text-left ${
                 isSelected
-                  ? "border-accent shadow-luxury scale-[1.02]"
-                  : "border-transparent hover:border-border hover:shadow-md"
+                  ? "border-accent shadow-luxury ring-2 ring-accent/20"
+                  : "border-border hover:border-accent/40 hover:shadow-md"
               }`}
             >
               {/* Swatch Visual */}
               <div
-                className="relative w-full aspect-[4/3] rounded-t-lg"
+                className="relative w-full h-24 sm:h-28"
                 style={{ background: design.gradient }}
               >
-                {/* Texture overlay */}
+                {/* Texture overlay for realism */}
                 <div
-                  className="absolute inset-0 opacity-15 mix-blend-overlay"
+                  className="absolute inset-0 opacity-20 mix-blend-overlay"
                   style={{
-                    backgroundImage: `repeating-linear-gradient(
-                      ${60 + Math.random() * 40}deg,
-                      transparent,
-                      transparent 4px,
-                      rgba(0,0,0,0.08) 4px,
-                      rgba(0,0,0,0.08) 5px
-                    )`,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm20 20h20v20H20V20z' fill='%23000' fill-opacity='.03'/%3E%3C/svg%3E")`,
                   }}
                 />
                 {isSelected && (
@@ -79,11 +73,11 @@ const DesignSelector = ({ flooringType, selectedDesign, onSelect }: DesignSelect
               </div>
 
               {/* Label */}
-              <div className={`px-2.5 py-2 bg-card ${isSelected ? "bg-accent/5" : ""}`}>
-                <p className={`text-xs font-body font-semibold truncate ${isSelected ? "text-accent" : "text-foreground"}`}>
+              <div className={`px-3 py-2.5 ${isSelected ? "bg-accent/5" : "bg-card"}`}>
+                <p className={`text-xs font-body font-bold truncate ${isSelected ? "text-accent" : "text-foreground"}`}>
                   {design.name}
                 </p>
-                <p className="text-[10px] font-body text-muted-foreground truncate">
+                <p className="text-[10px] font-body text-muted-foreground truncate mt-0.5">
                   {design.pattern} · {design.texture}
                 </p>
               </div>
@@ -93,25 +87,32 @@ const DesignSelector = ({ flooringType, selectedDesign, onSelect }: DesignSelect
       </motion.div>
 
       {designs.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground font-body text-sm">
-          No designs available for this shade filter. Try another shade.
+        <div className="text-center py-10 text-muted-foreground font-body text-sm bg-card rounded-xl border border-border">
+          No designs available for this shade filter. Try another.
         </div>
       )}
 
       {/* Selected Summary */}
       {selectedDesign && (
-        <div className="flex items-center gap-3 bg-accent/5 border border-accent/20 rounded-lg p-3">
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 bg-accent/5 border border-accent/20 rounded-xl p-3.5"
+        >
           <div
-            className="w-10 h-10 rounded-lg shrink-0"
+            className="w-12 h-12 rounded-lg shrink-0 shadow-md"
             style={{ background: selectedDesign.gradient }}
           />
           <div>
-            <p className="text-sm font-body font-semibold text-foreground">{selectedDesign.name}</p>
+            <p className="text-sm font-body font-bold text-foreground">{selectedDesign.name}</p>
             <p className="text-xs font-body text-muted-foreground">
               {selectedDesign.pattern} · {selectedDesign.texture}
             </p>
           </div>
-        </div>
+          <div className="ml-auto">
+            <span className="text-[10px] font-body font-semibold text-accent bg-accent/10 px-2 py-1 rounded-full">Selected</span>
+          </div>
+        </motion.div>
       )}
     </div>
   );

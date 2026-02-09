@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Calculator as CalcIcon } from "lucide-react";
+import { ArrowRight, ArrowLeft, Calculator as CalcIcon, Home, Layers, Palette, Crown, Ruler } from "lucide-react";
 import { flooringTypes } from "@/data/products";
 import { packageTiers } from "@/data/packageTiers";
 import { type FlooringDesign } from "@/data/flooringDesigns";
@@ -21,14 +21,23 @@ const typeImages: Record<string, string> = {
   resin: typeResin, carpet: typeCarpet, outdoor: typeOutdoor, rubber: typeRubber,
 };
 
-const spaceTypes = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Warehouse", "Hotel Lobby", "Gym"];
+const spaceTypes = [
+  { id: "living", label: "Living Room", icon: "🛋️" },
+  { id: "bedroom", label: "Bedroom", icon: "🛏️" },
+  { id: "kitchen", label: "Kitchen", icon: "🍳" },
+  { id: "bathroom", label: "Bathroom", icon: "🚿" },
+  { id: "office", label: "Office", icon: "💼" },
+  { id: "warehouse", label: "Warehouse", icon: "🏭" },
+  { id: "hotel", label: "Hotel Lobby", icon: "🏨" },
+  { id: "gym", label: "Gym", icon: "🏋️" },
+];
 
 const steps = [
-  { id: 1, label: "Space" },
-  { id: 2, label: "Flooring" },
-  { id: 3, label: "Design" },
-  { id: 4, label: "Package" },
-  { id: 5, label: "Area" },
+  { id: 1, label: "Space", icon: <Home className="w-4 h-4" /> },
+  { id: 2, label: "Flooring", icon: <Layers className="w-4 h-4" /> },
+  { id: 3, label: "Design", icon: <Palette className="w-4 h-4" /> },
+  { id: 4, label: "Package", icon: <Crown className="w-4 h-4" /> },
+  { id: 5, label: "Area", icon: <Ruler className="w-4 h-4" /> },
 ];
 
 export interface WizardInputs {
@@ -48,7 +57,7 @@ interface CalculatorWizardProps {
 
 const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [spaceType, setSpaceType] = useState("Living Room");
+  const [spaceType, setSpaceType] = useState("living");
   const [floorType, setFloorType] = useState("wood");
   const [selectedDesign, setSelectedDesign] = useState<FlooringDesign | null>(null);
   const [packageTier, setPackageTier] = useState("standard");
@@ -68,10 +77,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
 
   const handleNext = () => {
     if (currentStep < 5) {
-      // Reset design when changing flooring type
-      if (currentStep === 2) {
-        setSelectedDesign(null);
-      }
+      if (currentStep === 2) setSelectedDesign(null);
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -83,8 +89,9 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   const handleCalculate = () => {
     const selectedFloorType = flooringTypes.find((t) => t.id === floorType);
     const selectedPkg = packageTiers.find((p) => p.id === packageTier);
+    const selectedSpace = spaceTypes.find((s) => s.id === spaceType);
     onCalculate({
-      spaceType,
+      spaceType: selectedSpace?.label || spaceType,
       floorType,
       floorTypeName: selectedFloorType?.name || floorType,
       design: selectedDesign,
@@ -96,249 +103,277 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   };
 
   const selectedFloorType = flooringTypes.find((t) => t.id === floorType);
-
-  // Summary panel items
-  const summaryItems = [
-    { label: "Space", value: spaceType, active: currentStep >= 1 },
-    { label: "Flooring", value: selectedFloorType?.name?.replace(" Flooring", "") || "—", active: currentStep >= 2 },
-    { label: "Design", value: selectedDesign?.name || "—", active: currentStep >= 3, gradient: selectedDesign?.gradient },
-    { label: "Package", value: packageTiers.find((p) => p.id === packageTier)?.name || "—", active: currentStep >= 4 },
-    { label: "Area", value: `${area} sqft`, active: currentStep >= 5 },
-  ];
+  const selectedSpace = spaceTypes.find((s) => s.id === spaceType);
+  const selectedPkg = packageTiers.find((p) => p.id === packageTier);
 
   return (
     <div className="space-y-6">
       <StepIndicator steps={steps} currentStep={currentStep} />
 
-      {/* Summary Bar */}
-      <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
-        <div className="flex flex-wrap gap-3">
-          {summaryItems.map((item) => (
+      {/* Live Summary Bar */}
+      <div className="bg-card rounded-2xl border border-border p-4 shadow-luxury">
+        <p className="text-[10px] font-body text-muted-foreground uppercase tracking-widest mb-2.5">Your Selection</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "Space", value: selectedSpace?.label || "—", done: currentStep > 1 },
+            { label: "Type", value: selectedFloorType?.name?.replace(" Flooring", "").replace(" & ", "/") || "—", done: currentStep > 2 },
+            { label: "Design", value: selectedDesign?.name || "—", done: currentStep > 3, swatch: selectedDesign?.gradient },
+            { label: "Package", value: selectedPkg?.name || "—", done: currentStep > 4 },
+            { label: "Area", value: currentStep >= 5 ? `${area} sqft` : "—", done: false },
+          ].map((item) => (
             <div
               key={item.label}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-body transition-all ${
-                item.active ? "bg-secondary text-foreground" : "bg-muted/50 text-muted-foreground"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-body transition-all ${
+                item.done ? "bg-accent/10 text-accent border border-accent/20" : "bg-muted/50 text-muted-foreground"
               }`}
             >
-              {item.gradient && (
-                <div className="w-4 h-4 rounded-sm shrink-0" style={{ background: item.gradient }} />
+              {item.swatch && (
+                <div className="w-3.5 h-3.5 rounded-sm shrink-0 shadow-sm" style={{ background: item.swatch }} />
               )}
               <span className="font-medium">{item.label}:</span>
-              <span className="font-semibold">{item.value}</span>
+              <span className="font-bold">{item.value}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Step Content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.25 }}
-          className="min-h-[300px]"
-        >
-          {/* Step 1: Space Type */}
-          {currentStep === 1 && (
-            <div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-2">Where do you need flooring?</h3>
-              <p className="text-sm font-body text-muted-foreground mb-5">Select the space type for your flooring project.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {spaceTypes.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSpaceType(s)}
-                    className={`px-4 py-4 rounded-xl text-sm font-body font-semibold transition-all border-2 ${
-                      spaceType === s
-                        ? "gradient-accent text-accent-foreground border-accent shadow-luxury"
-                        : "bg-card text-foreground border-border hover:border-accent/50 hover:shadow-md"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
+      <div className="bg-card rounded-2xl border border-border shadow-luxury overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 md:p-8 min-h-[340px]"
+          >
+            {/* Step 1: Space */}
+            {currentStep === 1 && (
+              <div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-1">Where do you need flooring?</h3>
+                <p className="text-sm font-body text-muted-foreground mb-6">Select the space for your project.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {spaceTypes.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSpaceType(s.id)}
+                      className={`flex flex-col items-center gap-2 px-4 py-5 rounded-xl text-sm font-body font-semibold transition-all border-2 ${
+                        spaceType === s.id
+                          ? "border-accent bg-accent/5 text-accent shadow-md"
+                          : "border-border bg-background text-foreground hover:border-accent/40"
+                      }`}
+                    >
+                      <span className="text-2xl">{s.icon}</span>
+                      <span className="text-xs">{s.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 2: Flooring Type */}
-          {currentStep === 2 && (
-            <div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-2">Choose your flooring type</h3>
-              <p className="text-sm font-body text-muted-foreground mb-5">Each type has unique designs and patterns.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {flooringTypes.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      setFloorType(t.id);
-                      setSelectedDesign(null);
-                    }}
-                    className={`group rounded-xl overflow-hidden transition-all border-2 ${
-                      floorType === t.id
-                        ? "border-accent shadow-luxury scale-[1.02]"
-                        : "border-border hover:border-accent/50 hover:shadow-md"
-                    }`}
-                  >
-                    <div className="h-20 overflow-hidden">
-                      <img
-                        src={typeImages[t.id]}
-                        alt={t.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            {/* Step 2: Flooring Type */}
+            {currentStep === 2 && (
+              <div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-1">Choose your flooring type</h3>
+                <p className="text-sm font-body text-muted-foreground mb-6">Each type comes with unique designs.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {flooringTypes.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setFloorType(t.id);
+                        setSelectedDesign(null);
+                      }}
+                      className={`group rounded-xl overflow-hidden transition-all border-2 ${
+                        floorType === t.id
+                          ? "border-accent shadow-luxury"
+                          : "border-border hover:border-accent/40"
+                      }`}
+                    >
+                      <div className="h-20 overflow-hidden">
+                        <img
+                          src={typeImages[t.id]}
+                          alt={t.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className={`px-3 py-2.5 ${floorType === t.id ? "bg-accent/5" : "bg-background"}`}>
+                        <p className={`text-[11px] font-body font-bold ${floorType === t.id ? "text-accent" : "text-foreground"}`}>
+                          {t.name.replace(" Flooring", "").replace(" & ", "/")}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Design */}
+            {currentStep === 3 && (
+              <div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-1">
+                  Pick a design — {selectedFloorType?.name || ""}
+                </h3>
+                <p className="text-sm font-body text-muted-foreground mb-6">
+                  Filter by shade and select your preferred design.
+                </p>
+                <DesignSelector
+                  flooringType={floorType}
+                  selectedDesign={selectedDesign}
+                  onSelect={setSelectedDesign}
+                />
+              </div>
+            )}
+
+            {/* Step 4: Package */}
+            {currentStep === 4 && (
+              <div>
+                <h3 className="font-display font-bold text-xl text-foreground mb-1">Select your package</h3>
+                <p className="text-sm font-body text-muted-foreground mb-6">Choose a tier that fits your quality and budget.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {packageTiers.map((tier) => (
+                    <button
+                      key={tier.id}
+                      onClick={() => setPackageTier(tier.id)}
+                      className={`text-left rounded-xl p-5 transition-all border-2 ${
+                        packageTier === tier.id
+                          ? "border-accent shadow-luxury bg-accent/5"
+                          : "border-border bg-background hover:border-accent/40"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">{tier.icon}</span>
+                        <div>
+                          <p className={`font-display font-bold text-base ${packageTier === tier.id ? "text-accent" : "text-foreground"}`}>
+                            {tier.name}
+                          </p>
+                          <p className="text-[11px] font-body text-muted-foreground">{tier.description}</p>
+                        </div>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {tier.features.map((f) => (
+                          <li key={f} className="text-[11px] font-body text-muted-foreground flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Area & Budget */}
+            {currentStep === 5 && (
+              <div className="space-y-8">
+                <div>
+                  <h3 className="font-display font-bold text-xl text-foreground mb-1">Set area & budget</h3>
+                  <p className="text-sm font-body text-muted-foreground mb-6">Adjust to match your project size.</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-body font-semibold text-foreground">Area</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={10}
+                        max={5000}
+                        value={area}
+                        onChange={(e) => setArea(Number(e.target.value))}
+                        className="w-20 text-right px-2 py-1 rounded-lg border border-border bg-background font-body font-bold text-accent text-sm focus:ring-2 focus:ring-accent outline-none"
+                      />
+                      <span className="text-xs font-body text-muted-foreground">sqft</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min="10"
+                    max="5000"
+                    value={area}
+                    onChange={(e) => setArea(Number(e.target.value))}
+                    className="w-full accent-burnt-orange h-2 rounded-full"
+                  />
+                  <div className="flex justify-between text-[10px] text-muted-foreground font-body">
+                    <span>10 sqft</span><span>5,000 sqft</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-body font-semibold text-foreground">Budget per sqft</label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-body text-muted-foreground">AED</span>
+                      <input
+                        type="number"
+                        min={50}
+                        max={800}
+                        step={10}
+                        value={budget}
+                        onChange={(e) => setBudget(Number(e.target.value))}
+                        className="w-20 text-right px-2 py-1 rounded-lg border border-border bg-background font-body font-bold text-accent text-sm focus:ring-2 focus:ring-accent outline-none"
                       />
                     </div>
-                    <div className={`px-3 py-2.5 text-left ${floorType === t.id ? "bg-accent/10" : "bg-card"}`}>
-                      <p className={`text-xs font-body font-bold ${floorType === t.id ? "text-accent" : "text-foreground"}`}>
-                        {t.name.replace(" Flooring", "").replace(" & ", " ")}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Design/Pattern */}
-          {currentStep === 3 && (
-            <div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-2">
-                Pick a design for {selectedFloorType?.name || "your floor"}
-              </h3>
-              <p className="text-sm font-body text-muted-foreground mb-5">
-                Filter by shade category and select your preferred design.
-              </p>
-              <DesignSelector
-                flooringType={floorType}
-                selectedDesign={selectedDesign}
-                onSelect={setSelectedDesign}
-              />
-            </div>
-          )}
-
-          {/* Step 4: Package Tier */}
-          {currentStep === 4 && (
-            <div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-2">Select your package</h3>
-              <p className="text-sm font-body text-muted-foreground mb-5">
-                Choose a tier that matches your quality and budget expectations.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {packageTiers.map((tier) => (
-                  <button
-                    key={tier.id}
-                    onClick={() => setPackageTier(tier.id)}
-                    className={`text-left rounded-xl p-5 transition-all border-2 ${
-                      packageTier === tier.id
-                        ? "border-accent shadow-luxury bg-accent/5"
-                        : "border-border bg-card hover:border-accent/50 hover:shadow-md"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">{tier.icon}</span>
-                      <div>
-                        <p className={`font-display font-bold text-base ${packageTier === tier.id ? "text-accent" : "text-foreground"}`}>
-                          {tier.name}
-                        </p>
-                        <p className="text-xs font-body text-muted-foreground">{tier.description}</p>
-                      </div>
-                    </div>
-                    <ul className="space-y-1.5">
-                      {tier.features.map((f) => (
-                        <li key={f} className="text-xs font-body text-muted-foreground flex items-center gap-2">
-                          <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 5: Area & Budget */}
-          {currentStep === 5 && (
-            <div className="space-y-6">
-              <h3 className="font-display font-bold text-xl text-foreground mb-2">Set area & budget</h3>
-              <p className="text-sm font-body text-muted-foreground mb-5">
-                Adjust the sliders to match your project specifications.
-              </p>
-
-              <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-2">
-                  Area: <span className="text-accent">{area} sqft</span>
-                </label>
-                <input
-                  type="range"
-                  min="10"
-                  max="1000"
-                  value={area}
-                  onChange={(e) => setArea(Number(e.target.value))}
-                  className="w-full accent-burnt-orange"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground font-body mt-1">
-                  <span>10 sqft</span><span>1000 sqft</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="800"
+                    step="10"
+                    value={budget}
+                    onChange={(e) => setBudget(Number(e.target.value))}
+                    className="w-full accent-burnt-orange h-2 rounded-full"
+                  />
+                  <div className="flex justify-between text-[10px] text-muted-foreground font-body">
+                    <span>AED 50</span><span>AED 800</span>
+                  </div>
                 </div>
               </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
 
-              <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-2">
-                  Budget per sqft: <span className="text-accent">AED {budget}</span>
-                </label>
-                <input
-                  type="range"
-                  min="50"
-                  max="800"
-                  step="10"
-                  value={budget}
-                  onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-full accent-burnt-orange"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground font-body mt-1">
-                  <span>AED 50</span><span>AED 800</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-4 border-t border-border">
-        <button
-          onClick={handleBack}
-          disabled={currentStep === 1}
-          className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg font-body font-semibold text-sm transition-all ${
-            currentStep === 1
-              ? "text-muted-foreground opacity-50 cursor-not-allowed"
-              : "text-foreground hover:bg-secondary"
-          }`}
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-
-        {currentStep < 5 ? (
+        {/* Navigation */}
+        <div className="flex items-center justify-between px-6 md:px-8 py-4 border-t border-border bg-muted/30">
           <button
-            onClick={handleNext}
-            disabled={!canNext()}
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-body font-bold text-sm transition-all ${
-              canNext()
-                ? "gradient-accent text-accent-foreground hover:opacity-90 shadow-lg"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
+            onClick={handleBack}
+            disabled={currentStep === 1}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-body font-semibold text-sm transition-all ${
+              currentStep === 1
+                ? "text-muted-foreground opacity-40 cursor-not-allowed"
+                : "text-foreground hover:bg-secondary"
             }`}
           >
-            Next <ArrowRight className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" /> Back
           </button>
-        ) : (
-          <button
-            onClick={handleCalculate}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-body font-bold text-sm gradient-accent text-accent-foreground hover:opacity-90 shadow-lg transition-all"
-          >
-            <CalcIcon className="w-4 h-4" /> Calculate Estimate
-          </button>
-        )}
+
+          <div className="text-xs font-body text-muted-foreground">
+            Step {currentStep} of 5
+          </div>
+
+          {currentStep < 5 ? (
+            <button
+              onClick={handleNext}
+              disabled={!canNext()}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-body font-bold text-sm transition-all ${
+                canNext()
+                  ? "gradient-accent text-accent-foreground hover:opacity-90 shadow-lg"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              }`}
+            >
+              Next <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleCalculate}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-body font-bold text-sm gradient-accent text-accent-foreground hover:opacity-90 shadow-lg transition-all"
+            >
+              <CalcIcon className="w-4 h-4" /> Get Estimate
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
