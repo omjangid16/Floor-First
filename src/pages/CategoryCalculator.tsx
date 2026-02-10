@@ -332,7 +332,7 @@ const CategoryCalculator = () => {
               {/* Primary value with +/- */}
               <div className="flex items-center justify-center gap-5">
                 <button onClick={() => adjustArea(unit === "sqm" ? -5 : -50)}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors active:scale-95">
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
                   <Minus className="w-5 h-5 text-foreground" />
                 </button>
                 <div className="flex items-start justify-center gap-1 min-w-[140px]">
@@ -349,13 +349,13 @@ const CategoryCalculator = () => {
                   </span>
                 </div>
                 <button onClick={() => adjustArea(unit === "sqm" ? 5 : 50)}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors active:scale-95">
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
                   <Plus className="w-5 h-5 text-foreground" />
                 </button>
               </div>
 
               {/* Slider */}
-              <div className="mt-8 px-1">
+              <div className="mt-8 px-1" style={{ touchAction: "pan-y" }}>
                 <input
                   type="range"
                   min={unit === "sqm" ? 5 : 50}
@@ -365,6 +365,7 @@ const CategoryCalculator = () => {
                   onChange={(e) => setArea(Number(e.target.value))}
                   className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
                   style={{
+                    touchAction: "none",
                     background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${
                       ((area - (unit === "sqm" ? 5 : 50)) / ((unit === "sqm" ? 465 : 5000) - (unit === "sqm" ? 5 : 50))) * 100
                     }%, hsl(var(--muted)) ${
