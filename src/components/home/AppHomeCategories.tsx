@@ -11,10 +11,10 @@ import svcStairs from "@/assets/svc-stairs.jpg";
 import svcBathroom from "@/assets/svc-bathroom.jpg";
 
 const mainCategories = [
-  { title: "Wooden", image: catWooden, link: "/category/wood" },
-  { title: "Tiles", image: catTiles, link: "/category/tile" },
-  { title: "Carpet", image: catCarpet, link: "/category/carpet" },
-  { title: "Outdoor", image: catOutdoor, link: "/category/outdoor" },
+  { title: "Wooden", image: catWooden, link: "/calculator/wood" },
+  { title: "Tiles", image: catTiles, link: "/calculator/tile" },
+  { title: "Carpet", image: catCarpet, link: "/calculator/carpet" },
+  { title: "Outdoor", image: catOutdoor, link: "/calculator/outdoor" },
 ];
 
 const services = [
