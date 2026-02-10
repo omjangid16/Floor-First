@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Calculator as CalcIcon, Home, Layers, Palette, Crown, Ruler } from "lucide-react";
+import { ArrowRight, ArrowLeft, Calculator as CalcIcon, Home, Layers, Palette, Crown, Ruler, Minus, Plus } from "lucide-react";
 import { flooringTypes } from "@/data/products";
 import { packageTiers } from "@/data/packageTiers";
 import { type FlooringDesign } from "@/data/flooringDesigns";
@@ -22,14 +22,14 @@ const typeImages: Record<string, string> = {
 };
 
 const spaceTypes = [
-  { id: "living", label: "Living Room", icon: "🛋️" },
-  { id: "bedroom", label: "Bedroom", icon: "🛏️" },
-  { id: "kitchen", label: "Kitchen", icon: "🍳" },
-  { id: "bathroom", label: "Bathroom", icon: "🚿" },
-  { id: "office", label: "Office", icon: "💼" },
-  { id: "warehouse", label: "Warehouse", icon: "🏭" },
-  { id: "hotel", label: "Hotel Lobby", icon: "🏨" },
-  { id: "gym", label: "Gym", icon: "🏋️" },
+  { id: "living", label: "Living Room", icon: Home },
+  { id: "bedroom", label: "Bedroom", icon: Home },
+  { id: "kitchen", label: "Kitchen", icon: Home },
+  { id: "bathroom", label: "Bathroom", icon: Home },
+  { id: "office", label: "Office", icon: Home },
+  { id: "warehouse", label: "Warehouse", icon: Home },
+  { id: "hotel", label: "Hotel Lobby", icon: Home },
+  { id: "gym", label: "Gym", icon: Home },
 ];
 
 const steps = [
@@ -39,6 +39,8 @@ const steps = [
   { id: 4, label: "Package", icon: <Crown className="w-4 h-4" /> },
   { id: 5, label: "Area", icon: <Ruler className="w-4 h-4" /> },
 ];
+
+const areaPresets = [100, 250, 500, 1000, 2000];
 
 export interface WizardInputs {
   spaceType: string;
@@ -61,7 +63,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   const [floorType, setFloorType] = useState("wood");
   const [selectedDesign, setSelectedDesign] = useState<FlooringDesign | null>(null);
   const [packageTier, setPackageTier] = useState("standard");
-  const [area, setArea] = useState(50);
+  const [area, setArea] = useState(500);
   const [budget, setBudget] = useState(150);
 
   const canNext = () => {
@@ -105,6 +107,9 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   const selectedFloorType = flooringTypes.find((t) => t.id === floorType);
   const selectedSpace = spaceTypes.find((s) => s.id === spaceType);
   const selectedPkg = packageTiers.find((p) => p.id === packageTier);
+
+  const sliderPct = ((area - 50) / (5000 - 50)) * 100;
+  const budgetPct = ((budget - 50) / (800 - 50)) * 100;
 
   return (
     <div className="space-y-6">
@@ -154,20 +159,23 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
                 <h3 className="font-display font-bold text-xl text-foreground mb-1">Where do you need flooring?</h3>
                 <p className="text-sm font-body text-muted-foreground mb-6">Select the space for your project.</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {spaceTypes.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setSpaceType(s.id)}
-                      className={`flex flex-col items-center gap-2 px-4 py-5 rounded-xl text-sm font-body font-semibold transition-all border-2 ${
-                        spaceType === s.id
-                          ? "border-accent bg-accent/5 text-accent shadow-md"
-                          : "border-border bg-background text-foreground hover:border-accent/40"
-                      }`}
-                    >
-                      <span className="text-2xl">{s.icon}</span>
-                      <span className="text-xs">{s.label}</span>
-                    </button>
-                  ))}
+                  {spaceTypes.map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setSpaceType(s.id)}
+                        className={`flex flex-col items-center gap-2 px-4 py-5 rounded-xl text-sm font-body font-semibold transition-all border-2 ${
+                          spaceType === s.id
+                            ? "border-accent bg-accent/5 text-accent shadow-md"
+                            : "border-border bg-background text-foreground hover:border-accent/40"
+                        }`}
+                      >
+                        <Icon className="w-6 h-6" />
+                        <span className="text-xs">{s.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -265,69 +273,113 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
               </div>
             )}
 
-            {/* Step 5: Area & Budget */}
+            {/* Step 5: Area & Budget — Premium UI */}
             {currentStep === 5 && (
-              <div className="space-y-8">
+              <div className="space-y-10">
                 <div>
                   <h3 className="font-display font-bold text-xl text-foreground mb-1">Set area & budget</h3>
                   <p className="text-sm font-body text-muted-foreground mb-6">Adjust to match your project size.</p>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-body font-semibold text-foreground">Area</label>
-                    <div className="flex items-center gap-2">
+                {/* Area */}
+                <div>
+                  <label className="text-sm font-body font-semibold text-foreground mb-4 block">Area (sqft)</label>
+                  <div className="bg-muted/30 border border-border rounded-2xl p-6">
+                    <div className="flex items-center justify-center gap-5 mb-6">
+                      <button onClick={() => setArea(Math.max(50, area - 50))}
+                        className="w-11 h-11 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                        <Minus className="w-4 h-4 text-foreground" />
+                      </button>
+                      <div className="flex items-start gap-1 min-w-[130px] justify-center">
+                        <input
+                          type="number"
+                          min={50}
+                          max={5000}
+                          value={area}
+                          onChange={(e) => setArea(Math.max(50, Math.min(5000, Number(e.target.value))))}
+                          className="w-[110px] text-center text-4xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <span className="text-sm font-medium text-muted-foreground mt-1.5">sq ft</span>
+                      </div>
+                      <button onClick={() => setArea(Math.min(5000, area + 50))}
+                        className="w-11 h-11 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                        <Plus className="w-4 h-4 text-foreground" />
+                      </button>
+                    </div>
+                    <div className="relative" style={{ touchAction: "pan-y" }}>
                       <input
-                        type="number"
-                        min={10}
+                        type="range"
+                        min={50}
                         max={5000}
+                        step={10}
                         value={area}
                         onChange={(e) => setArea(Number(e.target.value))}
-                        className="w-20 text-right px-2 py-1 rounded-lg border border-border bg-background font-body font-bold text-accent text-sm focus:ring-2 focus:ring-accent outline-none"
+                        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${sliderPct}%, hsl(var(--muted)) ${sliderPct}%, hsl(var(--muted)) 100%)`,
+                          touchAction: "none",
+                        }}
                       />
-                      <span className="text-xs font-body text-muted-foreground">sqft</span>
+                      <div className="flex justify-between mt-1.5 text-[11px] text-muted-foreground font-body">
+                        <span>50 sq ft</span><span>5,000 sq ft</span>
+                      </div>
                     </div>
-                  </div>
-                  <input
-                    type="range"
-                    min="10"
-                    max="5000"
-                    value={area}
-                    onChange={(e) => setArea(Number(e.target.value))}
-                    className="w-full accent-burnt-orange h-2 rounded-full"
-                  />
-                  <div className="flex justify-between text-[10px] text-muted-foreground font-body">
-                    <span>10 sqft</span><span>5,000 sqft</span>
+                    {/* Presets */}
+                    <div className="flex justify-center gap-2 flex-wrap mt-5">
+                      {areaPresets.map((p) => (
+                        <button key={p} onClick={() => setArea(p)}
+                          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                            area === p ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
+                          }`}>{p.toLocaleString()}</button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-body font-semibold text-foreground">Budget per sqft</label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-body text-muted-foreground">AED</span>
+                {/* Budget */}
+                <div>
+                  <label className="text-sm font-body font-semibold text-foreground mb-4 block">Budget per sqft (AED)</label>
+                  <div className="bg-muted/30 border border-border rounded-2xl p-6">
+                    <div className="flex items-center justify-center gap-5 mb-6">
+                      <button onClick={() => setBudget(Math.max(50, budget - 10))}
+                        className="w-11 h-11 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                        <Minus className="w-4 h-4 text-foreground" />
+                      </button>
+                      <div className="flex items-start gap-1 min-w-[130px] justify-center">
+                        <span className="text-sm font-medium text-muted-foreground mt-1.5">AED</span>
+                        <input
+                          type="number"
+                          min={50}
+                          max={800}
+                          step={10}
+                          value={budget}
+                          onChange={(e) => setBudget(Math.max(50, Math.min(800, Number(e.target.value))))}
+                          className="w-[90px] text-center text-4xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+                      <button onClick={() => setBudget(Math.min(800, budget + 10))}
+                        className="w-11 h-11 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                        <Plus className="w-4 h-4 text-foreground" />
+                      </button>
+                    </div>
+                    <div className="relative" style={{ touchAction: "pan-y" }}>
                       <input
-                        type="number"
+                        type="range"
                         min={50}
                         max={800}
                         step={10}
                         value={budget}
                         onChange={(e) => setBudget(Number(e.target.value))}
-                        className="w-20 text-right px-2 py-1 rounded-lg border border-border bg-background font-body font-bold text-accent text-sm focus:ring-2 focus:ring-accent outline-none"
+                        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${budgetPct}%, hsl(var(--muted)) ${budgetPct}%, hsl(var(--muted)) 100%)`,
+                          touchAction: "none",
+                        }}
                       />
+                      <div className="flex justify-between mt-1.5 text-[11px] text-muted-foreground font-body">
+                        <span>AED 50</span><span>AED 800</span>
+                      </div>
                     </div>
-                  </div>
-                  <input
-                    type="range"
-                    min="50"
-                    max="800"
-                    step="10"
-                    value={budget}
-                    onChange={(e) => setBudget(Number(e.target.value))}
-                    className="w-full accent-burnt-orange h-2 rounded-full"
-                  />
-                  <div className="flex justify-between text-[10px] text-muted-foreground font-body">
-                    <span>AED 50</span><span>AED 800</span>
                   </div>
                 </div>
               </div>

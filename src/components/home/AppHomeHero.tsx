@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { Percent, Search } from "lucide-react";
+import logo from "@/assets/floor-first-logo.png";
 
 const AppHomeHero = () => {
   return (
     <div className="px-4 pt-4 pb-2">
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-lg font-bold text-foreground">Floor First</h1>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dubai's Premium Flooring</p>
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="Floor First" className="h-8 w-auto object-contain" />
+          <div>
+            <h1 className="text-base font-bold text-foreground leading-tight">Floor First</h1>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Dubai's Premium Flooring</p>
+          </div>
         </div>
         <Link
           to="/products"
@@ -30,7 +34,7 @@ const AppHomeHero = () => {
           </div>
           <Link
             to="/products"
-            className="shrink-0 px-4 py-2 rounded-xl bg-card text-foreground text-xs font-semibold"
+            className="shrink-0 px-4 py-2 rounded-xl bg-accent text-accent-foreground text-xs font-semibold"
           >
             Shop
           </Link>
