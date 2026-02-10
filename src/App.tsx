@@ -70,8 +70,8 @@ const AppLayout = () => {
       </div>
       {/* Footer only on desktop */}
       {!isAuth && <div className="hidden lg:block"><Footer /></div>}
-      {/* Bottom nav only on non-auth pages */}
-      {!isAuth && <MobileBottomNav />}
+      {/* Bottom nav only on non-auth pages, hidden on calculator */}
+      {!isAuth && !location.pathname.startsWith("/calculator/") && <MobileBottomNav />}
     </>
   );
 };
