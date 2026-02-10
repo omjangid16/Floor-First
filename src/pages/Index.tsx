@@ -1,11 +1,11 @@
 import AppHomeHero from "@/components/home/AppHomeHero";
-import AppHomeAllCategories from "@/components/home/AppHomeAllCategories";
+import AppHomeCategories from "@/components/home/AppHomeCategories";
 import AppHomeBestSellers from "@/components/home/AppHomeBestSellers";
 import AppHomeResources from "@/components/home/AppHomeResources";
 import AppHomePromise from "@/components/home/AppHomePromise";
 import DesktopHero from "@/components/home/DesktopHero";
 import DesktopBenefits from "@/components/home/DesktopBenefits";
-import DesktopAllCategories from "@/components/home/DesktopAllCategories";
+import DesktopCategories from "@/components/home/DesktopCategories";
 import DesktopBestSellers from "@/components/home/DesktopBestSellers";
 import DesktopSpaces from "@/components/home/DesktopSpaces";
 import DesktopCTA from "@/components/home/DesktopCTA";
@@ -16,7 +16,7 @@ const Index = () => {
       {/* Mobile App Layout */}
       <div className="lg:hidden pb-4">
         <AppHomeHero />
-        <AppHomeAllCategories />
+        <AppHomeCategories />
         <AppHomeBestSellers />
         <AppHomeResources />
         <AppHomePromise />
@@ -26,7 +26,7 @@ const Index = () => {
       <div className="hidden lg:block">
         <DesktopHero />
         <DesktopBenefits />
-        <DesktopAllCategories />
+        <DesktopCategories />
         <DesktopBestSellers />
         <DesktopSpaces />
         <DesktopCTA />
