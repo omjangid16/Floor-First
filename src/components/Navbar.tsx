@@ -36,7 +36,7 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 bg-primary backdrop-blur-md border-b border-walnut-light/20">
+    <header className="hidden lg:block sticky top-0 z-50 bg-primary backdrop-blur-md border-b border-walnut-light/20">
       <div className="container-luxury flex items-center justify-between h-16 lg:h-20">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">

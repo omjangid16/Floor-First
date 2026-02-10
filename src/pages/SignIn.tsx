@@ -1,82 +1,83 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 const SignIn = () => {
   const { toast } = useToast();
-  const [show, setShow] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
+  const [phone, setPhone] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Sign In", description: "Authentication requires Lovable Cloud. Enable it to proceed." });
+    if (!phone || phone.length < 9) {
+      toast({ title: "Error", description: "Please enter a valid phone number.", variant: "destructive" });
+      return;
+    }
+    toast({ title: "OTP Sent", description: "Check your phone for the verification code." });
+    navigate("/otp-verification", { state: { phone } });
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-4">
-            <h1 className="text-2xl font-display font-bold text-foreground">FLOOR FIRST</h1>
-            <p className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase font-body">Dubai's Premium Flooring</p>
-          </Link>
-          <h2 className="text-2xl font-display font-bold text-foreground mt-6">Welcome Back</h2>
-          <p className="text-sm text-muted-foreground font-body mt-1">Sign in to your account</p>
+    <main className="min-h-screen bg-card flex flex-col px-6 pt-16 pb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-sm mx-auto flex-1 flex flex-col"
+      >
+        {/* Logo */}
+        <div className="mb-10">
+          <div className="w-14 h-14 rounded-xl bg-foreground flex items-center justify-center mb-4">
+            <span className="text-card text-lg font-bold">FF</span>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-1">
+            Log in or sign up
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your mobile number to continue
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-luxury space-y-5">
-          <div>
-            <label className="block text-sm font-body font-medium text-foreground mb-1.5">Email or Phone</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background font-body text-foreground focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-body font-medium text-foreground mb-1.5">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type={show ? "text" : "password"}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background font-body text-foreground focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
-              />
-              <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="rounded border-border accent-burnt-orange" />
-              <span className="text-xs font-body text-muted-foreground">Remember me</span>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Mobile Number
             </label>
-            <Link to="/forgot-password" className="text-xs font-body font-semibold text-accent hover:underline">
-              Forgot password?
-            </Link>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+971 XX XXX XXXX"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-border bg-background text-foreground text-base focus:border-accent focus:ring-0 outline-none transition-colors"
+              />
+            </div>
           </div>
 
-          <button type="submit" className="w-full gradient-accent text-accent-foreground py-3 rounded-xl font-body font-bold text-sm hover:opacity-90 transition-opacity shadow-lg">
-            Sign In
+          <button
+            type="submit"
+            className="w-full py-4 rounded-2xl bg-foreground text-card text-base font-semibold hover:opacity-90 transition-opacity"
+          >
+            Send OTP
           </button>
 
-          <p className="text-center text-sm font-body text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/sign-up" className="text-accent font-semibold hover:underline">Sign Up</Link>
+          <p className="text-xs text-center text-muted-foreground mt-4 leading-relaxed">
+            By continuing, you agree to our{" "}
+            <span className="text-foreground font-medium">Terms of Service</span> and{" "}
+            <span className="text-foreground font-medium">Privacy Policy</span>
           </p>
+
+          {/* Skip */}
+          <div className="mt-auto pt-8 text-center">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Continue as guest
+            </Link>
+          </div>
         </form>
-      </div>
+      </motion.div>
     </main>
   );
 };

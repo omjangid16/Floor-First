@@ -1,23 +1,17 @@
-import HeroSection from "@/components/home/HeroSection";
-import PromoBanner from "@/components/home/PromoBanner";
-import CategoryShowcase from "@/components/home/CategoryShowcase";
-import BestSellers from "@/components/home/BestSellers";
-import SpaceShowcase from "@/components/home/SpaceShowcase";
-import StatsSection from "@/components/home/StatsSection";
-import InspirationPreview from "@/components/home/InspirationPreview";
-import ContactSection from "@/components/home/ContactSection";
+import AppHomeHero from "@/components/home/AppHomeHero";
+import AppHomeCategories from "@/components/home/AppHomeCategories";
+import AppHomeBestSellers from "@/components/home/AppHomeBestSellers";
+import AppHomeResources from "@/components/home/AppHomeResources";
+import AppHomePromise from "@/components/home/AppHomePromise";
 
 const Index = () => {
   return (
-    <main>
-      <HeroSection />
-      <PromoBanner />
-      <CategoryShowcase />
-      <BestSellers />
-      <SpaceShowcase />
-      <StatsSection />
-      <InspirationPreview />
-      <ContactSection />
+    <main className="bg-background min-h-screen pb-4">
+      <AppHomeHero />
+      <AppHomeCategories />
+      <AppHomeBestSellers />
+      <AppHomeResources />
+      <AppHomePromise />
     </main>
   );
 };
