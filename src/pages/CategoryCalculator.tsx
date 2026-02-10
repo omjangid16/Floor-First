@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,6 +27,120 @@ const gradeBarStyles: Record<string, { color: string; width: string }> = {
   standard: { color: "bg-accent/60", width: "w-4/5" },
   premium: { color: "bg-accent", width: "w-[90%]" },
   luxury: { color: "bg-accent", width: "w-full" },
+};
+
+/* ─── Custom touch-optimized Area Slider ─── */
+const TOUCH_SLOP = 10; // px threshold before deciding direction
+
+interface AreaSliderProps {
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (v: number) => void;
+  minLabel: string;
+  maxLabel: string;
+}
+
+const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: AreaSliderProps) => {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const directionLocked = useRef<"h" | "v" | null>(null);
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const pct = ((value - min) / (max - min)) * 100;
+
+  const valueFromX = useCallback((clientX: number) => {
+    const track = trackRef.current;
+    if (!track) return value;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const raw = min + ratio * (max - min);
+    return Math.round(raw / step) * step;
+  }, [min, max, step, value]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    startPos.current = { x: t.clientX, y: t.clientY };
+    directionLocked.current = null;
+    dragging.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - startPos.current.x);
+    const dy = Math.abs(t.clientY - startPos.current.y);
+
+    if (!directionLocked.current) {
+      if (dx < TOUCH_SLOP && dy < TOUCH_SLOP) return; // not enough movement
+      directionLocked.current = dx > dy ? "h" : "v";
+    }
+
+    if (directionLocked.current === "v") return; // let page scroll
+
+    // Horizontal drag — control slider
+    e.preventDefault();
+    dragging.current = true;
+    onChange(valueFromX(t.clientX));
+  }, [onChange, valueFromX]);
+
+  const onTouchEnd = useCallback(() => {
+    dragging.current = false;
+    directionLocked.current = null;
+  }, []);
+
+  // Mouse support for desktop
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    onChange(valueFromX(e.clientX));
+    dragging.current = true;
+
+    const onMove = (ev: MouseEvent) => {
+      if (dragging.current) onChange(valueFromX(ev.clientX));
+    };
+    const onUp = () => {
+      dragging.current = false;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [onChange, valueFromX]);
+
+  return (
+    <div className="mt-8 px-1" style={{ touchAction: "pan-y" }}>
+      {/* Track */}
+      <div
+        ref={trackRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
+        className="relative w-full h-11 flex items-center cursor-pointer"
+        role="slider"
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
+      >
+        {/* Track background */}
+        <div className="absolute left-0 right-0 h-2 rounded-full bg-muted" />
+        {/* Filled track */}
+        <div
+          className="absolute left-0 h-2 rounded-full bg-accent"
+          style={{ width: `${pct}%` }}
+        />
+        {/* Thumb */}
+        <div
+          className="absolute w-5 h-5 rounded-full bg-accent shadow-md -translate-x-1/2"
+          style={{ left: `${pct}%` }}
+        />
+      </div>
+      <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
+        <span>{minLabel}</span>
+        <span>{maxLabel}</span>
+      </div>
+    </div>
+  );
 };
 
 const CategoryCalculator = () => {
@@ -354,30 +468,16 @@ const CategoryCalculator = () => {
                 </button>
               </div>
 
-              {/* Slider */}
-              <div className="mt-8 px-1" style={{ touchAction: "pan-y" }}>
-                <input
-                  type="range"
-                  min={unit === "sqm" ? 5 : 50}
-                  max={unit === "sqm" ? 465 : 5000}
-                  step={unit === "sqm" ? 1 : 10}
-                  value={area}
-                  onChange={(e) => setArea(Number(e.target.value))}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
-                  style={{
-                    touchAction: "none",
-                    background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${
-                      ((area - (unit === "sqm" ? 5 : 50)) / ((unit === "sqm" ? 465 : 5000) - (unit === "sqm" ? 5 : 50))) * 100
-                    }%, hsl(var(--muted)) ${
-                      ((area - (unit === "sqm" ? 5 : 50)) / ((unit === "sqm" ? 465 : 5000) - (unit === "sqm" ? 5 : 50))) * 100
-                    }%, hsl(var(--muted)) 100%)`
-                  }}
-                />
-                <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
-                  <span>{unit === "sqm" ? "5 sq m" : "50 sq ft"}</span>
-                  <span>{unit === "sqm" ? "465 sq m" : "5,000 sq ft"}</span>
-                </div>
-              </div>
+              {/* Slider — custom touch-optimized */}
+              <AreaSlider
+                min={unit === "sqm" ? 5 : 50}
+                max={unit === "sqm" ? 465 : 5000}
+                step={unit === "sqm" ? 1 : 10}
+                value={area}
+                onChange={setArea}
+                minLabel={unit === "sqm" ? "5 sq m" : "50 sq ft"}
+                maxLabel={unit === "sqm" ? "465 sq m" : "5,000 sq ft"}
+              />
             </div>
 
             {/* Quick presets */}

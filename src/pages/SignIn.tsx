@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const SignIn = () => {
   const { toast } = useToast();
@@ -28,9 +29,7 @@ const SignIn = () => {
       >
         {/* Logo */}
         <div className="mb-10">
-          <div className="w-14 h-14 rounded-xl bg-foreground flex items-center justify-center mb-4">
-            <span className="text-card text-lg font-bold">FF</span>
-          </div>
+          <img src={floorFirstLogo} alt="Floor First" className="h-10 w-auto object-contain mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-1">
             Log in or sign up
           </h1>

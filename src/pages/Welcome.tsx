@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const Welcome = () => {
   return (
@@ -11,16 +12,8 @@ const Welcome = () => {
         className="w-full max-w-sm text-center"
       >
         {/* Logo */}
-        <div className="mb-12">
-          <div className="w-20 h-20 rounded-2xl bg-foreground mx-auto flex items-center justify-center mb-6">
-            <span className="text-card text-2xl font-bold tracking-tight">FF</span>
-          </div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
-            Floor First
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">
-            Dubai's Premium Flooring
-          </p>
+        <div className="mb-12 flex flex-col items-center">
+          <img src={floorFirstLogo} alt="Floor First" className="h-16 w-auto object-contain mb-4" />
         </div>
 
         {/* Welcome Text */}
