@@ -13,11 +13,15 @@ import { getCategoryShades, type CategoryShade } from "@/data/categoryShades";
 const SQFT_PRESETS = [100, 250, 500, 1000, 2000];
 const SQFT_MIN = 50;
 const SQFT_MAX = 5000;
-const SQFT_STEP = 10;
+const SQFT_STEP = 50; // matches +/- button delta
 const SQM_MIN = 5;
 const SQM_MAX = 465;
-const SQM_STEP = 1;
+const SQM_STEP = 5; // matches +/- button delta
 const CONVERSION = 10.764;
+
+/* Convert sqft↔sqm helpers */
+const sqftToSqm = (sqft: number) => Math.round(sqft / CONVERSION);
+const sqmToSqft = (sqm: number) => Math.round(sqm * CONVERSION);
 
 const stepsMeta = [
   { id: 1, label: "Designs" },
@@ -144,12 +148,8 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
   );
 };
 
-/* ─── Helper: clamp area to valid range ─── */
-const clampArea = (val: number, unit: "sqft" | "sqm") => {
-  const min = unit === "sqm" ? SQM_MIN : SQFT_MIN;
-  const max = unit === "sqm" ? SQM_MAX : SQFT_MAX;
-  return Math.max(min, Math.min(max, Math.round(val)));
-};
+/* ─── Helper: clamp sqft to valid range ─── */
+const clampSqft = (val: number) => Math.max(SQFT_MIN, Math.min(SQFT_MAX, Math.round(val)));
 
 const CategoryCalculator = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -161,7 +161,8 @@ const CategoryCalculator = () => {
   const [step, setStep] = useState(1);
   const [selectedShade, setSelectedShade] = useState("");
   const [packageTier, setPackageTier] = useState("standard");
-  const [area, setArea] = useState(500);
+  // SINGLE SOURCE OF TRUTH: always stored in sqft
+  const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [scheduleData, setScheduleData] = useState({
@@ -180,7 +181,8 @@ const CategoryCalculator = () => {
     );
   }
 
-  const areaInSqft = unit === "sqm" ? Math.round(area * CONVERSION) : area;
+  // Derived display value — never stored, always computed
+  const displayArea = unit === "sqm" ? sqftToSqm(areaSqft) : areaSqft;
   const shade = shades.find((s) => s.id === selectedShade);
 
   const toggleOption = (id: string) => {
@@ -193,7 +195,7 @@ const CategoryCalculator = () => {
     switch (step) {
       case 1: return !!selectedShade;
       case 2: return !!packageTier;
-      case 3: return area > 0;
+      case 3: return areaSqft > 0;
       case 4: return true;
       case 5: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "";
       default: return false;
@@ -206,20 +208,22 @@ const CategoryCalculator = () => {
     else setStep((s) => s - 1);
   };
 
-  /* ── Area helpers: always clamp to valid range ── */
-  const setClampedArea = (val: number) => setArea(clampArea(val, unit));
-
-  const adjustArea = (delta: number) => {
-    setArea((prev) => clampArea(prev + delta, unit));
+  /* ── Area helpers: all write to areaSqft ── */
+  const setAreaFromDisplay = (displayVal: number) => {
+    const sqft = unit === "sqm" ? sqmToSqft(displayVal) : displayVal;
+    setAreaSqft(clampSqft(sqft));
   };
 
+  const adjustArea = (delta: number) => {
+    // delta is in display units
+    const newDisplay = displayArea + delta;
+    const sqft = unit === "sqm" ? sqmToSqft(newDisplay) : newDisplay;
+    setAreaSqft(clampSqft(sqft));
+  };
+
+  // Unit switch: no conversion needed — areaSqft stays the same!
   const handleUnitSwitch = (newUnit: "sqft" | "sqm") => {
-    if (newUnit === unit) return;
-    const converted = newUnit === "sqm"
-      ? Math.round(area / CONVERSION)
-      : Math.round(area * CONVERSION);
     setUnit(newUnit);
-    setArea(clampArea(converted, newUnit));
   };
 
   /* ── Schedule field helpers ── */
@@ -245,12 +249,12 @@ const CategoryCalculator = () => {
   };
   const basePrice = basePrices[categoryId!] || 150;
   const pkg = packageTiers.find((p) => p.id === packageTier);
-  const materialCost = areaInSqft * basePrice * (pkg?.priceMultiplier || 1);
-  const installCost = selectedOptions.includes("standard-install") ? areaInSqft * 15 : 0;
+  const materialCost = areaSqft * basePrice * (pkg?.priceMultiplier || 1);
+  const installCost = selectedOptions.includes("standard-install") ? areaSqft * 15 : 0;
   const optionsCost = selectedOptions.reduce((sum, id) => {
     if (id === "standard-install") return sum;
     const opt = config.additionalOptions.find((o) => o.id === id);
-    return sum + (opt ? opt.pricePerSqft * areaInSqft : 0);
+    return sum + (opt ? opt.pricePerSqft * areaSqft : 0);
   }, 0);
   const subtotal = materialCost + installCost + optionsCost;
   const vat = Math.round(subtotal * 0.05);
@@ -485,12 +489,12 @@ const CategoryCalculator = () => {
                     type="number"
                     min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
                     max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
-                    value={area}
+                    value={displayArea}
                     onChange={(e) => {
                       const raw = Number(e.target.value);
-                      if (!isNaN(raw)) setArea(raw);
+                      if (!isNaN(raw)) setAreaFromDisplay(raw);
                     }}
-                    onBlur={() => setClampedArea(area)}
+                    onBlur={() => setAreaFromDisplay(displayArea)}
                     className="w-[120px] text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="text-base font-medium text-muted-foreground mt-2 shrink-0">
@@ -508,8 +512,8 @@ const CategoryCalculator = () => {
                 min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
                 max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
                 step={unit === "sqm" ? SQM_STEP : SQFT_STEP}
-                value={area}
-                onChange={setClampedArea}
+                value={displayArea}
+                onChange={setAreaFromDisplay}
                 minLabel={unit === "sqm" ? `${SQM_MIN} sq m` : `${SQFT_MIN} sq ft`}
                 maxLabel={unit === "sqm" ? `${SQM_MAX} sq m` : `${SQFT_MAX.toLocaleString()} sq ft`}
               />
@@ -518,10 +522,10 @@ const CategoryCalculator = () => {
             {/* Quick presets */}
             <div className="flex justify-center gap-2 flex-wrap mt-8">
               {SQFT_PRESETS.map((p) => {
-                const displayVal = unit === "sqm" ? Math.round(p / CONVERSION) : p;
-                const isSelected = area === displayVal;
+                const displayVal = unit === "sqm" ? sqftToSqm(p) : p;
+                const isSelected = areaSqft === p;
                 return (
-                  <button key={p} onClick={() => setClampedArea(displayVal)}
+                  <button key={p} onClick={() => setAreaSqft(p)}
                     className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                       isSelected ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
                     }`}>{displayVal.toLocaleString()}</button>
@@ -659,7 +663,7 @@ const CategoryCalculator = () => {
                 <div><span className="text-muted-foreground">Category:</span> <span className="font-bold text-foreground">{config.categoryName}</span></div>
                 {shade && <div><span className="text-muted-foreground">Design:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
                 <div><span className="text-muted-foreground">Grade:</span> <span className="font-bold text-foreground">{pkg?.name}</span></div>
-                <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaInSqft} sqft</span></div>
+                <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaSqft} sqft</span></div>
                 <div className="col-span-2"><span className="text-muted-foreground">Estimate:</span> <span className="font-bold text-accent text-base">AED {totalEstimate.toLocaleString()}</span></div>
               </div>
             </div>
