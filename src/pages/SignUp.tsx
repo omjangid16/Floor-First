@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Phone, Lock, AtSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const SignUp = () => {
   const { toast } = useToast();
@@ -29,8 +30,7 @@ const SignUp = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-4">
-            <h1 className="text-2xl font-display font-bold text-foreground">FLOOR FIRST</h1>
-            <p className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase font-body">Dubai's Premium Flooring</p>
+            <img src={floorFirstLogo} alt="Floor First" className="h-10 w-auto object-contain mx-auto" />
           </Link>
           <h2 className="text-2xl font-display font-bold text-foreground mt-6">Create Account</h2>
           <p className="text-sm text-muted-foreground font-body mt-1">Join the premium flooring experience</p>

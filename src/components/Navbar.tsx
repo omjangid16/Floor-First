@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, ChevronDown, User, Search, ArrowRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
+import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -42,18 +43,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-8 xl:px-12">
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-foreground flex items-center justify-center">
-              <span className="text-card text-sm font-extrabold">FF</span>
-            </div>
-            <div>
-              <span className="text-base font-bold text-foreground tracking-tight block leading-tight">
-                Floor First
-              </span>
-              <span className="text-[9px] text-muted-foreground tracking-[0.15em] uppercase leading-none">
-                Premium Flooring
-              </span>
-            </div>
+          <Link to="/" className="flex items-center shrink-0">
+            <img src={floorFirstLogo} alt="Floor First" className="h-9 w-auto object-contain" />
           </Link>
 
           {/* Center Nav */}

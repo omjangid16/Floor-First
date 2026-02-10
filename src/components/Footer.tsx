@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
+import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const footerLinks = {
   Products: [
@@ -33,14 +34,8 @@ const Footer = () => {
         <div className="grid grid-cols-5 gap-10">
           {/* Brand */}
           <div className="col-span-2">
-            <Link to="/" className="inline-flex items-center gap-2 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center">
-                <span className="text-foreground text-xs font-extrabold">FF</span>
-              </div>
-              <div>
-                <span className="text-sm font-bold text-card block leading-tight">Floor First</span>
-                <span className="text-[9px] text-card/40 tracking-[0.15em] uppercase">Premium Flooring</span>
-              </div>
+            <Link to="/" className="inline-block mb-5">
+              <img src={floorFirstLogo} alt="Floor First" className="h-8 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="text-sm text-card/50 leading-relaxed mb-6 max-w-xs">
               Premium flooring solutions for residential, commercial, and industrial spaces across the UAE.
