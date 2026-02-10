@@ -300,7 +300,7 @@ const CategoryCalculator = () => {
           </div>
         )}
 
-        {/* STEP 3: Area - Clean numeric input */}
+        {/* STEP 3: Area */}
         {step === 3 && (
           <div>
             <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
@@ -311,46 +311,87 @@ const CategoryCalculator = () => {
             </p>
 
             {/* Unit toggle */}
-            <div className="flex justify-center gap-1 mb-8">
-              {(["sqft", "sqm"] as const).map((u) => (
-                <button key={u} onClick={() => setUnit(u)}
-                  className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                    unit === u ? "bg-[hsl(var(--foreground))] text-background" : "bg-muted text-muted-foreground"
-                  }`}>{u === "sqft" ? "Sq Ft" : "Sq Meter"}</button>
-              ))}
-            </div>
-
-            {/* Numeric input with +/- */}
-            <div className="bg-card border border-border rounded-2xl p-8 mb-6 max-w-md mx-auto">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <button onClick={() => adjustArea(-50)}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
-                  <Minus className="w-5 h-5 text-foreground" />
-                </button>
-                <div className="text-center">
-                  <input type="number" min={10} max={10000} value={area}
-                    onChange={(e) => setArea(Math.max(0, Number(e.target.value)))}
-                    className="w-28 text-center text-4xl font-bold text-foreground bg-transparent border-none outline-none" />
-                  <p className="text-sm text-muted-foreground mt-1">{unit === "sqft" ? "sq ft" : "sq m"}</p>
-                </div>
-                <button onClick={() => adjustArea(50)}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
-                  <Plus className="w-5 h-5 text-foreground" />
-                </button>
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex bg-muted rounded-xl p-1">
+                {(["sqft", "sqm"] as const).map((u) => (
+                  <button key={u} onClick={() => {
+                    if (u !== unit) {
+                      setArea(u === "sqm" ? Math.round(area / 10.764) : Math.round(area * 10.764));
+                      setUnit(u);
+                    }
+                  }}
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                      unit === u ? "bg-[hsl(var(--foreground))] text-background shadow-sm" : "text-muted-foreground"
+                    }`}>{u === "sqft" ? "Sq Ft" : "Sq Meter"}</button>
+                ))}
               </div>
             </div>
 
-            {/* Quick chips */}
-            <div className="flex justify-center gap-2 flex-wrap">
-              {areaPresets.map((p) => (
-                <button key={p} onClick={() => setArea(p)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    area === p ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
-                  }`}>{p.toLocaleString()}</button>
-              ))}
+            {/* Value display card */}
+            <div className="bg-card border border-border rounded-2xl p-8 max-w-md mx-auto">
+              {/* Primary value with +/- */}
+              <div className="flex items-center justify-center gap-5">
+                <button onClick={() => adjustArea(unit === "sqm" ? -5 : -50)}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors active:scale-95">
+                  <Minus className="w-5 h-5 text-foreground" />
+                </button>
+                <div className="flex items-start justify-center gap-1 min-w-[140px]">
+                  <input
+                    type="number"
+                    min={1}
+                    max={unit === "sqm" ? 930 : 10000}
+                    value={area}
+                    onChange={(e) => setArea(Math.max(0, Number(e.target.value)))}
+                    className="w-[120px] text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-base font-medium text-muted-foreground mt-2 shrink-0">
+                    {unit === "sqft" ? "sq ft" : "sq m"}
+                  </span>
+                </div>
+                <button onClick={() => adjustArea(unit === "sqm" ? 5 : 50)}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors active:scale-95">
+                  <Plus className="w-5 h-5 text-foreground" />
+                </button>
+              </div>
+
+              {/* Slider */}
+              <div className="mt-8 px-1">
+                <input
+                  type="range"
+                  min={unit === "sqm" ? 5 : 50}
+                  max={unit === "sqm" ? 465 : 5000}
+                  step={unit === "sqm" ? 1 : 10}
+                  value={area}
+                  onChange={(e) => setArea(Number(e.target.value))}
+                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${
+                      ((area - (unit === "sqm" ? 5 : 50)) / ((unit === "sqm" ? 465 : 5000) - (unit === "sqm" ? 5 : 50))) * 100
+                    }%, hsl(var(--muted)) ${
+                      ((area - (unit === "sqm" ? 5 : 50)) / ((unit === "sqm" ? 465 : 5000) - (unit === "sqm" ? 5 : 50))) * 100
+                    }%, hsl(var(--muted)) 100%)`
+                  }}
+                />
+                <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
+                  <span>{unit === "sqm" ? "5 sq m" : "50 sq ft"}</span>
+                  <span>{unit === "sqm" ? "465 sq m" : "5,000 sq ft"}</span>
+                </div>
+              </div>
             </div>
 
-            <MobileEstimateBar />
+            {/* Quick presets */}
+            <div className="flex justify-center gap-2 flex-wrap mt-8">
+              {areaPresets.map((p) => {
+                const displayVal = unit === "sqm" ? Math.round(p / 10.764) : p;
+                const isSelected = area === displayVal;
+                return (
+                  <button key={p} onClick={() => setArea(displayVal)}
+                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                      isSelected ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
+                    }`}>{displayVal.toLocaleString()}</button>
+                );
+              })}
+            </div>
           </div>
         )}
 
