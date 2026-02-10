@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calculator } from "lucide-react";
 import { categories } from "@/data/categories";
 
 // Reuse existing type images as subcategory placeholders
@@ -64,6 +64,27 @@ const CategoryPage = () => {
         </div>
         <h1 className="text-3xl font-bold text-foreground tracking-tight">{pageTitle}</h1>
       </div>
+
+      {/* Calculator CTA */}
+      {!isAll && filteredCategories[0] && (
+        <div className="px-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 mb-4">
+          <Link
+            to={`/calculator/${categoryId}`}
+            className="flex items-center justify-between bg-accent/5 border border-accent/20 rounded-xl px-4 py-3 hover:bg-accent/10 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center">
+                <Calculator className="w-4 h-4 text-accent" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground">Calculate Cost</p>
+                <p className="text-[10px] text-muted-foreground">Get instant estimate for {filteredCategories[0].name}</p>
+              </div>
+            </div>
+            <ArrowLeft className="w-4 h-4 text-accent rotate-180" />
+          </Link>
+        </div>
+      )}
 
       {/* Content */}
       <div className="px-4 lg:px-0 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 pb-8">
