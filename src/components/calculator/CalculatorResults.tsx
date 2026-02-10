@@ -64,14 +64,13 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
           {[
             { label: "Space", value: spaceType },
             { label: "Type", value: floorTypeName },
-            { label: "Package", value: packageName, icon: pkg?.icon },
+            { label: "Package", value: packageName },
             { label: "Area", value: `${area} sqft` },
             { label: "Budget", value: `AED ${budget}/sqft` },
           ].map((item) => (
             <div key={item.label} className="bg-secondary rounded-lg px-3 py-2">
               <p className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">{item.label}</p>
               <p className="text-sm font-body font-semibold text-foreground flex items-center gap-1">
-                {item.icon && <span>{item.icon}</span>}
                 {item.value}
               </p>
             </div>
@@ -131,7 +130,7 @@ const CalculatorResults = ({ inputs, onBack }: CalculatorResultsProps) => {
         <div className="bg-card rounded-xl border border-border p-5 shadow-luxury">
           <TrendingUp className="w-6 h-6 text-accent mb-2" />
           <p className="text-sm font-body text-muted-foreground">Package Tier</p>
-          <p className="font-display font-bold text-foreground">{pkg?.icon} {packageName}</p>
+          <p className="font-display font-bold text-foreground">{packageName}</p>
         </div>
       </div>
 

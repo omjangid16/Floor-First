@@ -3,7 +3,7 @@ export interface PackageTier {
   name: string;
   description: string;
   priceMultiplier: number;
-  icon: string;
+  badge: string;
   features: string[];
 }
 
@@ -11,33 +11,33 @@ export const packageTiers: PackageTier[] = [
   {
     id: "economy",
     name: "Economy",
-    description: "Budget-friendly options with quality essentials",
+    description: "Budget-friendly option",
     priceMultiplier: 0.7,
-    icon: "💰",
-    features: ["Basic materials", "Standard finish", "1-year warranty", "Self-installation guide"],
+    badge: "1x base price",
+    features: ["Basic materials", "Standard finish", "1-year warranty"],
   },
   {
     id: "standard",
     name: "Standard",
-    description: "Balanced quality and value for everyday spaces",
+    description: "Quality meets value",
     priceMultiplier: 1.0,
-    icon: "⭐",
-    features: ["Quality materials", "Professional finish", "5-year warranty", "Basic installation included"],
+    badge: "1.5x base price",
+    features: ["Quality materials", "Professional finish", "5-year warranty"],
   },
   {
     id: "premium",
     name: "Premium",
-    description: "Superior materials and craftsmanship",
+    description: "Superior materials",
     priceMultiplier: 1.4,
-    icon: "💎",
-    features: ["Premium materials", "Designer finish", "15-year warranty", "Full installation included", "Underlay included"],
+    badge: "2.2x base price",
+    features: ["Premium materials", "Designer finish", "15-year warranty"],
   },
   {
     id: "luxury",
     name: "Luxury",
-    description: "The finest materials with white-glove service",
+    description: "Top-tier excellence",
     priceMultiplier: 2.0,
-    icon: "👑",
-    features: ["Imported luxury materials", "Bespoke finishing", "Lifetime warranty", "White-glove installation", "Premium underlay & skirting", "Post-install maintenance"],
+    badge: "3.5x base price",
+    features: ["Imported luxury materials", "Bespoke finishing", "Lifetime warranty"],
   },
 ];

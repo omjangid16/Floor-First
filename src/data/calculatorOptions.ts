@@ -2,119 +2,81 @@ export interface AdditionalOption {
   id: string;
   label: string;
   description: string;
-  pricePerSqft: number; // AED per sqft
-  icon: string;
+  pricePerSqft: number;
 }
 
 export interface CategoryCalculatorConfig {
   categoryId: string;
   categoryName: string;
-  shadeLabel: string; // e.g. "Shade", "Texture", "Finish"
+  shadeLabel: string;
   additionalOptions: AdditionalOption[];
 }
 
 const commonOptions: AdditionalOption[] = [
-  { id: "standard-install", label: "Standard Installation", description: "Professional floor installation", pricePerSqft: 15, icon: "🔧" },
-  { id: "old-floor-removal", label: "Old Floor Removal", description: "Remove and dispose of existing flooring", pricePerSqft: 8, icon: "🗑️" },
-  { id: "furniture-movement", label: "Furniture Movement", description: "Move furniture before and after installation", pricePerSqft: 5, icon: "🪑" },
+  { id: "standard-install", label: "Standard Installation", description: "Professional floor installation by certified experts", pricePerSqft: 15 },
+  { id: "old-floor-removal", label: "Old Floor Removal", description: "Remove and dispose of existing flooring", pricePerSqft: 8 },
+  { id: "furniture-movement", label: "Furniture Movement", description: "Move furniture before and after installation", pricePerSqft: 5 },
 ];
 
 export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig> = {
   vinyl: {
     categoryId: "vinyl",
     categoryName: "SPC / LVT",
-    shadeLabel: "Shade",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "underlay", label: "Underlay", description: "Sound & moisture underlay for vinyl", pricePerSqft: 6, icon: "🧱" },
-      { id: "skirting", label: "Skirting", description: "PVC skirting to match flooring", pricePerSqft: 4, icon: "📐" },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3, icon: "🚪" },
+      { id: "skirting", label: "Skirting", description: "PVC skirting to match flooring", pricePerSqft: 4 },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3 },
     ],
   },
   wood: {
     categoryId: "wood",
     categoryName: "Wooden Flooring",
-    shadeLabel: "Shade",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "underlay", label: "Premium Underlay", description: "Acoustic & thermal underlay for wood", pricePerSqft: 8, icon: "🧱" },
-      { id: "skirting", label: "Wood Skirting", description: "Solid wood skirting boards", pricePerSqft: 6, icon: "📐" },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3, icon: "🚪" },
-      { id: "staining", label: "Custom Staining", description: "Apply custom stain to match your style", pricePerSqft: 10, icon: "🎨" },
+      { id: "skirting", label: "Wood Skirting", description: "Solid wood skirting boards", pricePerSqft: 6 },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3 },
     ],
   },
   tile: {
     categoryId: "tile",
     categoryName: "Tile Flooring",
-    shadeLabel: "Design / Finish",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "waterproofing", label: "Waterproofing", description: "Waterproof membrane under tiles", pricePerSqft: 7, icon: "💧" },
-      { id: "grouting", label: "Premium Grouting", description: "Epoxy grout for lasting finish", pricePerSqft: 4, icon: "🧽" },
-      { id: "leveling", label: "Floor Leveling", description: "Self-leveling compound for even surface", pricePerSqft: 6, icon: "📏" },
+      { id: "waterproofing", label: "Waterproofing", description: "Waterproof membrane under tiles", pricePerSqft: 7 },
+      { id: "grouting", label: "Premium Grouting", description: "Epoxy grout for lasting finish", pricePerSqft: 4 },
     ],
   },
   outdoor: {
     categoryId: "outdoor",
-    categoryName: "Outdoor & Deck Flooring",
-    shadeLabel: "Shade",
+    categoryName: "Outdoor & Deck",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "drainage", label: "Drainage System", description: "Proper drainage setup for outdoor areas", pricePerSqft: 10, icon: "🌧️" },
-      { id: "anti-slip", label: "Anti-Slip Coating", description: "Safety coating for wet areas", pricePerSqft: 5, icon: "🦶" },
-      { id: "edging", label: "Edge Trim & Border", description: "Decorative edging and border profiles", pricePerSqft: 4, icon: "📐" },
+      { id: "drainage", label: "Drainage System", description: "Proper drainage setup for outdoor areas", pricePerSqft: 10 },
+      { id: "anti-slip", label: "Anti-Slip Coating", description: "Safety coating for wet areas", pricePerSqft: 5 },
     ],
   },
   carpet: {
     categoryId: "carpet",
     categoryName: "Carpet Flooring",
-    shadeLabel: "Texture / Color",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "underlay-carpet", label: "Carpet Underlay", description: "Cushioned underlay for comfort", pricePerSqft: 5, icon: "🧱" },
-      { id: "stain-guard", label: "Stain Guard", description: "Protective stain-resistant treatment", pricePerSqft: 4, icon: "🛡️" },
-      { id: "binding", label: "Edge Binding", description: "Professional edge binding for rugs", pricePerSqft: 3, icon: "✂️" },
+      { id: "underlay-carpet", label: "Carpet Underlay", description: "Cushioned underlay for comfort", pricePerSqft: 5 },
+      { id: "stain-guard", label: "Stain Guard", description: "Protective stain-resistant treatment", pricePerSqft: 4 },
     ],
   },
   stone: {
     categoryId: "stone",
     categoryName: "Stone Flooring",
-    shadeLabel: "Shade",
+    shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "sealing", label: "Stone Sealing", description: "Protective sealant for natural stone", pricePerSqft: 8, icon: "🛡️" },
-      { id: "polishing", label: "Polishing & Honing", description: "Professional stone polish finish", pricePerSqft: 12, icon: "✨" },
-      { id: "leveling", label: "Floor Leveling", description: "Self-leveling for heavy stone", pricePerSqft: 6, icon: "📏" },
-    ],
-  },
-  concrete: {
-    categoryId: "concrete",
-    categoryName: "Concrete Flooring",
-    shadeLabel: "Finish",
-    additionalOptions: [
-      ...commonOptions,
-      { id: "polishing", label: "Concrete Polishing", description: "Diamond polishing for smooth finish", pricePerSqft: 10, icon: "✨" },
-      { id: "sealing", label: "Surface Sealing", description: "Protective seal for concrete floors", pricePerSqft: 6, icon: "🛡️" },
-    ],
-  },
-  resin: {
-    categoryId: "resin",
-    categoryName: "Resin & Industrial Flooring",
-    shadeLabel: "Finish",
-    additionalOptions: [
-      ...commonOptions,
-      { id: "primer", label: "Primer Coat", description: "Base primer for resin adhesion", pricePerSqft: 5, icon: "🎨" },
-      { id: "anti-static", label: "Anti-Static Coating", description: "ESD protection for sensitive areas", pricePerSqft: 8, icon: "⚡" },
-    ],
-  },
-  rubber: {
-    categoryId: "rubber",
-    categoryName: "Rubber & Sports Flooring",
-    shadeLabel: "Color",
-    additionalOptions: [
-      ...commonOptions,
-      { id: "line-marking", label: "Line Marking", description: "Court or zone line marking", pricePerSqft: 4, icon: "📏" },
-      { id: "impact-pad", label: "Impact Padding", description: "Extra shock-absorption layer", pricePerSqft: 6, icon: "🏋️" },
+      { id: "sealing", label: "Stone Sealing", description: "Protective sealant for natural stone", pricePerSqft: 8 },
+      { id: "polishing", label: "Polishing & Honing", description: "Professional stone polish finish", pricePerSqft: 12 },
     ],
   },
 };
