@@ -243,7 +243,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">{tier.icon}</span>
+                        <span className="text-2xl font-bold text-accent">{tier.name.charAt(0)}</span>
                         <div>
                           <p className={`font-display font-bold text-base ${packageTier === tier.id ? "text-accent" : "text-foreground"}`}>
                             {tier.name}

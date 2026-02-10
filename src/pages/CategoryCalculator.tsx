@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, Check, Crown, Ruler, Settings,
-  CheckCircle2, Layers, Shield, Truck, Award, Calendar, Phone
+  ArrowLeft, ArrowRight, Check, Minus, Plus,
+  CheckCircle2, Shield, Truck, Award, Phone
 } from "lucide-react";
 import { categories } from "@/data/categories";
 import { packageTiers } from "@/data/packageTiers";
@@ -13,13 +13,21 @@ import { getCategoryShades, type CategoryShade } from "@/data/categoryShades";
 const areaPresets = [100, 250, 500, 1000, 2000];
 
 const stepsMeta = [
-  { id: 1, label: "Shades" },
+  { id: 1, label: "Designs" },
   { id: 2, label: "Grade" },
   { id: 3, label: "Area" },
   { id: 4, label: "Options" },
   { id: 5, label: "Schedule" },
   { id: 6, label: "Confirm" },
 ];
+
+// Grade visual bars
+const gradeBarStyles: Record<string, { color: string; width: string }> = {
+  economy: { color: "bg-muted-foreground/40", width: "w-3/5" },
+  standard: { color: "bg-accent/60", width: "w-4/5" },
+  premium: { color: "bg-accent", width: "w-[90%]" },
+  luxury: { color: "bg-accent", width: "w-full" },
+};
 
 const CategoryCalculator = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -28,7 +36,6 @@ const CategoryCalculator = () => {
   const config = categoryId ? getCalculatorConfig(categoryId) : null;
   const shades = categoryId ? getCategoryShades(categoryId) : [];
 
-  // State
   const [step, setStep] = useState(1);
   const [selectedShade, setSelectedShade] = useState("");
   const [packageTier, setPackageTier] = useState("standard");
@@ -76,9 +83,13 @@ const CategoryCalculator = () => {
     else setStep((s) => s - 1);
   };
 
+  const adjustArea = (delta: number) => {
+    setArea((prev) => Math.max(10, Math.min(10000, prev + delta)));
+  };
+
   // Price calculation
   const basePrices: Record<string, number> = {
-    tile: 140, stone: 320, wood: 280, vinyl: 95, resin: 80, carpet: 110, outdoor: 130, rubber: 70, concrete: 90,
+    tile: 140, stone: 320, wood: 280, vinyl: 95, carpet: 110, outdoor: 130,
   };
   const basePrice = basePrices[categoryId!] || 150;
   const pkg = packageTiers.find((p) => p.id === packageTier);
@@ -93,7 +104,7 @@ const CategoryCalculator = () => {
   const vat = Math.round(subtotal * 0.05);
   const totalEstimate = Math.round(subtotal + vat);
 
-  // ─── STEP BAR ─────────────────────────────────────────────────────
+  // ─── STEP BAR ─────────────────────────────────────────────
   const StepBar = () => (
     <div className="flex items-center justify-center gap-0 py-4">
       {stepsMeta.map((s, i) => {
@@ -107,12 +118,12 @@ const CategoryCalculator = () => {
               }`}>
                 {done ? <Check className="w-4 h-4" /> : s.id}
               </div>
-              <span className={`text-[10px] mt-1.5 font-semibold ${
+              <span className={`text-[10px] mt-1.5 font-semibold hidden sm:block ${
                 active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"
               }`}>{s.label}</span>
             </div>
             {i < stepsMeta.length - 1 && (
-              <div className={`w-8 md:w-14 h-[2px] mx-1 md:mx-2 -mt-4 ${done ? "bg-[hsl(var(--foreground))]" : "bg-border"}`} />
+              <div className={`w-6 sm:w-10 md:w-14 h-[2px] mx-1 md:mx-2 sm:-mt-4 ${done ? "bg-[hsl(var(--foreground))]" : "bg-border"}`} />
             )}
           </div>
         );
@@ -120,11 +131,11 @@ const CategoryCalculator = () => {
     </div>
   );
 
-  // ─── ESTIMATE PANEL (desktop sidebar) ─────────────────────────────
+  // ─── ESTIMATE PANEL ───────────────────────────────────────
   const EstimatePanel = () => (
     <div className="bg-[hsl(var(--foreground))] text-background rounded-2xl p-6">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="font-bold text-base italic">Price Estimate</h3>
+        <h3 className="font-bold text-base">Price Estimate</h3>
         <span className="text-[10px] border border-background/30 rounded-full px-2.5 py-1 flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
           Transparent Pricing
@@ -150,8 +161,6 @@ const CategoryCalculator = () => {
           </div>
         </div>
       </div>
-
-      {/* Trust badges */}
       <div className="mt-6 pt-5 border-t border-background/20 flex justify-around">
         {[
           { icon: <Shield className="w-5 h-5" />, label: "10 Year Warranty" },
@@ -167,7 +176,38 @@ const CategoryCalculator = () => {
     </div>
   );
 
-  // ─── STEP CONTENT ─────────────────────────────────────────────────
+  // ─── MOBILE ESTIMATE BAR ──────────────────────────────────
+  const MobileEstimateBar = () => (
+    <div className="lg:hidden bg-[hsl(var(--foreground))] text-background rounded-2xl mx-4 mt-6 p-5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-bold text-sm">Price Estimate</span>
+        <span className="text-[10px] border border-background/30 rounded-full px-2 py-0.5 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+          Transparent Pricing
+        </span>
+      </div>
+      <div className="space-y-2 text-sm mb-3">
+        <div className="flex justify-between">
+          <span className="text-background/60">Material Cost</span>
+          <span>AED {Math.round(materialCost).toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-background/60">Installation</span>
+          <span>AED {Math.round(installCost + optionsCost).toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-background/60">VAT (5%)</span>
+          <span>AED {vat.toLocaleString()}</span>
+        </div>
+      </div>
+      <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3">
+        <span className="font-bold">Total</span>
+        <span className="font-bold text-accent text-lg">AED {totalEstimate.toLocaleString()}</span>
+      </div>
+    </div>
+  );
+
+  // ─── STEP CONTENT ─────────────────────────────────────────
   const StepContent = () => (
     <AnimatePresence mode="wait">
       <motion.div
@@ -177,16 +217,16 @@ const CategoryCalculator = () => {
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.2 }}
       >
-        {/* STEP 1: Shades / Variants */}
+        {/* STEP 1: Shades / Designs with Images */}
         {step === 1 && (
           <div>
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground text-center mb-1">
-              Choose Your {config.shadeLabel}
+            <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
+              Select {config.categoryName} {config.shadeLabel}
             </h3>
-            <p className="text-sm text-muted-foreground text-center mb-8">
-              Choose from our {config.categoryName} collection
+            <p className="text-sm text-muted-foreground text-center mb-6">
+              Choose from our curated collection
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
               {shades.map((s) => (
                 <button
                   key={s.id}
@@ -198,11 +238,11 @@ const CategoryCalculator = () => {
                   }`}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden">
-                    <div
-                      className="w-full h-full"
-                      style={{ background: s.gradient }}
+                    <img
+                      src={s.image}
+                      alt={s.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    {/* Radio indicator */}
                     <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                       selectedShade === s.id
                         ? "bg-accent border-accent"
@@ -212,7 +252,7 @@ const CategoryCalculator = () => {
                     </div>
                   </div>
                   <div className="px-3 py-3 bg-card">
-                    <p className={`text-sm font-bold ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>
+                    <p className={`text-sm font-bold leading-tight ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>
                       {s.name}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{s.description}</p>
@@ -223,46 +263,47 @@ const CategoryCalculator = () => {
           </div>
         )}
 
-        {/* STEP 2: Material Grade */}
+        {/* STEP 2: Material Grade - Reference UI style */}
         {step === 2 && (
           <div>
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground text-center mb-1">
+            <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
               Select Material Grade
             </h3>
-            <p className="text-sm text-muted-foreground text-center mb-8">
-              Choose a quality tier that fits your budget
+            <p className="text-sm text-muted-foreground text-center mb-6">
+              Choose the quality level that fits your needs
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {packageTiers.map((tier) => (
-                <button key={tier.id} onClick={() => setPackageTier(tier.id)}
-                  className={`flex items-start gap-4 text-left rounded-2xl p-5 border-2 transition-all ${
-                    packageTier === tier.id ? "border-accent bg-accent/5 shadow-lg" : "border-border bg-card hover:border-accent/40"
-                  }`}>
-                  <span className="text-3xl mt-0.5">{tier.icon}</span>
-                  <div className="flex-1">
-                    <p className={`font-bold text-base ${packageTier === tier.id ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{tier.description}</p>
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {tier.features.slice(0, 3).map((f) => (
-                        <span key={f} className="text-[9px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{f}</span>
-                      ))}
+            <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-lg mx-auto">
+              {packageTiers.map((tier) => {
+                const selected = packageTier === tier.id;
+                const barStyle = gradeBarStyles[tier.id];
+                return (
+                  <button key={tier.id} onClick={() => setPackageTier(tier.id)}
+                    className={`rounded-2xl p-5 border-2 transition-all text-left relative ${
+                      selected ? "border-accent bg-accent/5 shadow-lg" : "border-border bg-card hover:border-accent/40"
+                    }`}>
+                    {/* Visual bar */}
+                    <div className="h-2 bg-muted rounded-full mb-4 overflow-hidden relative">
+                      <div className={`h-full rounded-full ${barStyle.color} ${barStyle.width} transition-all`} />
+                      <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
+                        selected ? "bg-accent border-accent" : "bg-card border-muted-foreground/30"
+                      }`} style={{ right: tier.id === "luxury" ? "0" : tier.id === "premium" ? "10%" : tier.id === "standard" ? "20%" : "40%" }} />
                     </div>
-                  </div>
-                  {packageTier === tier.id && (
-                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-accent-foreground" />
-                    </div>
-                  )}
-                </button>
-              ))}
+                    <p className={`font-bold text-lg mb-1 ${selected ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
+                    <p className="text-xs text-muted-foreground mb-3">{tier.description}</p>
+                    <span className="inline-block text-[11px] font-semibold bg-muted px-3 py-1 rounded-full text-muted-foreground">
+                      {tier.badge}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* STEP 3: Area */}
+        {/* STEP 3: Area - Clean numeric input */}
         {step === 3 && (
           <div>
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground text-center mb-1">
+            <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
               Enter Your Area
             </h3>
             <p className="text-sm text-muted-foreground text-center mb-6">
@@ -279,22 +320,23 @@ const CategoryCalculator = () => {
               ))}
             </div>
 
-            {/* Area display card */}
-            <div className="bg-card border border-border rounded-2xl p-8 mb-6 max-w-lg mx-auto">
-              <div className="flex items-baseline justify-center gap-3 mb-6">
-                <input type="number" min={10} max={10000} value={area}
-                  onChange={(e) => setArea(Number(e.target.value))}
-                  className="w-32 text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none" />
-                <span className="text-lg text-muted-foreground font-medium">{unit === "sqft" ? "sq ft" : "sq m"}</span>
-              </div>
-
-              {/* Slider */}
-              <input type="range" min="50" max="5000" value={area}
-                onChange={(e) => setArea(Number(e.target.value))}
-                className="w-full accent-[hsl(var(--accent))] h-2 rounded-full mb-2" />
-              <div className="flex justify-between text-[11px] text-muted-foreground">
-                <span>50 {unit === "sqft" ? "sq ft" : "sq m"}</span>
-                <span>5000 {unit === "sqft" ? "sq ft" : "sq m"}</span>
+            {/* Numeric input with +/- */}
+            <div className="bg-card border border-border rounded-2xl p-8 mb-6 max-w-md mx-auto">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <button onClick={() => adjustArea(-50)}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
+                  <Minus className="w-5 h-5 text-foreground" />
+                </button>
+                <div className="text-center">
+                  <input type="number" min={10} max={10000} value={area}
+                    onChange={(e) => setArea(Math.max(0, Number(e.target.value)))}
+                    className="w-28 text-center text-4xl font-bold text-foreground bg-transparent border-none outline-none" />
+                  <p className="text-sm text-muted-foreground mt-1">{unit === "sqft" ? "sq ft" : "sq m"}</p>
+                </div>
+                <button onClick={() => adjustArea(50)}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
+                  <Plus className="w-5 h-5 text-foreground" />
+                </button>
               </div>
             </div>
 
@@ -304,29 +346,24 @@ const CategoryCalculator = () => {
                 <button key={p} onClick={() => setArea(p)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                     area === p ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
-                  }`}>{p.toLocaleString()} {unit === "sqft" ? "sq ft" : "sq m"}</button>
+                  }`}>{p.toLocaleString()}</button>
               ))}
             </div>
 
-            {/* Mobile live price */}
-            <div className="lg:hidden mt-8 bg-[hsl(var(--foreground))] text-background rounded-2xl p-5 text-center">
-              <p className="text-[10px] text-background/60 uppercase tracking-wider mb-1">Estimated Total</p>
-              <p className="text-3xl font-bold text-accent">AED {totalEstimate.toLocaleString()}</p>
-              <p className="text-[11px] text-background/60 mt-1">{pkg?.name} grade · {areaInSqft} sqft</p>
-            </div>
+            <MobileEstimateBar />
           </div>
         )}
 
         {/* STEP 4: Additional Options */}
         {step === 4 && (
           <div>
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground text-center mb-1">
+            <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
               Additional Options
             </h3>
-            <p className="text-sm text-muted-foreground text-center mb-8">
+            <p className="text-sm text-muted-foreground text-center mb-6">
               Enhance your flooring project with these services
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {config.additionalOptions.map((opt) => {
                 const sel = selectedOptions.includes(opt.id);
                 return (
@@ -341,8 +378,8 @@ const CategoryCalculator = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className={`font-bold text-sm ${sel ? "text-foreground" : "text-foreground"}`}>{opt.label}</p>
-                        <p className="text-sm font-bold text-accent">+AED {opt.pricePerSqft}/sq ft</p>
+                        <p className="font-bold text-sm text-foreground">{opt.label}</p>
+                        <p className="text-sm font-bold text-accent">+AED {opt.pricePerSqft}/sqft</p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{opt.description}</p>
                     </div>
@@ -351,21 +388,17 @@ const CategoryCalculator = () => {
               })}
             </div>
 
-            {/* Mobile estimate */}
-            <div className="lg:hidden mt-8 bg-[hsl(var(--foreground))] text-background rounded-2xl p-5 text-center">
-              <p className="text-[10px] text-background/60 uppercase tracking-wider mb-1">Updated Estimate</p>
-              <p className="text-3xl font-bold text-accent">AED {totalEstimate.toLocaleString()}</p>
-            </div>
+            <MobileEstimateBar />
           </div>
         )}
 
         {/* STEP 5: Schedule */}
         {step === 5 && (
           <div>
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground text-center mb-1">
+            <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
               Schedule a Visit
             </h3>
-            <p className="text-sm text-muted-foreground text-center mb-8">
+            <p className="text-sm text-muted-foreground text-center mb-6">
               Book a time for our floor advisor to visit you
             </p>
             <div className="max-w-lg mx-auto space-y-4">
@@ -418,17 +451,16 @@ const CategoryCalculator = () => {
               <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-accent" />
               </div>
-              <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-1">
-                What to expect next?
+              <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">
+                What happens next?
               </h3>
-              <p className="text-sm text-muted-foreground">Here's what happens after you confirm.</p>
+              <p className="text-sm text-muted-foreground">Here's what to expect after you confirm.</p>
             </div>
             <div className="space-y-3 mb-8 max-w-lg mx-auto">
               {[
-                "Floor Advisor will arrange your samples",
-                "He will visit you and advise",
-                "Share actual quote",
-                "Confirmation",
+                "Our flooring expert will contact you",
+                "Samples will be arranged if required",
+                "Final on-site quote will be shared",
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 bg-card border border-border rounded-2xl p-4">
                   <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
@@ -443,7 +475,7 @@ const CategoryCalculator = () => {
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Your Summary</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div><span className="text-muted-foreground">Category:</span> <span className="font-bold text-foreground">{config.categoryName}</span></div>
-                {shade && <div><span className="text-muted-foreground">Shade:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
+                {shade && <div><span className="text-muted-foreground">Design:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
                 <div><span className="text-muted-foreground">Grade:</span> <span className="font-bold text-foreground">{pkg?.name}</span></div>
                 <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaInSqft} sqft</span></div>
                 <div className="col-span-2"><span className="text-muted-foreground">Estimate:</span> <span className="font-bold text-accent text-base">AED {totalEstimate.toLocaleString()}</span></div>
@@ -465,7 +497,7 @@ const CategoryCalculator = () => {
     </AnimatePresence>
   );
 
-  // ─── MAIN LAYOUT ──────────────────────────────────────────────────
+  // ─── MAIN LAYOUT ──────────────────────────────────────────
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
@@ -474,7 +506,7 @@ const CategoryCalculator = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div>
-          <h1 className="text-base font-bold text-foreground">{config.categoryName} Calculator</h1>
+          <h1 className="text-base font-bold text-foreground">{config.categoryName}</h1>
           <p className="text-[10px] text-muted-foreground">Step {step} of 6</p>
         </div>
       </div>
@@ -484,9 +516,8 @@ const CategoryCalculator = () => {
         <StepBar />
       </div>
 
-      {/* Layout: Mobile = single column, Desktop = content + sticky estimate */}
+      {/* Layout */}
       <div className="lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8 lg:items-start">
-        {/* Main Content */}
         <div className="px-4 lg:px-0 pb-32 lg:pb-8 mt-4">
           <div className="lg:bg-card lg:rounded-2xl lg:border lg:border-border lg:p-8 lg:shadow-luxury">
             <StepContent />
@@ -507,18 +538,6 @@ const CategoryCalculator = () => {
               </button>
             </div>
           )}
-
-          {/* Desktop CTA for step 5 */}
-          {step === 5 && (
-            <div className="hidden lg:flex justify-end mt-4">
-              <button onClick={handleNext} disabled={!canNext()}
-                className={`flex items-center gap-1.5 px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-                  canNext() ? "bg-accent text-accent-foreground hover:opacity-90 shadow-lg" : "bg-muted text-muted-foreground cursor-not-allowed"
-                }`}>
-                Continue <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Desktop Sticky Estimate Panel */}
@@ -527,9 +546,9 @@ const CategoryCalculator = () => {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation - ALWAYS VISIBLE */}
       {step < 6 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50 safe-area-bottom">
           <button onClick={handleBack}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-all">
             <ArrowLeft className="w-4 h-4" /> Back
@@ -538,12 +557,12 @@ const CategoryCalculator = () => {
             className={`flex items-center gap-1.5 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
               canNext() ? "bg-accent text-accent-foreground hover:opacity-90 shadow-lg" : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}>
-            {step === 5 ? "Continue" : "Continue"} <ArrowRight className="w-4 h-4" />
+            Continue <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Mobile Get Final Quote on step 6 */}
+      {/* Mobile step 6 bottom */}
       {step === 6 && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50">
           <button onClick={handleBack}
