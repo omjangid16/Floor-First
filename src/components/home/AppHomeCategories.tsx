@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 import catFeatured from "@/assets/cat-featured-spc.jpg";
 import catWooden from "@/assets/cat-wooden.jpg";
@@ -19,9 +18,9 @@ const mainCategories = [
 ];
 
 const services = [
-  { title: "Kitchen", image: svcKitchen, link: "/products?type=tile", desc: "Tiles & Stone" },
-  { title: "Stairs", image: svcStairs, link: "/products?type=wood", desc: "Wood & Vinyl" },
-  { title: "Bathroom", image: svcBathroom, link: "/products?type=tile", desc: "Waterproof" },
+  { title: "Kitchen", image: svcKitchen, link: "/products?type=tile" },
+  { title: "Stairs", image: svcStairs, link: "/products?type=wood" },
+  { title: "Bathroom", image: svcBathroom, link: "/products?type=tile" },
 ];
 
 const AppHomeCategories = () => {
@@ -34,34 +33,35 @@ const AppHomeCategories = () => {
       >
         <Link
           to="/calculator/vinyl"
-          className="block relative rounded-3xl overflow-hidden h-52 mb-3"
+          className="block relative rounded-3xl overflow-hidden h-52 mb-2"
         >
           <img
             src={catFeatured}
             alt="SPC / LVT Flooring"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/10 to-transparent" />
+          {/* Popular badge */}
           <div className="absolute top-4 left-4">
-            <span className="text-xs text-card/90 font-medium bg-card/10 backdrop-blur-sm px-3 py-1 rounded-full">Popular</span>
+            <span className="text-sm text-card/90 font-medium">Popular</span>
           </div>
+          {/* Bottom text */}
           <div className="absolute bottom-0 left-0 right-0 p-5">
-            <h2 className="text-2xl font-bold text-card leading-tight">SPC / LVT</h2>
-            <p className="text-sm text-card/80 mt-0.5">Starting at AED 42/sqm</p>
+            <h2 className="text-3xl font-bold text-card leading-tight">SPC/LVT</h2>
+            <p className="text-sm text-card/80 mt-0.5">Starting at AED 42/Sqmt</p>
           </div>
         </Link>
       </motion.div>
 
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-foreground">Categories</h3>
-        <Link to="/category/all" className="text-xs font-medium text-accent flex items-center gap-0.5">
-          View All <ArrowRight className="w-3 h-3" />
+      {/* View All link */}
+      <div className="flex justify-end mb-3">
+        <Link to="/category/all" className="text-sm font-medium text-foreground">
+          View All
         </Link>
       </div>
 
-      {/* Main Category Grid */}
-      <div className="grid grid-cols-4 gap-3 mb-8">
+      {/* Main Category Grid — 4 in a row */}
+      <div className="grid grid-cols-4 gap-3 mb-4">
         {mainCategories.map((cat, i) => (
           <motion.div
             key={cat.title}
@@ -70,12 +70,12 @@ const AppHomeCategories = () => {
             viewport={{ once: true }}
             transition={{ delay: i * 0.05 }}
           >
-            <Link to={cat.link} className="block text-center group">
-              <div className="aspect-square rounded-2xl overflow-hidden mb-1.5 border border-border">
+            <Link to={cat.link} className="block text-center">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-1.5">
                 <img
                   src={cat.image}
                   alt={cat.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <p className="text-xs font-medium text-foreground">{cat.title}</p>
@@ -84,14 +84,19 @@ const AppHomeCategories = () => {
         ))}
       </div>
 
+      {/* View All Products */}
+      <div className="flex justify-center mb-8">
+        <Link
+          to="/category/all"
+          className="text-sm font-medium text-foreground"
+        >
+          View All Products
+        </Link>
+      </div>
+
       {/* Services Section */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-foreground">Services</h3>
-          <Link to="/services" className="text-xs font-medium text-accent flex items-center gap-0.5">
-            All Services <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
+        <h3 className="text-lg font-bold text-foreground mb-3">Services</h3>
         <div className="grid grid-cols-3 gap-3">
           {services.map((svc, i) => (
             <motion.div
@@ -101,16 +106,15 @@ const AppHomeCategories = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
             >
-              <Link to={svc.link} className="block text-center group">
-                <div className="aspect-square rounded-2xl overflow-hidden mb-1.5 border border-border">
+              <Link to={svc.link} className="block text-center">
+                <div className="aspect-square rounded-2xl overflow-hidden mb-1.5">
                   <img
                     src={svc.image}
                     alt={svc.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="text-xs font-semibold text-foreground">{svc.title}</p>
-                <p className="text-[10px] text-muted-foreground">{svc.desc}</p>
+                <p className="text-xs font-medium text-foreground">{svc.title}</p>
               </Link>
             </motion.div>
           ))}
