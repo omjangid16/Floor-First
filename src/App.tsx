@@ -26,6 +26,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import OtpVerification from "./pages/OtpVerification";
 import ForgotPassword from "./pages/ForgotPassword";
+import CategoryPage from "./pages/CategoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const AppLayout = () => {
       <div className={!isAuth ? "pb-16 lg:pb-0" : ""}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
