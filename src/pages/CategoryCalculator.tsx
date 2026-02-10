@@ -10,7 +10,14 @@ import { packageTiers } from "@/data/packageTiers";
 import { getCalculatorConfig } from "@/data/calculatorOptions";
 import { getCategoryShades, type CategoryShade } from "@/data/categoryShades";
 
-const areaPresets = [100, 250, 500, 1000, 2000];
+const SQFT_PRESETS = [100, 250, 500, 1000, 2000];
+const SQFT_MIN = 50;
+const SQFT_MAX = 5000;
+const SQFT_STEP = 10;
+const SQM_MIN = 5;
+const SQM_MAX = 465;
+const SQM_STEP = 1;
+const CONVERSION = 10.764;
 
 const stepsMeta = [
   { id: 1, label: "Designs" },
@@ -21,7 +28,6 @@ const stepsMeta = [
   { id: 6, label: "Confirm" },
 ];
 
-// Grade visual bars
 const gradeBarStyles: Record<string, { color: string; width: string }> = {
   economy: { color: "bg-muted-foreground/40", width: "w-3/5" },
   standard: { color: "bg-accent/60", width: "w-4/5" },
@@ -30,7 +36,7 @@ const gradeBarStyles: Record<string, { color: string; width: string }> = {
 };
 
 /* ─── Custom touch-optimized Area Slider ─── */
-const TOUCH_SLOP = 10; // px threshold before deciding direction
+const TOUCH_SLOP = 10;
 
 interface AreaSliderProps {
   min: number;
@@ -48,16 +54,17 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
   const directionLocked = useRef<"h" | "v" | null>(null);
   const startPos = useRef({ x: 0, y: 0 });
 
-  const pct = ((value - min) / (max - min)) * 100;
+  const clampedValue = Math.max(min, Math.min(max, value));
+  const pct = ((clampedValue - min) / (max - min)) * 100;
 
   const valueFromX = useCallback((clientX: number) => {
     const track = trackRef.current;
-    if (!track) return value;
+    if (!track) return clampedValue;
     const rect = track.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const raw = min + ratio * (max - min);
     return Math.round(raw / step) * step;
-  }, [min, max, step, value]);
+  }, [min, max, step, clampedValue]);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     const t = e.touches[0];
@@ -72,13 +79,12 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
     const dy = Math.abs(t.clientY - startPos.current.y);
 
     if (!directionLocked.current) {
-      if (dx < TOUCH_SLOP && dy < TOUCH_SLOP) return; // not enough movement
+      if (dx < TOUCH_SLOP && dy < TOUCH_SLOP) return;
       directionLocked.current = dx > dy ? "h" : "v";
     }
 
-    if (directionLocked.current === "v") return; // let page scroll
+    if (directionLocked.current === "v") return;
 
-    // Horizontal drag — control slider
     e.preventDefault();
     dragging.current = true;
     onChange(valueFromX(t.clientX));
@@ -89,7 +95,6 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
     directionLocked.current = null;
   }, []);
 
-  // Mouse support for desktop
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     onChange(valueFromX(e.clientX));
@@ -109,7 +114,6 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
 
   return (
     <div className="mt-8 px-1" style={{ touchAction: "pan-y" }}>
-      {/* Track */}
       <div
         ref={trackRef}
         onTouchStart={onTouchStart}
@@ -120,16 +124,13 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
         role="slider"
         aria-valuemin={min}
         aria-valuemax={max}
-        aria-valuenow={value}
+        aria-valuenow={clampedValue}
       >
-        {/* Track background */}
         <div className="absolute left-0 right-0 h-2 rounded-full bg-muted" />
-        {/* Filled track */}
         <div
           className="absolute left-0 h-2 rounded-full bg-accent"
           style={{ width: `${pct}%` }}
         />
-        {/* Thumb */}
         <div
           className="absolute w-5 h-5 rounded-full bg-accent shadow-md -translate-x-1/2"
           style={{ left: `${pct}%` }}
@@ -141,6 +142,13 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
       </div>
     </div>
   );
+};
+
+/* ─── Helper: clamp area to valid range ─── */
+const clampArea = (val: number, unit: "sqft" | "sqm") => {
+  const min = unit === "sqm" ? SQM_MIN : SQFT_MIN;
+  const max = unit === "sqm" ? SQM_MAX : SQFT_MAX;
+  return Math.max(min, Math.min(max, Math.round(val)));
 };
 
 const CategoryCalculator = () => {
@@ -159,6 +167,7 @@ const CategoryCalculator = () => {
   const [scheduleData, setScheduleData] = useState({
     date: "", time: "", name: "", email: "", address: "", unit: "",
   });
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   if (!category || !config) {
     return (
@@ -171,7 +180,7 @@ const CategoryCalculator = () => {
     );
   }
 
-  const areaInSqft = unit === "sqm" ? Math.round(area * 10.764) : area;
+  const areaInSqft = unit === "sqm" ? Math.round(area * CONVERSION) : area;
   const shade = shades.find((s) => s.id === selectedShade);
 
   const toggleOption = (id: string) => {
@@ -186,7 +195,7 @@ const CategoryCalculator = () => {
       case 2: return !!packageTier;
       case 3: return area > 0;
       case 4: return true;
-      case 5: return scheduleData.name && scheduleData.email && scheduleData.date;
+      case 5: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "";
       default: return false;
     }
   };
@@ -197,8 +206,37 @@ const CategoryCalculator = () => {
     else setStep((s) => s - 1);
   };
 
+  /* ── Area helpers: always clamp to valid range ── */
+  const setClampedArea = (val: number) => setArea(clampArea(val, unit));
+
   const adjustArea = (delta: number) => {
-    setArea((prev) => Math.max(10, Math.min(10000, prev + delta)));
+    setArea((prev) => clampArea(prev + delta, unit));
+  };
+
+  const handleUnitSwitch = (newUnit: "sqft" | "sqm") => {
+    if (newUnit === unit) return;
+    const converted = newUnit === "sqm"
+      ? Math.round(area / CONVERSION)
+      : Math.round(area * CONVERSION);
+    setUnit(newUnit);
+    setArea(clampArea(converted, newUnit));
+  };
+
+  /* ── Schedule field helpers ── */
+  const handleScheduleChange = (field: string, value: string) => {
+    setScheduleData((prev) => ({ ...prev, [field]: value }));
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const isFieldInvalid = (field: string, value: string) => {
+    if (!touchedFields[field]) return false;
+    return value.trim() === "";
+  };
+
+  const fieldBorderClass = (field: string, value: string) => {
+    if (isFieldInvalid(field, value)) return "border-destructive focus:border-destructive";
+    if (touchedFields[field] && value.trim() !== "") return "border-accent/40 focus:border-accent";
+    return "border-border focus:border-accent";
   };
 
   // Price calculation
@@ -227,17 +265,17 @@ const CategoryCalculator = () => {
         return (
           <div key={s.id} className="flex items-center">
             <div className="flex flex-col items-center">
-              <div className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                 done ? "bg-[hsl(var(--foreground))] text-background" : active ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
               }`}>
                 {done ? <Check className="w-4 h-4" /> : s.id}
               </div>
-              <span className={`text-[10px] mt-1.5 font-semibold hidden sm:block ${
+              <span className={`text-[9px] sm:text-[10px] mt-1 font-semibold ${
                 active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"
               }`}>{s.label}</span>
             </div>
             {i < stepsMeta.length - 1 && (
-              <div className={`w-6 sm:w-10 md:w-14 h-[2px] mx-1 md:mx-2 sm:-mt-4 ${done ? "bg-[hsl(var(--foreground))]" : "bg-border"}`} />
+              <div className={`w-4 sm:w-8 md:w-14 h-[2px] mx-0.5 sm:mx-1 md:mx-2 -mt-4 ${done ? "bg-[hsl(var(--foreground))]" : "bg-border"}`} />
             )}
           </div>
         );
@@ -292,26 +330,26 @@ const CategoryCalculator = () => {
 
   // ─── MOBILE ESTIMATE BAR ──────────────────────────────────
   const MobileEstimateBar = () => (
-    <div className="lg:hidden bg-[hsl(var(--foreground))] text-background rounded-2xl mx-4 mt-6 p-5">
-      <div className="flex items-center justify-between mb-3">
+    <div className="lg:hidden bg-[hsl(var(--foreground))] text-background rounded-2xl mx-0 mt-8 p-5">
+      <div className="flex items-center justify-between mb-4">
         <span className="font-bold text-sm">Price Estimate</span>
         <span className="text-[10px] border border-background/30 rounded-full px-2 py-0.5 flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
           Transparent Pricing
         </span>
       </div>
-      <div className="space-y-2 text-sm mb-3">
+      <div className="space-y-2.5 text-sm mb-4">
         <div className="flex justify-between">
           <span className="text-background/60">Material Cost</span>
-          <span>AED {Math.round(materialCost).toLocaleString()}</span>
+          <span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-background/60">Installation</span>
-          <span>AED {Math.round(installCost + optionsCost).toLocaleString()}</span>
+          <span className="font-semibold">AED {Math.round(installCost + optionsCost).toLocaleString()}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-background/60">VAT (5%)</span>
-          <span>AED {vat.toLocaleString()}</span>
+          <span className="font-semibold">AED {vat.toLocaleString()}</span>
         </div>
       </div>
       <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3">
@@ -377,7 +415,7 @@ const CategoryCalculator = () => {
           </div>
         )}
 
-        {/* STEP 2: Material Grade - Reference UI style */}
+        {/* STEP 2: Material Grade */}
         {step === 2 && (
           <div>
             <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
@@ -395,7 +433,6 @@ const CategoryCalculator = () => {
                     className={`rounded-2xl p-5 border-2 transition-all text-left relative ${
                       selected ? "border-accent bg-accent/5 shadow-lg" : "border-border bg-card hover:border-accent/40"
                     }`}>
-                    {/* Visual bar */}
                     <div className="h-2 bg-muted rounded-full mb-4 overflow-hidden relative">
                       <div className={`h-full rounded-full ${barStyle.color} ${barStyle.width} transition-all`} />
                       <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
@@ -428,12 +465,7 @@ const CategoryCalculator = () => {
             <div className="flex justify-center mb-8">
               <div className="inline-flex bg-muted rounded-xl p-1">
                 {(["sqft", "sqm"] as const).map((u) => (
-                  <button key={u} onClick={() => {
-                    if (u !== unit) {
-                      setArea(u === "sqm" ? Math.round(area / 10.764) : Math.round(area * 10.764));
-                      setUnit(u);
-                    }
-                  }}
+                  <button key={u} onClick={() => handleUnitSwitch(u)}
                     className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                       unit === u ? "bg-[hsl(var(--foreground))] text-background shadow-sm" : "text-muted-foreground"
                     }`}>{u === "sqft" ? "Sq Ft" : "Sq Meter"}</button>
@@ -443,7 +475,6 @@ const CategoryCalculator = () => {
 
             {/* Value display card */}
             <div className="bg-card border border-border rounded-2xl p-8 max-w-md mx-auto">
-              {/* Primary value with +/- */}
               <div className="flex items-center justify-center gap-5">
                 <button onClick={() => adjustArea(unit === "sqm" ? -5 : -50)}
                   className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
@@ -452,10 +483,14 @@ const CategoryCalculator = () => {
                 <div className="flex items-start justify-center gap-1 min-w-[140px]">
                   <input
                     type="number"
-                    min={1}
-                    max={unit === "sqm" ? 930 : 10000}
+                    min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
+                    max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
                     value={area}
-                    onChange={(e) => setArea(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) => {
+                      const raw = Number(e.target.value);
+                      if (!isNaN(raw)) setArea(raw);
+                    }}
+                    onBlur={() => setClampedArea(area)}
                     className="w-[120px] text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="text-base font-medium text-muted-foreground mt-2 shrink-0">
@@ -468,25 +503,25 @@ const CategoryCalculator = () => {
                 </button>
               </div>
 
-              {/* Slider — custom touch-optimized */}
+              {/* Slider */}
               <AreaSlider
-                min={unit === "sqm" ? 5 : 50}
-                max={unit === "sqm" ? 465 : 5000}
-                step={unit === "sqm" ? 1 : 10}
+                min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
+                max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
+                step={unit === "sqm" ? SQM_STEP : SQFT_STEP}
                 value={area}
-                onChange={setArea}
-                minLabel={unit === "sqm" ? "5 sq m" : "50 sq ft"}
-                maxLabel={unit === "sqm" ? "465 sq m" : "5,000 sq ft"}
+                onChange={setClampedArea}
+                minLabel={unit === "sqm" ? `${SQM_MIN} sq m` : `${SQFT_MIN} sq ft`}
+                maxLabel={unit === "sqm" ? `${SQM_MAX} sq m` : `${SQFT_MAX.toLocaleString()} sq ft`}
               />
             </div>
 
             {/* Quick presets */}
             <div className="flex justify-center gap-2 flex-wrap mt-8">
-              {areaPresets.map((p) => {
-                const displayVal = unit === "sqm" ? Math.round(p / 10.764) : p;
+              {SQFT_PRESETS.map((p) => {
+                const displayVal = unit === "sqm" ? Math.round(p / CONVERSION) : p;
                 const isSelected = area === displayVal;
                 return (
-                  <button key={p} onClick={() => setArea(displayVal)}
+                  <button key={p} onClick={() => setClampedArea(displayVal)}
                     className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                       isSelected ? "bg-accent text-accent-foreground" : "bg-card border border-border text-foreground hover:border-accent/40"
                     }`}>{displayVal.toLocaleString()}</button>
@@ -518,10 +553,10 @@ const CategoryCalculator = () => {
                     }`}>
                       {sel && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold text-sm text-foreground">{opt.label}</p>
-                        <p className="text-sm font-bold text-accent">+AED {opt.pricePerSqft}/sqft</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-sm text-foreground truncate">{opt.label}</p>
+                        <p className="text-sm font-bold text-accent whitespace-nowrap">+AED {opt.pricePerSqft}/sqft</p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{opt.description}</p>
                     </div>
@@ -546,41 +581,47 @@ const CategoryCalculator = () => {
             <div className="max-w-lg mx-auto space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-foreground mb-1.5 block">Date</label>
+                  <label className="text-xs font-semibold text-foreground mb-1.5 block">Date <span className="text-destructive">*</span></label>
                   <input type="date" value={scheduleData.date}
-                    onChange={(e) => setScheduleData({ ...scheduleData, date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none" />
+                    onChange={(e) => handleScheduleChange("date", e.target.value)}
+                    onBlur={() => setTouchedFields((p) => ({ ...p, date: true }))}
+                    className={`w-full px-4 py-3 rounded-xl border-2 bg-card text-foreground text-sm outline-none transition-colors ${fieldBorderClass("date", scheduleData.date)}`} />
+                  {isFieldInvalid("date", scheduleData.date) && <p className="text-destructive text-[11px] mt-1">Required</p>}
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-foreground mb-1.5 block">Time</label>
                   <input type="time" value={scheduleData.time}
-                    onChange={(e) => setScheduleData({ ...scheduleData, time: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none" />
+                    onChange={(e) => handleScheduleChange("time", e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-foreground mb-1.5 block">Full Name</label>
+                <label className="text-xs font-semibold text-foreground mb-1.5 block">Full Name <span className="text-destructive">*</span></label>
                 <input type="text" placeholder="Your name" value={scheduleData.name}
-                  onChange={(e) => setScheduleData({ ...scheduleData, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground" />
+                  onChange={(e) => handleScheduleChange("name", e.target.value)}
+                  onBlur={() => setTouchedFields((p) => ({ ...p, name: true }))}
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-card text-foreground text-sm outline-none placeholder:text-muted-foreground transition-colors ${fieldBorderClass("name", scheduleData.name)}`} />
+                {isFieldInvalid("name", scheduleData.name) && <p className="text-destructive text-[11px] mt-1">Required</p>}
               </div>
               <div>
-                <label className="text-xs font-semibold text-foreground mb-1.5 block">Email</label>
+                <label className="text-xs font-semibold text-foreground mb-1.5 block">Email <span className="text-destructive">*</span></label>
                 <input type="email" placeholder="your@email.com" value={scheduleData.email}
-                  onChange={(e) => setScheduleData({ ...scheduleData, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground" />
+                  onChange={(e) => handleScheduleChange("email", e.target.value)}
+                  onBlur={() => setTouchedFields((p) => ({ ...p, email: true }))}
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-card text-foreground text-sm outline-none placeholder:text-muted-foreground transition-colors ${fieldBorderClass("email", scheduleData.email)}`} />
+                {isFieldInvalid("email", scheduleData.email) && <p className="text-destructive text-[11px] mt-1">Required</p>}
               </div>
               <div>
                 <label className="text-xs font-semibold text-foreground mb-1.5 block">Address</label>
                 <input type="text" placeholder="Your address in Dubai" value={scheduleData.address}
-                  onChange={(e) => setScheduleData({ ...scheduleData, address: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground" />
+                  onChange={(e) => handleScheduleChange("address", e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground transition-colors" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-foreground mb-1.5 block">Unit / Villa / Apartment</label>
                 <input type="text" placeholder="e.g. Villa 12, Apt 304" value={scheduleData.unit}
-                  onChange={(e) => setScheduleData({ ...scheduleData, unit: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground" />
+                  onChange={(e) => handleScheduleChange("unit", e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground transition-colors" />
               </div>
             </div>
           </div>
@@ -612,7 +653,6 @@ const CategoryCalculator = () => {
                 </div>
               ))}
             </div>
-            {/* Summary */}
             <div className="bg-card border border-border rounded-2xl p-5 mb-6 max-w-lg mx-auto">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Your Summary</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -654,13 +694,13 @@ const CategoryCalculator = () => {
       </div>
 
       {/* Step Indicator */}
-      <div className="px-3 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
+      <div className="px-2 sm:px-3 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
         <StepBar />
       </div>
 
       {/* Layout */}
       <div className="lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8 lg:items-start">
-        <div className="px-4 lg:px-0 pb-32 lg:pb-8 mt-4">
+        <div className="px-4 lg:px-0 pb-28 lg:pb-8 mt-4">
           <div className="lg:bg-card lg:rounded-2xl lg:border lg:border-border lg:p-8 lg:shadow-luxury">
             <StepContent />
           </div>
@@ -688,7 +728,7 @@ const CategoryCalculator = () => {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation - ALWAYS VISIBLE */}
+      {/* Mobile Bottom Navigation */}
       {step < 6 && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50 safe-area-bottom">
           <button onClick={handleBack}
@@ -704,7 +744,6 @@ const CategoryCalculator = () => {
         </div>
       )}
 
-      {/* Mobile step 6 bottom */}
       {step === 6 && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50">
           <button onClick={handleBack}
