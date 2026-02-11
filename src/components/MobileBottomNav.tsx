@@ -4,7 +4,7 @@ import { useCart } from "@/contexts/CartContext";
 
 const tabs = [
   { label: "Home", path: "/", icon: Home },
-  { label: "Categories", path: "/products", icon: Grid3X3 },
+  { label: "Categories", path: "/categories", icon: Grid3X3 },
   { label: "Calculator", path: "/calculator", icon: Calculator },
   { label: "Cart", path: "/cart", icon: ShoppingCart },
   { label: "Profile", path: "/sign-in", icon: User },

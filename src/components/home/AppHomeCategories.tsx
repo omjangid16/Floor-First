@@ -19,9 +19,9 @@ const mainCategories = [
 ];
 
 const services = [
-  { title: "Kitchen", image: svcKitchen, link: "/products?type=tile" },
-  { title: "Stairs", image: svcStairs, link: "/products?type=wood" },
-  { title: "Bathroom", image: svcBathroom, link: "/products?type=tile" },
+  { title: "Kitchen", image: svcKitchen, link: "/categories?space=kitchen" },
+  { title: "Stairs", image: svcStairs, link: "/categories?space=stairs" },
+  { title: "Bathroom", image: svcBathroom, link: "/categories?space=bathroom" },
 ];
 
 const AppHomeCategories = () => {
@@ -59,7 +59,7 @@ const AppHomeCategories = () => {
 
       {/* View All link */}
       <div className="flex justify-end mb-3">
-        <Link to="/category/all" className="text-sm font-medium text-foreground">
+        <Link to="/categories" className="text-sm font-medium text-foreground">
           View All
         </Link>
       </div>
@@ -91,7 +91,7 @@ const AppHomeCategories = () => {
       {/* View All Products */}
       <div className="flex justify-center mb-8">
         <Link
-          to="/category/all"
+          to="/categories"
           className="text-sm font-medium text-foreground"
         >
           View All Products

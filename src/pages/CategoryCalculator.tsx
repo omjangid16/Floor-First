@@ -131,7 +131,7 @@ const CategoryCalculator = () => {
 
   const [step, setStep] = useState(1);
   const [selectedShade, setSelectedShade] = useState("");
-  const [packageTier, setPackageTier] = useState("standard");
+  const [packageTier, setPackageTier] = useState(categoryId === "vinyl" ? "premium" : "standard");
   const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
