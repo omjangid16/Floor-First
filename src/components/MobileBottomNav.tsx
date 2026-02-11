@@ -7,7 +7,7 @@ const tabs = [
   { label: "Categories", path: "/categories", icon: Grid3X3 },
   { label: "Calculator", path: "/calculator", icon: Calculator },
   { label: "Cart", path: "/cart", icon: ShoppingCart },
-  { label: "Profile", path: "/sign-in", icon: User },
+  { label: "Profile", path: "/welcome", icon: User },
 ];
 
 const MobileBottomNav = () => {
