@@ -28,6 +28,7 @@ import SignUp from "./pages/SignUp";
 import OtpVerification from "./pages/OtpVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import CategoryPage from "./pages/CategoryPage";
+import CategoryModule from "./pages/CategoryModule";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const AppLayout = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
+          <Route path="/categories" element={<CategoryModule />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
