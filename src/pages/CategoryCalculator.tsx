@@ -241,51 +241,23 @@ const CategoryCalculator = () => {
         </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-base font-bold text-foreground">{config.categoryName}</h1>
-          <p className="text-[10px] text-muted-foreground">Step {step} of 6</p>
+          <p className="text-[10px] text-muted-foreground">{config.categoryName} Calculator</p>
         </div>
       </div>
 
-      {/* ═══ PREMIUM STEP INDICATOR ═══ */}
+      {/* ═══ LINEAR PROGRESS BAR ═══ */}
       <div className="px-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
         <div className="py-4">
-          {/* Classic premium stepper */}
-          <div className="flex items-center justify-between">
-            {stepsMeta.map((s, i) => {
-              const done = step > s.id;
-              const active = step === s.id;
-              return (
-                <div key={s.id} className="flex items-center flex-1 last:flex-none">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      done
-                        ? "bg-accent text-accent-foreground"
-                        : active
-                        ? "border-2 border-accent text-accent bg-accent/10"
-                        : "border border-border text-muted-foreground bg-card"
-                    }`}>
-                      {done ? (
-                        <Check className="w-3.5 h-3.5" />
-                      ) : (
-                        <span className="scale-75">{s.icon}</span>
-                      )}
-                    </div>
-                    <span className={`text-[9px] sm:text-[10px] mt-1.5 font-medium transition-colors ${
-                      active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground/60"
-                    }`}>{s.label}</span>
-                  </div>
-                  {i < stepsMeta.length - 1 && (
-                    <div className="flex-1 h-[2px] mx-1.5 sm:mx-2 mt-[-14px] relative overflow-hidden rounded-full bg-border">
-                      <motion.div
-                        className="absolute inset-y-0 left-0 bg-accent rounded-full"
-                        initial={false}
-                        animate={{ width: done ? "100%" : "0%" }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <p className="text-xs text-muted-foreground mb-2">
+            Step {step} of 6 — <span className="font-semibold text-foreground">{stepsMeta[step - 1]?.label}</span>
+          </p>
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-accent"
+              initial={false}
+              animate={{ width: `${(step / 6) * 100}%` }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            />
           </div>
         </div>
       </div>
@@ -551,6 +523,10 @@ const CategoryCalculator = () => {
                       })}
                     </div>
 
+                    <p className="text-[10px] text-muted-foreground/70 text-center mb-6 max-w-lg mx-auto">
+                      Why Cost? For mutual commitment and respect for time, refundable upon order placement.
+                    </p>
+
                     <div className="max-w-lg mx-auto space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -621,7 +597,7 @@ const CategoryCalculator = () => {
                       <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 shadow-md">
                         <CheckCircle2 className="w-8 h-8 text-green-600" />
                       </div>
-                      <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">What happens next?</h3>
+                      <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">Confirmation</h3>
                       <p className="text-sm text-muted-foreground">Here's what to expect after you confirm.</p>
                     </div>
                     <div className="space-y-3 mb-8 max-w-lg mx-auto">
@@ -672,8 +648,7 @@ const CategoryCalculator = () => {
                       ))}
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground text-center mb-2 max-w-lg mx-auto">Note: Final quote based on selection & site condition.</p>
-                    <p className="text-[10px] text-muted-foreground/70 text-center mb-6 max-w-lg mx-auto">Why Cost -- For mutual commitment and respect for time, refundable upon order placement.</p>
+                    <p className="text-[11px] text-muted-foreground text-center mb-6 max-w-lg mx-auto">Note: Final quote based on selection & site condition.</p>
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
