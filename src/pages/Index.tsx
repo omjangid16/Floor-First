@@ -3,6 +3,8 @@ import AppHomeCategories from "@/components/home/AppHomeCategories";
 import AppHomeBestSellers from "@/components/home/AppHomeBestSellers";
 import AppHomeResources from "@/components/home/AppHomeResources";
 import AppHomePromise from "@/components/home/AppHomePromise";
+import AppHomeStats from "@/components/home/AppHomeStats";
+import AppHomeHelpCenter from "@/components/home/AppHomeHelpCenter";
 import DesktopHero from "@/components/home/DesktopHero";
 import DesktopBenefits from "@/components/home/DesktopBenefits";
 import DesktopCategories from "@/components/home/DesktopCategories";
@@ -20,6 +22,8 @@ const Index = () => {
         <AppHomeBestSellers />
         <AppHomeResources />
         <AppHomePromise />
+        <AppHomeStats />
+        <AppHomeHelpCenter />
       </div>
 
       {/* Desktop Website Layout */}

@@ -3,6 +3,7 @@ export interface AdditionalOption {
   label: string;
   description: string;
   pricePerSqft: number;
+  priceUnit?: string; // "sqm" | "linear_meter" | "per_door"
 }
 
 export interface CategoryCalculatorConfig {
@@ -13,9 +14,9 @@ export interface CategoryCalculatorConfig {
 }
 
 const commonOptions: AdditionalOption[] = [
-  { id: "standard-install", label: "Standard Installation", description: "Professional floor installation by certified experts", pricePerSqft: 15 },
-  { id: "old-floor-removal", label: "Old Floor Removal", description: "Remove and dispose of existing flooring", pricePerSqft: 8 },
-  { id: "furniture-movement", label: "Furniture Movement", description: "Move furniture before and after installation", pricePerSqft: 5 },
+  { id: "standard-install", label: "Standard Installation", description: "Professional floor installation by certified experts", pricePerSqft: 45, priceUnit: "sqm" },
+  { id: "furniture-movement", label: "Furniture Movement", description: "Move furniture before and after installation", pricePerSqft: 5, priceUnit: "sqm" },
+  { id: "old-floor-removal", label: "Old Floor Removal", description: "Remove and dispose of existing flooring", pricePerSqft: 14, priceUnit: "sqm" },
 ];
 
 export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig> = {
@@ -25,8 +26,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "skirting", label: "Skirting", description: "PVC skirting to match flooring", pricePerSqft: 4 },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3 },
+      { id: "skirting", label: "Skirting", description: "PVC skirting to match flooring", pricePerSqft: 39, priceUnit: "linear_meter" },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 14, priceUnit: "per_door" },
     ],
   },
   wood: {
@@ -35,8 +36,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "skirting", label: "Wood Skirting", description: "Solid wood skirting boards", pricePerSqft: 6 },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 3 },
+      { id: "skirting", label: "Wood Skirting", description: "Solid wood skirting boards", pricePerSqft: 39, priceUnit: "linear_meter" },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 14, priceUnit: "per_door" },
     ],
   },
   tile: {
@@ -45,8 +46,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "waterproofing", label: "Waterproofing", description: "Waterproof membrane under tiles", pricePerSqft: 7 },
-      { id: "grouting", label: "Premium Grouting", description: "Epoxy grout for lasting finish", pricePerSqft: 4 },
+      { id: "waterproofing", label: "Waterproofing", description: "Waterproof membrane under tiles", pricePerSqft: 7, priceUnit: "sqm" },
+      { id: "grouting", label: "Premium Grouting", description: "Epoxy grout for lasting finish", pricePerSqft: 4, priceUnit: "sqm" },
     ],
   },
   outdoor: {
@@ -55,8 +56,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "drainage", label: "Drainage System", description: "Proper drainage setup for outdoor areas", pricePerSqft: 10 },
-      { id: "anti-slip", label: "Anti-Slip Coating", description: "Safety coating for wet areas", pricePerSqft: 5 },
+      { id: "drainage", label: "Drainage System", description: "Proper drainage setup for outdoor areas", pricePerSqft: 10, priceUnit: "sqm" },
+      { id: "anti-slip", label: "Anti-Slip Coating", description: "Safety coating for wet areas", pricePerSqft: 5, priceUnit: "sqm" },
     ],
   },
   carpet: {
@@ -65,8 +66,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "underlay-carpet", label: "Carpet Underlay", description: "Cushioned underlay for comfort", pricePerSqft: 5 },
-      { id: "stain-guard", label: "Stain Guard", description: "Protective stain-resistant treatment", pricePerSqft: 4 },
+      { id: "underlay-carpet", label: "Carpet Underlay", description: "Cushioned underlay for comfort", pricePerSqft: 5, priceUnit: "sqm" },
+      { id: "stain-guard", label: "Stain Guard", description: "Protective stain-resistant treatment", pricePerSqft: 4, priceUnit: "sqm" },
     ],
   },
   stone: {
@@ -75,8 +76,8 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     shadeLabel: "Design",
     additionalOptions: [
       ...commonOptions,
-      { id: "sealing", label: "Stone Sealing", description: "Protective sealant for natural stone", pricePerSqft: 8 },
-      { id: "polishing", label: "Polishing & Honing", description: "Professional stone polish finish", pricePerSqft: 12 },
+      { id: "sealing", label: "Stone Sealing", description: "Protective sealant for natural stone", pricePerSqft: 8, priceUnit: "sqm" },
+      { id: "polishing", label: "Polishing & Honing", description: "Professional stone polish finish", pricePerSqft: 12, priceUnit: "sqm" },
     ],
   },
 };
