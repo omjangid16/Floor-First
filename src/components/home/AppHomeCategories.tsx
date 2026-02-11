@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Flame } from "lucide-react";
 
 import catFeatured from "@/assets/cat-featured-spc.jpg";
 import catWooden from "@/assets/cat-wooden.jpg";
@@ -41,9 +42,12 @@ const AppHomeCategories = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/10 to-transparent" />
-          {/* Popular badge */}
+          {/* Popular badge — premium pill */}
           <div className="absolute top-4 left-4">
-            <span className="text-sm text-card/90 font-medium">Popular</span>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-bold shadow-lg backdrop-blur-sm">
+              <Flame className="w-3.5 h-3.5" />
+              Popular
+            </span>
           </div>
           {/* Bottom text */}
           <div className="absolute bottom-0 left-0 right-0 p-5">

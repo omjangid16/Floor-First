@@ -3,7 +3,10 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, Check, Minus, Plus,
-  CheckCircle2, Shield, Truck, Award, Phone
+  CheckCircle2, Shield, Truck, Award, Phone,
+  MessageCircle, ChevronDown, ChevronUp, HelpCircle,
+  Calendar, Clock, User, Mail, MapPin, Home, Smartphone,
+  Palette, Layers, Ruler, Settings, ClipboardCheck
 } from "lucide-react";
 import { categories } from "@/data/categories";
 import { packageTiers } from "@/data/packageTiers";
@@ -13,23 +16,22 @@ import { getCategoryShades, type CategoryShade } from "@/data/categoryShades";
 const SQFT_PRESETS = [100, 250, 500, 1000, 2000];
 const SQFT_MIN = 50;
 const SQFT_MAX = 5000;
-const SQFT_STEP = 50; // matches +/- button delta
+const SQFT_STEP = 50;
 const SQM_MIN = 5;
 const SQM_MAX = 465;
-const SQM_STEP = 5; // matches +/- button delta
+const SQM_STEP = 5;
 const CONVERSION = 10.764;
 
-/* Convert sqft↔sqm helpers */
 const sqftToSqm = (sqft: number) => Math.round(sqft / CONVERSION);
 const sqmToSqft = (sqm: number) => Math.round(sqm * CONVERSION);
 
 const stepsMeta = [
-  { id: 1, label: "Designs" },
-  { id: 2, label: "Grade" },
-  { id: 3, label: "Area" },
-  { id: 4, label: "Options" },
-  { id: 5, label: "Schedule" },
-  { id: 6, label: "Confirm" },
+  { id: 1, label: "Designs", icon: <Palette className="w-4 h-4" /> },
+  { id: 2, label: "Grade", icon: <Layers className="w-4 h-4" /> },
+  { id: 3, label: "Area", icon: <Ruler className="w-4 h-4" /> },
+  { id: 4, label: "Options", icon: <Settings className="w-4 h-4" /> },
+  { id: 5, label: "Schedule", icon: <Calendar className="w-4 h-4" /> },
+  { id: 6, label: "Confirm", icon: <ClipboardCheck className="w-4 h-4" /> },
 ];
 
 const gradeBarStyles: Record<string, { color: string; width: string }> = {
@@ -43,13 +45,8 @@ const gradeBarStyles: Record<string, { color: string; width: string }> = {
 const TOUCH_SLOP = 10;
 
 interface AreaSliderProps {
-  min: number;
-  max: number;
-  step: number;
-  value: number;
-  onChange: (v: number) => void;
-  minLabel: string;
-  maxLabel: string;
+  min: number; max: number; step: number; value: number;
+  onChange: (v: number) => void; minLabel: string; maxLabel: string;
 }
 
 const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: AreaSliderProps) => {
@@ -81,14 +78,11 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
     const t = e.touches[0];
     const dx = Math.abs(t.clientX - startPos.current.x);
     const dy = Math.abs(t.clientY - startPos.current.y);
-
     if (!directionLocked.current) {
       if (dx < TOUCH_SLOP && dy < TOUCH_SLOP) return;
       directionLocked.current = dx > dy ? "h" : "v";
     }
-
     if (directionLocked.current === "v") return;
-
     e.preventDefault();
     dragging.current = true;
     onChange(valueFromX(t.clientX));
@@ -103,53 +97,30 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
     e.preventDefault();
     onChange(valueFromX(e.clientX));
     dragging.current = true;
-
-    const onMove = (ev: MouseEvent) => {
-      if (dragging.current) onChange(valueFromX(ev.clientX));
-    };
-    const onUp = () => {
-      dragging.current = false;
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
+    const onMove = (ev: MouseEvent) => { if (dragging.current) onChange(valueFromX(ev.clientX)); };
+    const onUp = () => { dragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
   }, [onChange, valueFromX]);
 
   return (
     <div className="mt-8 px-1" style={{ touchAction: "pan-y" }}>
-      <div
-        ref={trackRef}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        onMouseDown={onMouseDown}
-        className="relative w-full h-11 flex items-center cursor-pointer"
-        role="slider"
-        aria-valuemin={min}
-        aria-valuemax={max}
-        aria-valuenow={clampedValue}
-      >
+      <div ref={trackRef} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onMouseDown={onMouseDown}
+        className="relative w-full h-11 flex items-center cursor-pointer" role="slider" aria-valuemin={min} aria-valuemax={max} aria-valuenow={clampedValue}>
         <div className="absolute left-0 right-0 h-2 rounded-full bg-muted" />
-        <div
-          className="absolute left-0 h-2 rounded-full bg-accent"
-          style={{ width: `${pct}%` }}
-        />
-        <div
-          className="absolute w-5 h-5 rounded-full bg-accent shadow-md -translate-x-1/2"
-          style={{ left: `${pct}%` }}
-        />
+        <div className="absolute left-0 h-2 rounded-full bg-accent transition-[width] duration-75" style={{ width: `${pct}%` }} />
+        <div className="absolute w-6 h-6 rounded-full bg-accent shadow-lg border-2 border-accent-foreground -translate-x-1/2 transition-[left] duration-75" style={{ left: `${pct}%` }} />
       </div>
       <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
-        <span>{minLabel}</span>
-        <span>{maxLabel}</span>
+        <span>{minLabel}</span><span>{maxLabel}</span>
       </div>
     </div>
   );
 };
 
-/* ─── Helper: clamp sqft to valid range ─── */
 const clampSqft = (val: number) => Math.max(SQFT_MIN, Math.min(SQFT_MAX, Math.round(val)));
+
+const WHATSAPP_URL = "https://wa.me/971501234567?text=Hi%2C%20I%20need%20help%20with%20flooring";
 
 const CategoryCalculator = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -161,14 +132,15 @@ const CategoryCalculator = () => {
   const [step, setStep] = useState(1);
   const [selectedShade, setSelectedShade] = useState("");
   const [packageTier, setPackageTier] = useState("standard");
-  // SINGLE SOURCE OF TRUTH: always stored in sqft
   const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [scheduleData, setScheduleData] = useState({
-    date: "", time: "", name: "", email: "", address: "", unit: "",
+    date: "", time: "", name: "", email: "", phone: "", address: "", unit: "",
   });
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  const [areaHelpOpen, setAreaHelpOpen] = useState(false);
+  const [scheduleType, setScheduleType] = useState<"samples" | "visit">("samples");
 
   if (!category || !config) {
     return (
@@ -181,14 +153,11 @@ const CategoryCalculator = () => {
     );
   }
 
-  // Derived display value — never stored, always computed
   const displayArea = unit === "sqm" ? sqftToSqm(areaSqft) : areaSqft;
   const shade = shades.find((s) => s.id === selectedShade);
 
   const toggleOption = (id: string) => {
-    setSelectedOptions((prev) =>
-      prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id]
-    );
+    setSelectedOptions((prev) => prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id]);
   };
 
   const canNext = () => {
@@ -197,36 +166,27 @@ const CategoryCalculator = () => {
       case 2: return !!packageTier;
       case 3: return areaSqft > 0;
       case 4: return true;
-      case 5: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "";
+      case 5: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "" && scheduleData.phone.trim().length >= 7;
       default: return false;
     }
   };
 
   const handleNext = () => { if (step < 6 && canNext()) setStep((s) => s + 1); };
-  const handleBack = () => {
-    if (step === 1) navigate(-1);
-    else setStep((s) => s - 1);
-  };
+  const handleBack = () => { if (step === 1) navigate(-1); else setStep((s) => s - 1); };
 
-  /* ── Area helpers: all write to areaSqft ── */
   const setAreaFromDisplay = (displayVal: number) => {
     const sqft = unit === "sqm" ? sqmToSqft(displayVal) : displayVal;
     setAreaSqft(clampSqft(sqft));
   };
 
   const adjustArea = (delta: number) => {
-    // delta is in display units
     const newDisplay = displayArea + delta;
     const sqft = unit === "sqm" ? sqmToSqft(newDisplay) : newDisplay;
     setAreaSqft(clampSqft(sqft));
   };
 
-  // Unit switch: no conversion needed — areaSqft stays the same!
-  const handleUnitSwitch = (newUnit: "sqft" | "sqm") => {
-    setUnit(newUnit);
-  };
+  const handleUnitSwitch = (newUnit: "sqft" | "sqm") => { setUnit(newUnit); };
 
-  /* ── Schedule field helpers ── */
   const handleScheduleChange = (field: string, value: string) => {
     setScheduleData((prev) => ({ ...prev, [field]: value }));
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
@@ -243,24 +203,35 @@ const CategoryCalculator = () => {
     return "border-border focus:border-accent";
   };
 
-  // Price calculation
-  const basePrices: Record<string, number> = {
-    tile: 140, stone: 320, wood: 280, vinyl: 95, carpet: 110, outdoor: 130,
-  };
+  // Price calculation — sqm-based pricing
+  const areaSqm = areaSqft / CONVERSION;
+  const basePrices: Record<string, number> = { tile: 140, stone: 320, wood: 280, vinyl: 95, carpet: 110, outdoor: 130 };
   const basePrice = basePrices[categoryId!] || 150;
   const pkg = packageTiers.find((p) => p.id === packageTier);
   const materialCost = areaSqft * basePrice * (pkg?.priceMultiplier || 1);
-  const installCost = selectedOptions.includes("standard-install") ? areaSqft * 15 : 0;
-  const optionsCost = selectedOptions.reduce((sum, id) => {
-    if (id === "standard-install") return sum;
-    const opt = config.additionalOptions.find((o) => o.id === id);
-    return sum + (opt ? opt.pricePerSqft * areaSqft : 0);
-  }, 0);
-  const subtotal = materialCost + installCost + optionsCost;
-  const vat = Math.round(subtotal * 0.05);
-  const totalEstimate = Math.round(subtotal + vat);
 
-  // ─── MAIN LAYOUT (all inline to prevent remount issues) ──
+  // Calculate options cost with proper units
+  const optionsCost = selectedOptions.reduce((sum, id) => {
+    const opt = config.additionalOptions.find((o) => o.id === id);
+    if (!opt) return sum;
+    if (opt.priceUnit === "per_door") return sum + opt.pricePerSqft * 4; // assume 4 doors
+    if (opt.priceUnit === "linear_meter") return sum + opt.pricePerSqft * Math.sqrt(areaSqm) * 4; // perimeter estimate
+    return sum + opt.pricePerSqft * areaSqm; // sqm based
+  }, 0);
+
+  const subtotal = materialCost + optionsCost;
+  const discount = Math.round(subtotal * 0.1); // 10% first order
+  const discountedSubtotal = subtotal - discount;
+  const vat = Math.round(discountedSubtotal * 0.05);
+  const totalEstimate = Math.round(discountedSubtotal + vat);
+
+  // Price unit label helper
+  const getPriceUnitLabel = (priceUnit?: string) => {
+    if (priceUnit === "linear_meter") return "/linear m";
+    if (priceUnit === "per_door") return "/door";
+    return "/sqm";
+  };
+
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
@@ -268,36 +239,61 @@ const CategoryCalculator = () => {
         <button onClick={handleBack} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-base font-bold text-foreground">{config.categoryName}</h1>
           <p className="text-[10px] text-muted-foreground">Step {step} of 6</p>
         </div>
       </div>
 
-      {/* Step Indicator — inline */}
-      <div className="px-2 sm:px-3 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
-        <div className="flex items-center justify-center gap-0 py-4">
-          {stepsMeta.map((s, i) => {
-            const done = step > s.id;
-            const active = step === s.id;
-            return (
-              <div key={s.id} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    done ? "bg-[hsl(var(--foreground))] text-background" : active ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {done ? <Check className="w-4 h-4" /> : s.id}
-                  </div>
-                  <span className={`text-[9px] sm:text-[10px] mt-1 font-semibold ${
+      {/* ═══ PREMIUM STEP INDICATOR ═══ */}
+      <div className="px-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
+        <div className="py-4">
+          {/* Progress bar */}
+          <div className="relative h-1 bg-muted rounded-full mb-5 mx-2">
+            <motion.div
+              className="absolute left-0 top-0 h-full rounded-full bg-accent"
+              initial={false}
+              animate={{ width: `${((step - 1) / (stepsMeta.length - 1)) * 100}%` }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            />
+          </div>
+          {/* Step circles */}
+          <div className="flex items-center justify-between">
+            {stepsMeta.map((s, i) => {
+              const done = step > s.id;
+              const active = step === s.id;
+              return (
+                <div key={s.id} className="flex flex-col items-center gap-1.5 flex-1">
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      scale: active ? 1.1 : 1,
+                      backgroundColor: done
+                        ? "hsl(var(--accent))"
+                        : active
+                        ? "hsl(var(--accent))"
+                        : "hsl(var(--muted))",
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-shadow ${
+                      active ? "shadow-lg ring-4 ring-accent/20" : done ? "shadow-md" : ""
+                    }`}
+                  >
+                    {done ? (
+                      <Check className="w-4 h-4 text-accent-foreground" />
+                    ) : (
+                      <span className={`${active ? "text-accent-foreground" : "text-muted-foreground"}`}>
+                        {s.icon}
+                      </span>
+                    )}
+                  </motion.div>
+                  <span className={`text-[9px] sm:text-[10px] font-semibold transition-colors ${
                     active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"
                   }`}>{s.label}</span>
                 </div>
-                {i < stepsMeta.length - 1 && (
-                  <div className={`w-4 sm:w-8 md:w-14 h-[2px] mx-0.5 sm:mx-1 md:mx-2 -mt-4 ${done ? "bg-[hsl(var(--foreground))]" : "bg-border"}`} />
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -305,53 +301,32 @@ const CategoryCalculator = () => {
       <div className="lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8 lg:items-start">
         <div className="px-4 lg:px-0 pb-28 lg:pb-8 mt-4">
           <div className="lg:bg-card lg:rounded-2xl lg:border lg:border-border lg:p-8 lg:shadow-luxury">
-            {/* ─── STEP CONTENT — inline ─── */}
             <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
+              <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+
                 {/* STEP 1: Shades / Designs */}
                 {step === 1 && (
                   <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
                       Select {config.categoryName} {config.shadeLabel}
                     </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
-                      Choose from our curated collection
-                    </p>
+                    <p className="text-sm text-muted-foreground text-center mb-6">Choose from our curated collection</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                       {shades.map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={() => setSelectedShade(s.id)}
+                        <button key={s.id} onClick={() => setSelectedShade(s.id)}
                           className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
-                            selectedShade === s.id
-                              ? "border-accent shadow-lg ring-2 ring-accent/20"
-                              : "border-border hover:border-accent/40"
-                          }`}
-                        >
+                            selectedShade === s.id ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
+                          }`}>
                           <div className="relative aspect-[4/5] overflow-hidden">
-                            <img
-                              src={s.image}
-                              alt={s.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
+                            <img src={s.image} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              selectedShade === s.id
-                                ? "bg-accent border-accent"
-                                : "bg-background/80 border-background/60"
+                              selectedShade === s.id ? "bg-accent border-accent" : "bg-background/80 border-background/60"
                             }`}>
                               {selectedShade === s.id && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
                             </div>
                           </div>
                           <div className="px-3 py-3 bg-card">
-                            <p className={`text-sm font-bold leading-tight ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>
-                              {s.name}
-                            </p>
+                            <p className={`text-sm font-bold leading-tight ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>{s.name}</p>
                             <p className="text-[11px] text-muted-foreground mt-0.5">{s.description}</p>
                           </div>
                         </button>
@@ -363,12 +338,8 @@ const CategoryCalculator = () => {
                 {/* STEP 2: Material Grade */}
                 {step === 2 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
-                      Select Material Grade
-                    </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
-                      Choose the quality level that fits your needs
-                    </p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Select Material Grade</h3>
+                    <p className="text-sm text-muted-foreground text-center mb-6">Choose the quality level that fits your needs</p>
                     <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-lg mx-auto">
                       {packageTiers.map((tier) => {
                         const selected = packageTier === tier.id;
@@ -380,15 +351,10 @@ const CategoryCalculator = () => {
                             }`}>
                             <div className="h-2 bg-muted rounded-full mb-4 overflow-hidden relative">
                               <div className={`h-full rounded-full ${barStyle.color} ${barStyle.width} transition-all`} />
-                              <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
-                                selected ? "bg-accent border-accent" : "bg-card border-muted-foreground/30"
-                              }`} style={{ right: tier.id === "luxury" ? "0" : tier.id === "premium" ? "10%" : tier.id === "standard" ? "20%" : "40%" }} />
                             </div>
                             <p className={`font-bold text-lg mb-1 ${selected ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
                             <p className="text-xs text-muted-foreground mb-3">{tier.description}</p>
-                            <span className="inline-block text-[11px] font-semibold bg-muted px-3 py-1 rounded-full text-muted-foreground">
-                              {tier.badge}
-                            </span>
+                            <span className="inline-block text-[11px] font-semibold bg-muted px-3 py-1 rounded-full text-muted-foreground">{tier.badge}</span>
                           </button>
                         );
                       })}
@@ -399,12 +365,8 @@ const CategoryCalculator = () => {
                 {/* STEP 3: Area */}
                 {step === 3 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
-                      Enter Your Area
-                    </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
-                      Specify the total area to be covered
-                    </p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Enter Your Area</h3>
+                    <p className="text-sm text-muted-foreground text-center mb-6">Specify the total area to be covered</p>
 
                     {/* Unit toggle */}
                     <div className="flex justify-center mb-8">
@@ -421,43 +383,29 @@ const CategoryCalculator = () => {
                     {/* Value display card */}
                     <div className="bg-card border border-border rounded-2xl p-8 max-w-md mx-auto">
                       <div className="flex items-center justify-center gap-5">
-                        <button onClick={() => adjustArea(unit === "sqm" ? -5 : -50)}
+                        <button onClick={() => adjustArea(unit === "sqm" ? -SQM_STEP : -SQFT_STEP)}
                           className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
                           <Minus className="w-5 h-5 text-foreground" />
                         </button>
                         <div className="flex items-start justify-center gap-1 min-w-[140px]">
-                          <input
-                            type="number"
-                            min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
-                            max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
+                          <input type="number" min={unit === "sqm" ? SQM_MIN : SQFT_MIN} max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
                             value={displayArea}
-                            onChange={(e) => {
-                              const raw = Number(e.target.value);
-                              if (!isNaN(raw)) setAreaFromDisplay(raw);
-                            }}
+                            onChange={(e) => { const raw = Number(e.target.value); if (!isNaN(raw)) setAreaFromDisplay(raw); }}
                             onBlur={() => setAreaFromDisplay(displayArea)}
-                            className="w-[120px] text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-                          <span className="text-base font-medium text-muted-foreground mt-2 shrink-0">
-                            {unit === "sqft" ? "sq ft" : "sq m"}
-                          </span>
+                            className="w-[120px] text-center text-5xl font-bold text-foreground bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                          <span className="text-base font-medium text-muted-foreground mt-2 shrink-0">{unit === "sqft" ? "sq ft" : "sq m"}</span>
                         </div>
-                        <button onClick={() => adjustArea(unit === "sqm" ? 5 : 50)}
+                        <button onClick={() => adjustArea(unit === "sqm" ? SQM_STEP : SQFT_STEP)}
                           className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors">
                           <Plus className="w-5 h-5 text-foreground" />
                         </button>
                       </div>
-
-                      {/* Slider */}
                       <AreaSlider
-                        min={unit === "sqm" ? SQM_MIN : SQFT_MIN}
-                        max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
-                        step={unit === "sqm" ? SQM_STEP : SQFT_STEP}
-                        value={displayArea}
+                        min={unit === "sqm" ? SQM_MIN : SQFT_MIN} max={unit === "sqm" ? SQM_MAX : SQFT_MAX}
+                        step={unit === "sqm" ? SQM_STEP : SQFT_STEP} value={displayArea}
                         onChange={setAreaFromDisplay}
                         minLabel={unit === "sqm" ? `${SQM_MIN} sq m` : `${SQFT_MIN} sq ft`}
-                        maxLabel={unit === "sqm" ? `${SQM_MAX} sq m` : `${SQFT_MAX.toLocaleString()} sq ft`}
-                      />
+                        maxLabel={unit === "sqm" ? `${SQM_MAX} sq m` : `${SQFT_MAX.toLocaleString()} sq ft`} />
                     </div>
 
                     {/* Quick presets */}
@@ -473,18 +421,47 @@ const CategoryCalculator = () => {
                         );
                       })}
                     </div>
+
+                    {/* Area Help Section */}
+                    <div className="mt-8">
+                      <button onClick={() => setAreaHelpOpen(!areaHelpOpen)}
+                        className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-card border border-border text-left hover:border-accent/40 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <HelpCircle className="w-5 h-5 text-accent" />
+                          <span className="text-sm font-semibold text-foreground">How do I calculate area?</span>
+                        </div>
+                        {areaHelpOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                      </button>
+                      <AnimatePresence>
+                        {areaHelpOpen && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <div className="px-5 py-4 mt-2 rounded-2xl bg-card border border-border space-y-3">
+                              <p className="text-sm text-foreground font-medium">Simple Formula</p>
+                              <p className="text-xs text-muted-foreground">Measure the length and width of your room in feet, then multiply them together.</p>
+                              <div className="bg-muted rounded-xl p-4 text-center">
+                                <p className="text-sm font-bold text-foreground">Length (ft) x Width (ft) = Area (sq ft)</p>
+                                <p className="text-xs text-muted-foreground mt-1">Example: 15 ft x 20 ft = 300 sq ft</p>
+                              </div>
+                              <p className="text-xs text-muted-foreground">For irregular rooms, divide the space into rectangles, calculate each, and add them together.</p>
+                              <div className="bg-muted rounded-xl p-4 flex items-center justify-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                                  <Ruler className="w-5 h-5 text-accent" />
+                                </div>
+                                <p className="text-xs text-muted-foreground">Video tutorial coming soon</p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 )}
 
                 {/* STEP 4: Additional Options */}
                 {step === 4 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
-                      Additional Options
-                    </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
-                      Enhance your flooring project with these services
-                    </p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Additional Options</h3>
+                    <p className="text-sm text-muted-foreground text-center mb-6">Enhance your flooring project with these services</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {config.additionalOptions.map((opt) => {
                         const sel = selectedOptions.includes(opt.id);
@@ -501,7 +478,7 @@ const CategoryCalculator = () => {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-2">
                                 <p className="font-bold text-sm text-foreground truncate">{opt.label}</p>
-                                <p className="text-sm font-bold text-accent whitespace-nowrap">+AED {opt.pricePerSqft}/sqft</p>
+                                <p className="text-sm font-bold text-accent whitespace-nowrap">+AED {opt.pricePerSqft}{getPriceUnitLabel(opt.priceUnit)}</p>
                               </div>
                               <p className="text-xs text-muted-foreground mt-1">{opt.description}</p>
                             </div>
@@ -510,33 +487,38 @@ const CategoryCalculator = () => {
                       })}
                     </div>
 
-                    {/* Mobile Estimate Bar — inline */}
+                    {/* Mobile Estimate Bar */}
                     <div className="lg:hidden bg-[hsl(var(--foreground))] text-background rounded-2xl mx-0 mt-8 p-5">
                       <div className="flex items-center justify-between mb-4">
                         <span className="font-bold text-sm">Price Estimate</span>
                         <span className="text-[10px] border border-background/30 rounded-full px-2 py-0.5 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                          Transparent Pricing
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Transparent Pricing
                         </span>
                       </div>
                       <div className="space-y-2.5 text-sm mb-4">
-                        <div className="flex justify-between">
-                          <span className="text-background/60">Material Cost</span>
-                          <span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-background/60">Installation</span>
-                          <span className="font-semibold">AED {Math.round(installCost + optionsCost).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-background/60">VAT (5%)</span>
-                          <span className="font-semibold">AED {vat.toLocaleString()}</span>
-                        </div>
+                        <div className="flex justify-between"><span className="text-background/60">Material Cost</span><span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-background/60">Add-ons</span><span className="font-semibold">AED {Math.round(optionsCost).toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-background/60">Subtotal</span><span className="font-semibold">AED {Math.round(subtotal).toLocaleString()}</span></div>
+                        <div className="flex justify-between text-accent"><span>First Order Discount (10%)</span><span className="font-semibold">- AED {discount.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-background/60">VAT (5%)</span><span className="font-semibold">AED {vat.toLocaleString()}</span></div>
                       </div>
-                      <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3">
+                      <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3 mb-4">
                         <span className="font-bold">Total</span>
                         <span className="font-bold text-accent text-lg">AED {totalEstimate.toLocaleString()}</span>
                       </div>
+                      {/* Warranty badges */}
+                      <div className="flex justify-around pt-3 border-t border-background/20">
+                        {[
+                          { icon: <Shield className="w-4 h-4" />, label: "10 Year Warranty" },
+                          { icon: <Award className="w-4 h-4" />, label: "Premium Quality" },
+                          { icon: <Truck className="w-4 h-4" />, label: "Expert Install" },
+                        ].map((b) => (
+                          <div key={b.label} className="flex flex-col items-center gap-1 text-[9px] text-background/60">
+                            <span className="text-accent">{b.icon}</span>{b.label}
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-background/40 text-center mt-3">Note: Final quote based on selection & site condition.</p>
                     </div>
                   </div>
                 )}
@@ -544,16 +526,39 @@ const CategoryCalculator = () => {
                 {/* STEP 5: Schedule */}
                 {step === 5 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
-                      Schedule a Visit
-                    </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
-                      Book a time for our floor advisor to visit you
-                    </p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Schedule a Visit</h3>
+                    <p className="text-sm text-muted-foreground text-center mb-6">Book a time for our floor advisor to visit you</p>
+
+                    {/* Radio selection cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-w-lg mx-auto">
+                      {[
+                        { id: "samples" as const, label: "Order Samples with Site Visit", desc: "Get physical samples delivered to your location" },
+                        { id: "visit" as const, label: "Schedule Visit Only", desc: "Expert consultation at your space" },
+                      ].map((opt) => {
+                        const sel = scheduleType === opt.id;
+                        return (
+                          <button key={opt.id} onClick={() => setScheduleType(opt.id)}
+                            className={`flex items-start gap-3 text-left rounded-2xl p-5 border-2 transition-all ${
+                              sel ? "border-accent bg-accent/5 shadow-md" : "border-border bg-card hover:border-accent/40"
+                            }`}>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
+                              sel ? "border-accent" : "border-muted-foreground/40"
+                            }`}>
+                              {sel && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
+                            </div>
+                            <div>
+                              <p className={`font-bold text-sm ${sel ? "text-accent" : "text-foreground"}`}>{opt.label}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     <div className="max-w-lg mx-auto space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs font-semibold text-foreground mb-1.5 block">Date <span className="text-destructive">*</span></label>
+                          <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Date <span className="text-destructive">*</span></label>
                           <input type="date" value={scheduleData.date}
                             onChange={(e) => handleScheduleChange("date", e.target.value)}
                             onBlur={() => setTouchedFields((p) => ({ ...p, date: true }))}
@@ -561,14 +566,14 @@ const CategoryCalculator = () => {
                           {isFieldInvalid("date", scheduleData.date) && <p className="text-destructive text-[11px] mt-1">Required</p>}
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-foreground mb-1.5 block">Time</label>
+                          <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" /> Time</label>
                           <input type="time" value={scheduleData.time}
                             onChange={(e) => handleScheduleChange("time", e.target.value)}
                             className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none transition-colors" />
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-foreground mb-1.5 block">Full Name <span className="text-destructive">*</span></label>
+                        <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-muted-foreground" /> Full Name <span className="text-destructive">*</span></label>
                         <input type="text" placeholder="Your name" value={scheduleData.name}
                           onChange={(e) => handleScheduleChange("name", e.target.value)}
                           onBlur={() => setTouchedFields((p) => ({ ...p, name: true }))}
@@ -576,21 +581,35 @@ const CategoryCalculator = () => {
                         {isFieldInvalid("name", scheduleData.name) && <p className="text-destructive text-[11px] mt-1">Required</p>}
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-foreground mb-1.5 block">Email <span className="text-destructive">*</span></label>
+                        <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-muted-foreground" /> Email <span className="text-destructive">*</span></label>
                         <input type="email" placeholder="your@email.com" value={scheduleData.email}
                           onChange={(e) => handleScheduleChange("email", e.target.value)}
                           onBlur={() => setTouchedFields((p) => ({ ...p, email: true }))}
                           className={`w-full px-4 py-3 rounded-xl border-2 bg-card text-foreground text-sm outline-none placeholder:text-muted-foreground transition-colors ${fieldBorderClass("email", scheduleData.email)}`} />
                         {isFieldInvalid("email", scheduleData.email) && <p className="text-destructive text-[11px] mt-1">Required</p>}
                       </div>
+                      {/* Mobile Number */}
                       <div>
-                        <label className="text-xs font-semibold text-foreground mb-1.5 block">Address</label>
+                        <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><Smartphone className="w-3.5 h-3.5 text-muted-foreground" /> Mobile Number <span className="text-destructive">*</span></label>
+                        <div className="flex gap-2">
+                          <div className="flex items-center px-3 py-3 rounded-xl border-2 border-border bg-muted text-foreground text-sm font-semibold shrink-0">
+                            +971
+                          </div>
+                          <input type="tel" placeholder="Enter your mobile number" value={scheduleData.phone}
+                            onChange={(e) => handleScheduleChange("phone", e.target.value)}
+                            onBlur={() => setTouchedFields((p) => ({ ...p, phone: true }))}
+                            className={`flex-1 px-4 py-3 rounded-xl border-2 bg-card text-foreground text-sm outline-none placeholder:text-muted-foreground transition-colors ${fieldBorderClass("phone", scheduleData.phone)}`} />
+                        </div>
+                        {isFieldInvalid("phone", scheduleData.phone) && <p className="text-destructive text-[11px] mt-1">Mobile number is required</p>}
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-muted-foreground" /> Address</label>
                         <input type="text" placeholder="Your address in Dubai" value={scheduleData.address}
                           onChange={(e) => handleScheduleChange("address", e.target.value)}
                           className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground transition-colors" />
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-foreground mb-1.5 block">Unit / Villa / Apartment</label>
+                        <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5"><Home className="w-3.5 h-3.5 text-muted-foreground" /> Unit / Villa / Apartment</label>
                         <input type="text" placeholder="e.g. Villa 12, Apt 304" value={scheduleData.unit}
                           onChange={(e) => handleScheduleChange("unit", e.target.value)}
                           className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card text-foreground text-sm focus:border-accent outline-none placeholder:text-muted-foreground transition-colors" />
@@ -606,17 +625,11 @@ const CategoryCalculator = () => {
                       <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                         <CheckCircle2 className="w-8 h-8 text-accent" />
                       </div>
-                      <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">
-                        What happens next?
-                      </h3>
+                      <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">What happens next?</h3>
                       <p className="text-sm text-muted-foreground">Here's what to expect after you confirm.</p>
                     </div>
                     <div className="space-y-3 mb-8 max-w-lg mx-auto">
-                      {[
-                        "Our flooring expert will contact you",
-                        "Samples will be arranged if required",
-                        "Final on-site quote will be shared",
-                      ].map((item, i) => (
+                      {["Our flooring expert will contact you", "Samples will be arranged if required", "Final on-site quote will be shared"].map((item, i) => (
                         <div key={i} className="flex items-center gap-3 bg-card border border-border rounded-2xl p-4">
                           <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
                             <Check className="w-4 h-4 text-accent" />
@@ -625,30 +638,76 @@ const CategoryCalculator = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="bg-card border border-border rounded-2xl p-5 mb-6 max-w-lg mx-auto">
+
+                    {/* Summary */}
+                    <div className="bg-card border border-border rounded-2xl p-5 mb-4 max-w-lg mx-auto">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Your Summary</p>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div><span className="text-muted-foreground">Category:</span> <span className="font-bold text-foreground">{config.categoryName}</span></div>
                         {shade && <div><span className="text-muted-foreground">Design:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
                         <div><span className="text-muted-foreground">Grade:</span> <span className="font-bold text-foreground">{pkg?.name}</span></div>
                         <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaSqft} sqft</span></div>
-                        <div className="col-span-2"><span className="text-muted-foreground">Estimate:</span> <span className="font-bold text-accent text-base">AED {totalEstimate.toLocaleString()}</span></div>
                       </div>
                     </div>
+
+                    {/* Price breakdown */}
+                    <div className="bg-card border border-border rounded-2xl p-5 mb-4 max-w-lg mx-auto">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold text-foreground">AED {Math.round(subtotal).toLocaleString()}</span></div>
+                        <div className="flex justify-between text-accent"><span>First Order Discount (10%)</span><span className="font-semibold">- AED {discount.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">VAT (5%)</span><span className="font-semibold text-foreground">AED {vat.toLocaleString()}</span></div>
+                        <div className="border-t border-border pt-2 flex justify-between items-center">
+                          <span className="font-bold text-foreground">Total Estimate</span>
+                          <span className="font-bold text-accent text-lg">AED {totalEstimate.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Feature badges */}
+                    <div className="flex justify-center gap-6 mb-4 max-w-lg mx-auto">
+                      {[
+                        { icon: <Shield className="w-5 h-5" />, label: "10 Year Warranty" },
+                        { icon: <Award className="w-5 h-5" />, label: "Premium Quality" },
+                        { icon: <Truck className="w-5 h-5" />, label: "Expert Installation" },
+                      ].map((b) => (
+                        <div key={b.label} className="flex flex-col items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+                          <span className="text-accent">{b.icon}</span>{b.label}
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground text-center mb-6 max-w-lg mx-auto">Note: Final quote based on selection & site condition.</p>
+
+                    {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-                      <button onClick={() => navigate("/")}
-                        className="flex-1 py-4 rounded-xl bg-accent text-accent-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                        <Phone className="w-4 h-4" /> Get Final Quote
+                      <button onClick={() => navigate("/get-quote")}
+                        className="flex-1 py-4 rounded-xl border-2 border-accent text-accent font-bold text-sm hover:bg-accent/5 transition-colors flex items-center justify-center gap-2">
+                        Request Sample
                       </button>
                       <button onClick={() => navigate("/")}
-                        className="flex-1 py-4 rounded-xl border-2 border-accent text-accent font-bold text-sm hover:bg-accent/5 transition-colors">
-                        Confirm Request
+                        className="flex-1 py-4 rounded-xl bg-accent text-accent-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                        <Phone className="w-4 h-4" /> Confirm Request
                       </button>
                     </div>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
+
+            {/* ═══ CONSULT FLOORING ADVISER ═══ */}
+            <div className="mt-8">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border hover:border-accent/40 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-[#25D366]/10 flex items-center justify-center shrink-0">
+                  <MessageCircle className="w-5 h-5 text-[#25D366]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted-foreground">New to Flooring?</p>
+                  <p className="text-sm font-bold text-foreground">Consult a Flooring Adviser</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </a>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -668,29 +727,21 @@ const CategoryCalculator = () => {
           )}
         </div>
 
-        {/* Desktop Sticky Estimate Panel — inline */}
+        {/* Desktop Sticky Estimate Panel */}
         <div className="hidden lg:block sticky top-24 mt-4">
           <div className="bg-[hsl(var(--foreground))] text-background rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-bold text-base">Price Estimate</h3>
               <span className="text-[10px] border border-background/30 rounded-full px-2.5 py-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                Transparent Pricing
+                <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Transparent Pricing
               </span>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-background/60">Material Cost</span>
-                <span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-background/60">Installation</span>
-                <span className="font-semibold">AED {Math.round(installCost + optionsCost).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-background/60">VAT (5%)</span>
-                <span className="font-semibold">AED {vat.toLocaleString()}</span>
-              </div>
+              <div className="flex justify-between"><span className="text-background/60">Material Cost</span><span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-background/60">Add-ons</span><span className="font-semibold">AED {Math.round(optionsCost).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-background/60">Subtotal</span><span className="font-semibold">AED {Math.round(subtotal).toLocaleString()}</span></div>
+              <div className="flex justify-between text-accent"><span>First Order (10% Off)</span><span className="font-semibold">- AED {discount.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-background/60">VAT (5%)</span><span className="font-semibold">AED {vat.toLocaleString()}</span></div>
               <div className="border-t border-background/20 pt-3">
                 <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3">
                   <span className="font-bold text-sm">Total Estimate</span>
@@ -698,18 +749,19 @@ const CategoryCalculator = () => {
                 </div>
               </div>
             </div>
+            {/* Badges */}
             <div className="mt-6 pt-5 border-t border-background/20 flex justify-around">
               {[
                 { icon: <Shield className="w-5 h-5" />, label: "10 Year Warranty" },
-                { icon: <Award className="w-5 h-5" />, label: "Quality Assured" },
-                { icon: <Truck className="w-5 h-5" />, label: "Free Delivery" },
+                { icon: <Award className="w-5 h-5" />, label: "Premium Quality" },
+                { icon: <Truck className="w-5 h-5" />, label: "Expert Install" },
               ].map((badge) => (
                 <div key={badge.label} className="flex flex-col items-center gap-1.5 text-[10px] text-background/60">
-                  <span className="text-accent">{badge.icon}</span>
-                  {badge.label}
+                  <span className="text-accent">{badge.icon}</span>{badge.label}
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-background/40 text-center mt-4">Note: Final quote based on selection & site condition.</p>
           </div>
         </div>
       </div>
@@ -738,7 +790,7 @@ const CategoryCalculator = () => {
           </button>
           <button onClick={() => navigate("/")}
             className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-accent text-accent-foreground hover:opacity-90 shadow-lg">
-            <Phone className="w-4 h-4" /> Get Final Quote
+            <Phone className="w-4 h-4" /> Confirm Request
           </button>
         </div>
       )}
