@@ -27,7 +27,7 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     additionalOptions: [
       ...commonOptions,
       { id: "skirting", label: "Skirting", description: "PVC skirting to match flooring", pricePerSqft: 39, priceUnit: "linear_meter" },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 14, priceUnit: "per_door" },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 49, priceUnit: "per_door" },
     ],
   },
   wood: {
@@ -37,7 +37,7 @@ export const categoryCalculatorConfigs: Record<string, CategoryCalculatorConfig>
     additionalOptions: [
       ...commonOptions,
       { id: "skirting", label: "Wood Skirting", description: "Solid wood skirting boards", pricePerSqft: 39, priceUnit: "linear_meter" },
-      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 14, priceUnit: "per_door" },
+      { id: "door-trimming", label: "Door Trimming", description: "Trim doors to fit new floor height", pricePerSqft: 49, priceUnit: "per_door" },
     ],
   },
   tile: {

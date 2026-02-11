@@ -13,7 +13,6 @@ import spaceResidential from "@/assets/space-residential.jpg";
 import spaceCommercial from "@/assets/space-commercial.jpg";
 import spaceIndustrial from "@/assets/space-industrial.jpg";
 
-// ─── Shade images used across flooring types ───
 import shadeEngineeredWood from "@/assets/shade-engineered-wood.jpg";
 import shadeParquet from "@/assets/shade-parquet.jpg";
 import shadeSolidHardwood from "@/assets/shade-solid-hardwood.jpg";
@@ -35,7 +34,15 @@ import shadeMarble from "@/assets/shade-marble.jpg";
 import shadeSandstone from "@/assets/shade-sandstone.jpg";
 import shadeSlate from "@/assets/shade-slate.jpg";
 
-export interface FlooringShade {
+import typeTile from "@/assets/type-tile.jpg";
+import typeWood from "@/assets/type-wood.jpg";
+import typeVinyl from "@/assets/type-vinyl.jpg";
+import typeCarpet from "@/assets/type-carpet.jpg";
+import typeOutdoor from "@/assets/type-outdoor.jpg";
+
+// ─── Types ───
+
+export interface FlooringPattern {
   id: string;
   name: string;
   description: string;
@@ -47,303 +54,260 @@ export interface FlooringType {
   name: string;
   isPopular: boolean;
   image: string;
-  priceRange: string; // e.g. "85–190"
-  calculatorId?: string; // maps to calculator categoryId
-  shades: FlooringShade[];
+  priceRange: string;
+  calculatorId?: string;
+  patterns: FlooringPattern[];
+}
+
+export interface MaterialCategory {
+  id: string;
+  name: string;
+  image: string;
+  isPopular?: boolean;
+  flooringTypes: FlooringType[];
 }
 
 export interface Segment {
   id: string;
   name: string;
   image: string;
-  flooringTypes: FlooringType[];
+  materials: MaterialCategory[];
 }
 
-// ─── Shade definitions for each flooring type ───
+// ─── Pattern definitions ───
 
-const spcShades: FlooringShade[] = [
-  { id: "spc-oak", name: "Oak Finish", description: "Warm natural oak look", image: shadeSpc },
-  { id: "spc-walnut", name: "Walnut Finish", description: "Rich dark tones", image: shadeEngineeredWood },
-  { id: "spc-grey", name: "Grey Stone", description: "Modern cool tones", image: shadeSlate },
-  { id: "spc-light", name: "Light Maple", description: "Bright airy finish", image: shadeLaminate },
+const spcPatterns: FlooringPattern[] = [
+  { id: "spc-wood-grain", name: "Classic Wood Plank", description: "Natural wood-look planks", image: shadeSpc },
+  { id: "spc-herringbone", name: "Herringbone", description: "Timeless angular pattern", image: shadeParquet },
+  { id: "spc-wide-plank", name: "Wide Plank", description: "Modern wide-format", image: shadeEngineeredWood },
+  { id: "spc-stone-look", name: "Stone Look", description: "Realistic stone effect", image: shadeSlate },
 ];
 
-const lvtShades: FlooringShade[] = [
-  { id: "lvt-marble", name: "Marble Effect", description: "Elegant marble look", image: shadeLvt },
-  { id: "lvt-concrete", name: "Concrete Look", description: "Industrial modern", image: shadePorcelainTiles },
-  { id: "lvt-wood", name: "Wood Grain", description: "Classic timber finish", image: shadeWpc },
-  { id: "lvt-rustic", name: "Rustic Oak", description: "Characterful grain", image: shadeParquet },
+const lvtPatterns: FlooringPattern[] = [
+  { id: "lvt-marble-effect", name: "Marble Effect", description: "Elegant marble look", image: shadeLvt },
+  { id: "lvt-concrete-look", name: "Concrete Look", description: "Industrial modern", image: shadePorcelainTiles },
+  { id: "lvt-wood-grain", name: "Wood Grain", description: "Classic timber finish", image: shadeWpc },
+  { id: "lvt-chevron", name: "Chevron", description: "Designer V-pattern", image: shadeParquet },
 ];
 
-const laminateShades: FlooringShade[] = [
-  { id: "lam-oak", name: "Classic Oak", description: "Timeless wood look", image: shadeLaminate },
-  { id: "lam-grey", name: "Ash Grey", description: "Contemporary grey", image: shadeSlate },
-  { id: "lam-walnut", name: "Dark Walnut", description: "Deep warm tones", image: shadeEngineeredWood },
-  { id: "lam-chevron", name: "Chevron Pattern", description: "Designer chevron", image: shadeParquet },
+const rigidCorePatterns: FlooringPattern[] = [
+  { id: "rc-oak-plank", name: "Oak Plank", description: "Sturdy oak-look rigid core", image: shadeSpc },
+  { id: "rc-rustic", name: "Rustic Wood", description: "Aged weathered look", image: shadeSolidHardwood },
+  { id: "rc-tile-look", name: "Tile Look", description: "Stone-effect rigid", image: shadeCeramicTiles },
 ];
 
-const ceramicPorcelainShades: FlooringShade[] = [
-  { id: "cp-marble", name: "Marble Veining", description: "Luxurious marble effect", image: shadeCeramicTiles },
-  { id: "cp-wood", name: "Wood Look", description: "Warm wood-effect tiles", image: shadePorcelainTiles },
-  { id: "cp-cement", name: "Cement Look", description: "Industrial charm", image: shadeCementTiles },
-  { id: "cp-mosaic", name: "Mosaic Pattern", description: "Decorative small format", image: shadeMosaicTiles },
+const glueDownPatterns: FlooringPattern[] = [
+  { id: "gd-strip", name: "Strip Pattern", description: "Narrow plank strips", image: shadeLvt },
+  { id: "gd-parquet", name: "Parquet Style", description: "Geometric wood blocks", image: shadeParquet },
+  { id: "gd-fabric-look", name: "Fabric Look", description: "Woven textile effect", image: shadeCarpetTiles },
 ];
 
-const porcelainVitrifiedShades: FlooringShade[] = [
-  { id: "pv-gloss", name: "High Gloss White", description: "Bright reflective finish", image: shadeVitrifiedTiles },
-  { id: "pv-matt", name: "Matte Stone", description: "Subtle natural tones", image: shadePorcelainTiles },
-  { id: "pv-dark", name: "Dark Basalt", description: "Bold contemporary", image: shadeSlate },
-  { id: "pv-terrazzo", name: "Terrazzo Look", description: "Speckled aggregate", image: shadeTerrazzo },
+const clickLockPatterns: FlooringPattern[] = [
+  { id: "cl-wide-plank", name: "Wide Plank", description: "Easy-install wide format", image: shadeEngineeredWood },
+  { id: "cl-chevron", name: "Chevron", description: "Click-lock chevron", image: shadeParquet },
+  { id: "cl-stone", name: "Stone Effect", description: "Natural stone look", image: shadeStonePavers },
 ];
 
-const carpetTileShades: FlooringShade[] = [
-  { id: "ct-grey", name: "Charcoal Grey", description: "Professional modern", image: shadeCarpetTiles },
-  { id: "ct-blue", name: "Ocean Blue", description: "Calming office tones", image: shadeCarpetTiles },
-  { id: "ct-beige", name: "Sand Beige", description: "Warm neutral", image: shadeAreaRugs },
-  { id: "ct-stripe", name: "Striped Pattern", description: "Linear design", image: shadeWallCarpet },
+const engineeredWoodPatterns: FlooringPattern[] = [
+  { id: "ew-herringbone", name: "Herringbone", description: "Classic herringbone in wood", image: shadeParquet },
+  { id: "ew-wide-plank", name: "Wide Plank", description: "Contemporary wide boards", image: shadeEngineeredWood },
+  { id: "ew-chevron", name: "Chevron", description: "Angled V pattern", image: shadeParquet },
+  { id: "ew-plank", name: "Standard Plank", description: "Traditional straight plank", image: shadeSolidHardwood },
 ];
 
-const epoxyShades: FlooringShade[] = [
-  { id: "ep-grey", name: "Industrial Grey", description: "Classic industrial", image: typeResin },
-  { id: "ep-flake", name: "Decorative Flake", description: "Multi-color chips", image: typeRubber },
-  { id: "ep-metallic", name: "Metallic Swirl", description: "Unique metallic effect", image: typeStone },
-  { id: "ep-clear", name: "Clear Coat", description: "Transparent finish", image: shadePorcelainTiles },
+const laminatePatterns: FlooringPattern[] = [
+  { id: "lam-oak-plank", name: "Classic Oak Plank", description: "Timeless oak look", image: shadeLaminate },
+  { id: "lam-herringbone", name: "Herringbone", description: "Designer herringbone", image: shadeParquet },
+  { id: "lam-rustic", name: "Rustic Wood", description: "Weathered character", image: shadeSolidHardwood },
+  { id: "lam-chevron", name: "Chevron Pattern", description: "V-shape chevron", image: shadeParquet },
 ];
 
-const puFlooringShades: FlooringShade[] = [
-  { id: "pu-beige", name: "Beige Satin", description: "Food-grade finish", image: shadeSandstone },
-  { id: "pu-grey", name: "Steel Grey", description: "Heavy-duty grey", image: shadeSlate },
-  { id: "pu-tan", name: "Tan Brown", description: "Warm industrial", image: shadeLimestone },
-  { id: "pu-cream", name: "Cream White", description: "Clean bright finish", image: shadeMarble },
+const solidHardwoodPatterns: FlooringPattern[] = [
+  { id: "sh-plank", name: "Traditional Plank", description: "Classic solid planks", image: shadeSolidHardwood },
+  { id: "sh-parquet", name: "Parquet", description: "Geometric block pattern", image: shadeParquet },
+  { id: "sh-wide-board", name: "Wide Board", description: "Premium wide format", image: shadeEngineeredWood },
 ];
 
-const selfLevelingShades: FlooringShade[] = [
-  { id: "sl-white", name: "Pure White", description: "Ultra-clean surface", image: shadeMarble },
-  { id: "sl-grey", name: "Concrete Grey", description: "Seamless grey", image: typeResin },
-  { id: "sl-sand", name: "Sand Tone", description: "Warm neutral", image: shadeSandstone },
-  { id: "sl-dark", name: "Dark Charcoal", description: "Statement dark floor", image: shadeSlate },
+const parquetPatterns: FlooringPattern[] = [
+  { id: "pq-herringbone", name: "Herringbone", description: "Iconic angular design", image: shadeParquet },
+  { id: "pq-chevron", name: "Chevron", description: "Angled V-shape", image: shadeParquet },
+  { id: "pq-basket-weave", name: "Basket Weave", description: "Interlocking weave", image: shadeEngineeredWood },
+  { id: "pq-versailles", name: "Versailles", description: "Royal geometric panel", image: shadeSolidHardwood },
 ];
 
-const polishedConcreteShades: FlooringShade[] = [
-  { id: "pc-natural", name: "Natural Concrete", description: "Raw industrial look", image: typeResin },
-  { id: "pc-salt", name: "Salt & Pepper", description: "Exposed aggregate", image: shadeGranite },
-  { id: "pc-cream", name: "Cream Polish", description: "Warm polished tone", image: shadeLimestone },
-  { id: "pc-dark", name: "Charcoal Polish", description: "Dark modern finish", image: shadeSlate },
+const ceramicPatterns: FlooringPattern[] = [
+  { id: "cer-marble-vein", name: "Marble Veining", description: "Luxurious marble effect", image: shadeCeramicTiles },
+  { id: "cer-wood-look", name: "Wood Look", description: "Warm wood-effect tiles", image: shadePorcelainTiles },
+  { id: "cer-cement", name: "Cement Look", description: "Industrial charm", image: shadeCementTiles },
+  { id: "cer-mosaic", name: "Mosaic Pattern", description: "Decorative small format", image: shadeMosaicTiles },
 ];
 
-const spcLvtCombinedShades: FlooringShade[] = [
-  ...spcShades.slice(0, 2),
-  ...lvtShades.slice(0, 2),
+const porcelainPatterns: FlooringPattern[] = [
+  { id: "por-high-gloss", name: "High Gloss", description: "Bright reflective finish", image: shadeVitrifiedTiles },
+  { id: "por-matte-stone", name: "Matte Stone", description: "Subtle natural tones", image: shadePorcelainTiles },
+  { id: "por-terrazzo", name: "Terrazzo Look", description: "Speckled aggregate", image: shadeTerrazzo },
+  { id: "por-marble", name: "Marble Look", description: "Premium marble effect", image: shadeMarble },
 ];
 
-const epoxyPuShades: FlooringShade[] = [
-  ...epoxyShades.slice(0, 2),
-  ...puFlooringShades.slice(0, 2),
+const mosaicPatterns: FlooringPattern[] = [
+  { id: "mos-geometric", name: "Geometric", description: "Bold geometric shapes", image: shadeMosaicTiles },
+  { id: "mos-hexagon", name: "Hexagon", description: "Modern hex layout", image: shadeMosaicTiles },
+  { id: "mos-random", name: "Random Mix", description: "Artistic random pattern", image: shadeCementTiles },
 ];
 
-// ─── Space-specific flooring types ───
-
-export interface SpaceConfig {
-  id: string;
-  name: string;
-  flooringTypes: FlooringType[];
-}
-
-export const spaceFlooringTypes: SpaceConfig[] = [
-  {
-    id: "kitchen",
-    name: "Kitchen",
-    flooringTypes: [
-      { id: "kitchen-ceramic", name: "Ceramic / Porcelain Tiles", isPopular: true, image: shadeCeramicTiles, priceRange: "35–160", calculatorId: "tile", shades: ceramicPorcelainShades },
-      { id: "kitchen-spc", name: "SPC Flooring", isPopular: false, image: shadeSpc, priceRange: "85–190", calculatorId: "vinyl", shades: spcShades },
-      { id: "kitchen-lvt", name: "Luxury Vinyl Tiles", isPopular: false, image: shadeLvt, priceRange: "75–180", calculatorId: "vinyl", shades: lvtShades },
-      { id: "kitchen-stone", name: "Natural Stone", isPopular: false, image: shadeGranite, priceRange: "140–500", calculatorId: "stone", shades: [
-        { id: "ks-granite", name: "Granite", description: "Ultra durable", image: shadeGranite },
-        { id: "ks-marble", name: "Marble", description: "Luxury veined", image: shadeMarble },
-        { id: "ks-limestone", name: "Limestone", description: "Warm elegance", image: shadeLimestone },
-        { id: "ks-slate", name: "Slate", description: "Rustic texture", image: shadeSlate },
-      ]},
-    ],
-  },
-  {
-    id: "stairs",
-    name: "Stairs",
-    flooringTypes: [
-      { id: "stairs-wood", name: "Engineered Wood", isPopular: true, image: shadeEngineeredWood, priceRange: "95–450", calculatorId: "wood", shades: [
-        { id: "sw-oak", name: "Oak Plank", description: "Classic warmth", image: shadeEngineeredWood },
-        { id: "sw-walnut", name: "Walnut", description: "Rich dark tones", image: shadeSolidHardwood },
-        { id: "sw-ash", name: "Ash Grey", description: "Modern neutral", image: shadeLaminate },
-        { id: "sw-teak", name: "Teak", description: "Golden warmth", image: shadeParquet },
-      ]},
-      { id: "stairs-spc", name: "SPC Flooring", isPopular: false, image: shadeSpc, priceRange: "85–190", calculatorId: "vinyl", shades: spcShades },
-      { id: "stairs-stone", name: "Natural Stone", isPopular: false, image: shadeMarble, priceRange: "140–500", calculatorId: "stone", shades: [
-        { id: "ss-marble", name: "Marble", description: "Luxury treads", image: shadeMarble },
-        { id: "ss-granite", name: "Granite", description: "Hard wearing", image: shadeGranite },
-        { id: "ss-limestone", name: "Limestone", description: "Soft elegance", image: shadeLimestone },
-        { id: "ss-sandstone", name: "Sandstone", description: "Earthy tones", image: shadeSandstone },
-      ]},
-      { id: "stairs-carpet", name: "Carpet Runner", isPopular: false, image: shadeWallCarpet, priceRange: "60–140", calculatorId: "carpet", shades: [
-        { id: "sc-wool", name: "Wool Runner", description: "Premium natural fibre", image: shadeWallCarpet },
-        { id: "sc-nylon", name: "Nylon Pattern", description: "Durable patterned", image: shadeCarpetTiles },
-        { id: "sc-sisal", name: "Sisal Natural", description: "Eco-friendly weave", image: shadeAreaRugs },
-        { id: "sc-stripe", name: "Stripe Design", description: "Classic stripes", image: shadeCarpetTiles },
-      ]},
-    ],
-  },
-  {
-    id: "bathroom",
-    name: "Bathroom",
-    flooringTypes: [
-      { id: "bath-porcelain", name: "Porcelain Tiles", isPopular: true, image: shadePorcelainTiles, priceRange: "55–160", calculatorId: "tile", shades: [
-        { id: "bp-marble", name: "Marble Look", description: "Elegant veining", image: shadePorcelainTiles },
-        { id: "bp-mosaic", name: "Mosaic", description: "Small-format beauty", image: shadeMosaicTiles },
-        { id: "bp-wood", name: "Wood Look", description: "Warm waterproof", image: shadeCeramicTiles },
-        { id: "bp-stone", name: "Stone Look", description: "Natural texture", image: shadeStonePavers },
-      ]},
-      { id: "bath-spc", name: "SPC Flooring", isPopular: false, image: shadeSpc, priceRange: "85–190", calculatorId: "vinyl", shades: spcShades },
-      { id: "bath-stone", name: "Natural Stone", isPopular: false, image: shadeMarble, priceRange: "140–500", calculatorId: "stone", shades: [
-        { id: "bs-marble", name: "Marble", description: "Spa luxury", image: shadeMarble },
-        { id: "bs-limestone", name: "Limestone", description: "Soft texture", image: shadeLimestone },
-        { id: "bs-slate", name: "Slate", description: "Anti-slip natural", image: shadeSlate },
-        { id: "bs-travertine", name: "Travertine", description: "Mediterranean feel", image: shadeSandstone },
-      ]},
-      { id: "bath-lvt", name: "LVT Waterproof", isPopular: false, image: shadeLvt, priceRange: "75–180", calculatorId: "vinyl", shades: lvtShades },
-    ],
-  },
+const carpetTilePatterns: FlooringPattern[] = [
+  { id: "ct-linear", name: "Linear Stripe", description: "Clean parallel lines", image: shadeCarpetTiles },
+  { id: "ct-loop-pile", name: "Loop Pile", description: "Textured loop finish", image: shadeWallCarpet },
+  { id: "ct-plush", name: "Plush Cut", description: "Soft dense pile", image: shadeAreaRugs },
 ];
 
-// ─── Main segments ───
+const wallToWallPatterns: FlooringPattern[] = [
+  { id: "ww-plain", name: "Plain Weave", description: "Uniform solid finish", image: shadeWallCarpet },
+  { id: "ww-textured", name: "Textured Loop", description: "Multi-level loop", image: shadeCarpetTiles },
+  { id: "ww-patterned", name: "Patterned", description: "Decorative repeat pattern", image: shadeAreaRugs },
+];
+
+const areaRugPatterns: FlooringPattern[] = [
+  { id: "ar-persian", name: "Persian", description: "Traditional ornate design", image: shadeAreaRugs },
+  { id: "ar-modern", name: "Modern Abstract", description: "Contemporary art rug", image: shadeCarpetTiles },
+  { id: "ar-natural", name: "Natural Fibre", description: "Jute, sisal, seagrass", image: shadeWallCarpet },
+];
+
+const outdoorTilePatterns: FlooringPattern[] = [
+  { id: "ot-stone-look", name: "Stone Look", description: "Natural stone effect", image: shadeOutdoorTiles },
+  { id: "ot-wood-look", name: "Wood Look", description: "Outdoor wood plank", image: shadeTimberDecking },
+  { id: "ot-geometric", name: "Geometric", description: "Bold outdoor pattern", image: shadeStonePavers },
+];
+
+const timberDeckingPatterns: FlooringPattern[] = [
+  { id: "td-straight", name: "Straight Plank", description: "Classic deck boards", image: shadeTimberDecking },
+  { id: "td-herringbone", name: "Herringbone Deck", description: "Angular deck layout", image: shadeTimberDecking },
+  { id: "td-diagonal", name: "Diagonal", description: "Angled board pattern", image: shadeWpcDecking },
+];
+
+const wpcDeckingPatterns: FlooringPattern[] = [
+  { id: "wpc-plank", name: "Standard Plank", description: "Composite deck boards", image: shadeWpcDecking },
+  { id: "wpc-wide", name: "Wide Plank", description: "Modern wide composite", image: shadeWpcDecking },
+  { id: "wpc-grooved", name: "Grooved Surface", description: "Anti-slip grooved", image: shadeWpcDecking },
+];
+
+const stonePaverPatterns: FlooringPattern[] = [
+  { id: "sp-random", name: "Random Ashlar", description: "Mixed-size layout", image: shadeStonePavers },
+  { id: "sp-stacked", name: "Stacked Bond", description: "Aligned grid pattern", image: shadeGranite },
+  { id: "sp-herringbone", name: "Herringbone", description: "Classic angled pavers", image: shadeStonePavers },
+];
+
+// ─── Material categories with flooring types ───
+
+const spcLvtMaterial: MaterialCategory = {
+  id: "spc-lvt",
+  name: "SPC / LVT",
+  image: typeVinyl,
+  isPopular: true,
+  flooringTypes: [
+    { id: "ft-spc", name: "SPC Vinyl", isPopular: true, image: shadeSpc, priceRange: "85–190", calculatorId: "vinyl", patterns: spcPatterns },
+    { id: "ft-lvt", name: "LVT Vinyl", isPopular: false, image: shadeLvt, priceRange: "75–180", calculatorId: "vinyl", patterns: lvtPatterns },
+    { id: "ft-rigid-core", name: "Rigid Core Vinyl", isPopular: false, image: shadePvc, priceRange: "90–200", calculatorId: "vinyl", patterns: rigidCorePatterns },
+    { id: "ft-glue-down", name: "Glue Down Vinyl", isPopular: false, image: shadeVinylSheets, priceRange: "65–150", calculatorId: "vinyl", patterns: glueDownPatterns },
+    { id: "ft-click-lock", name: "Click Lock Vinyl", isPopular: false, image: shadeWpc, priceRange: "80–170", calculatorId: "vinyl", patterns: clickLockPatterns },
+  ],
+};
+
+const woodenMaterial: MaterialCategory = {
+  id: "wooden",
+  name: "Wooden",
+  image: typeWood,
+  flooringTypes: [
+    { id: "ft-engineered", name: "Engineered Wood", isPopular: true, image: shadeEngineeredWood, priceRange: "95–450", calculatorId: "wood", patterns: engineeredWoodPatterns },
+    { id: "ft-laminate", name: "Laminate", isPopular: false, image: shadeLaminate, priceRange: "55–130", calculatorId: "wood", patterns: laminatePatterns },
+    { id: "ft-solid-hardwood", name: "Solid Hardwood", isPopular: false, image: shadeSolidHardwood, priceRange: "180–600", calculatorId: "wood", patterns: solidHardwoodPatterns },
+    { id: "ft-parquet", name: "Parquet", isPopular: false, image: shadeParquet, priceRange: "120–350", calculatorId: "wood", patterns: parquetPatterns },
+  ],
+};
+
+const tilesMaterial: MaterialCategory = {
+  id: "tiles",
+  name: "Tiles",
+  image: typeTile,
+  flooringTypes: [
+    { id: "ft-ceramic", name: "Ceramic Tiles", isPopular: false, image: shadeCeramicTiles, priceRange: "35–90", calculatorId: "tile", patterns: ceramicPatterns },
+    { id: "ft-porcelain", name: "Porcelain Tiles", isPopular: true, image: shadePorcelainTiles, priceRange: "55–160", calculatorId: "tile", patterns: porcelainPatterns },
+    { id: "ft-vitrified", name: "Vitrified Tiles", isPopular: false, image: shadeVitrifiedTiles, priceRange: "50–140", calculatorId: "tile", patterns: porcelainPatterns },
+    { id: "ft-mosaic", name: "Mosaic Tiles", isPopular: false, image: shadeMosaicTiles, priceRange: "80–250", calculatorId: "tile", patterns: mosaicPatterns },
+    { id: "ft-terrazzo", name: "Terrazzo Tiles", isPopular: false, image: shadeTerrazzo, priceRange: "90–220", calculatorId: "tile", patterns: ceramicPatterns },
+  ],
+};
+
+const carpetMaterial: MaterialCategory = {
+  id: "carpet",
+  name: "Carpet",
+  image: typeCarpet,
+  flooringTypes: [
+    { id: "ft-carpet-tiles", name: "Carpet Tiles", isPopular: true, image: shadeCarpetTiles, priceRange: "60–140", calculatorId: "carpet", patterns: carpetTilePatterns },
+    { id: "ft-wall-to-wall", name: "Wall-to-Wall Carpet", isPopular: false, image: shadeWallCarpet, priceRange: "45–120", calculatorId: "carpet", patterns: wallToWallPatterns },
+    { id: "ft-area-rugs", name: "Area Rugs", isPopular: false, image: shadeAreaRugs, priceRange: "50–300", calculatorId: "carpet", patterns: areaRugPatterns },
+  ],
+};
+
+const outdoorMaterial: MaterialCategory = {
+  id: "outdoor",
+  name: "Outdoor",
+  image: typeOutdoor,
+  flooringTypes: [
+    { id: "ft-outdoor-tiles", name: "Outdoor Tiles", isPopular: true, image: shadeOutdoorTiles, priceRange: "45–120", calculatorId: "outdoor", patterns: outdoorTilePatterns },
+    { id: "ft-timber-decking", name: "Timber Decking", isPopular: false, image: shadeTimberDecking, priceRange: "120–350", calculatorId: "outdoor", patterns: timberDeckingPatterns },
+    { id: "ft-wpc-decking", name: "WPC Decking", isPopular: false, image: shadeWpcDecking, priceRange: "90–250", calculatorId: "outdoor", patterns: wpcDeckingPatterns },
+    { id: "ft-stone-pavers", name: "Stone Pavers", isPopular: false, image: shadeStonePavers, priceRange: "80–300", calculatorId: "outdoor", patterns: stonePaverPatterns },
+  ],
+};
+
+// ─── Segments ───
 
 export const segments: Segment[] = [
   {
     id: "residential",
     name: "Residential",
     image: spaceResidential,
-    flooringTypes: [
-      {
-        id: "res-spc",
-        name: "SPC Flooring",
-        isPopular: true,
-        image: shadeSpc,
-        priceRange: "85–190",
-        calculatorId: "vinyl",
-        shades: spcShades,
-      },
-      {
-        id: "res-lvt",
-        name: "Luxury Vinyl Tiles (LVT)",
-        isPopular: false,
-        image: shadeLvt,
-        priceRange: "75–180",
-        calculatorId: "vinyl",
-        shades: lvtShades,
-      },
-      {
-        id: "res-laminate",
-        name: "Laminate Flooring",
-        isPopular: false,
-        image: shadeLaminate,
-        priceRange: "55–130",
-        calculatorId: "wood",
-        shades: laminateShades,
-      },
-      {
-        id: "res-ceramic",
-        name: "Ceramic / Porcelain Tiles",
-        isPopular: false,
-        image: shadeCeramicTiles,
-        priceRange: "35–160",
-        calculatorId: "tile",
-        shades: ceramicPorcelainShades,
-      },
-    ],
+    materials: [spcLvtMaterial, woodenMaterial, tilesMaterial, carpetMaterial, outdoorMaterial],
   },
   {
     id: "commercial",
     name: "Commercial",
     image: spaceCommercial,
-    flooringTypes: [
-      {
-        id: "com-spc-lvt",
-        name: "SPC / LVT",
-        isPopular: true,
-        image: shadeSpc,
-        priceRange: "75–190",
-        calculatorId: "vinyl",
-        shades: spcLvtCombinedShades,
-      },
-      {
-        id: "com-porcelain",
-        name: "Porcelain / Vitrified Tiles",
-        isPopular: false,
-        image: shadeVitrifiedTiles,
-        priceRange: "55–180",
-        calculatorId: "tile",
-        shades: porcelainVitrifiedShades,
-      },
-      {
-        id: "com-carpet",
-        name: "Carpet Tiles",
-        isPopular: false,
-        image: shadeCarpetTiles,
-        priceRange: "60–140",
-        calculatorId: "carpet",
-        shades: carpetTileShades,
-      },
-      {
-        id: "com-epoxy",
-        name: "Epoxy / PU Flooring",
-        isPopular: false,
-        image: typeResin,
-        priceRange: "65–190",
-        calculatorId: "resin",
-        shades: epoxyPuShades,
-      },
-    ],
+    materials: [spcLvtMaterial, tilesMaterial, carpetMaterial, woodenMaterial, outdoorMaterial],
   },
   {
     id: "industrial",
     name: "Industrial",
     image: spaceIndustrial,
-    flooringTypes: [
-      {
-        id: "ind-epoxy",
-        name: "Epoxy Flooring",
-        isPopular: true,
-        image: typeResin,
-        priceRange: "65–140",
-        calculatorId: "resin",
-        shades: epoxyShades,
-      },
-      {
-        id: "ind-pu",
-        name: "PU Flooring",
-        isPopular: false,
-        image: typeRubber,
-        priceRange: "90–190",
-        calculatorId: "resin",
-        shades: puFlooringShades,
-      },
-      {
-        id: "ind-self-leveling",
-        name: "Self-Leveling Resin",
-        isPopular: false,
-        image: typeStone,
-        priceRange: "110–240",
-        calculatorId: "resin",
-        shades: selfLevelingShades,
-      },
-      {
-        id: "ind-concrete",
-        name: "Polished Concrete",
-        isPopular: false,
-        image: shadeGranite,
-        priceRange: "70–160",
-        calculatorId: "concrete",
-        shades: polishedConcreteShades,
-      },
-    ],
+    materials: [spcLvtMaterial, tilesMaterial, outdoorMaterial, woodenMaterial, carpetMaterial],
   },
 ];
 
 export const getSegmentById = (id: string) => segments.find((s) => s.id === id);
+
+// ─── Space-specific configs (Kitchen/Stairs/Bathroom) ───
+
+export interface SpaceConfig {
+  id: string;
+  name: string;
+  materials: MaterialCategory[];
+}
+
+export const spaceFlooringTypes: SpaceConfig[] = [
+  {
+    id: "kitchen",
+    name: "Kitchen",
+    materials: [tilesMaterial, spcLvtMaterial, woodenMaterial],
+  },
+  {
+    id: "stairs",
+    name: "Stairs",
+    materials: [woodenMaterial, spcLvtMaterial, carpetMaterial],
+  },
+  {
+    id: "bathroom",
+    name: "Bathroom",
+    materials: [tilesMaterial, spcLvtMaterial, outdoorMaterial],
+  },
+];

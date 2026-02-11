@@ -248,48 +248,41 @@ const CategoryCalculator = () => {
       {/* ═══ PREMIUM STEP INDICATOR ═══ */}
       <div className="px-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
         <div className="py-4">
-          {/* Progress bar */}
-          <div className="relative h-1 bg-muted rounded-full mb-5 mx-2">
-            <motion.div
-              className="absolute left-0 top-0 h-full rounded-full bg-accent"
-              initial={false}
-              animate={{ width: `${((step - 1) / (stepsMeta.length - 1)) * 100}%` }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-            />
-          </div>
-          {/* Step circles */}
+          {/* Classic premium stepper */}
           <div className="flex items-center justify-between">
             {stepsMeta.map((s, i) => {
               const done = step > s.id;
               const active = step === s.id;
               return (
-                <div key={s.id} className="flex flex-col items-center gap-1.5 flex-1">
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      scale: active ? 1.1 : 1,
-                      backgroundColor: done
-                        ? "hsl(var(--accent))"
+                <div key={s.id} className="flex items-center flex-1 last:flex-none">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      done
+                        ? "bg-accent text-accent-foreground"
                         : active
-                        ? "hsl(var(--accent))"
-                        : "hsl(var(--muted))",
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-shadow ${
-                      active ? "shadow-lg ring-4 ring-accent/20" : done ? "shadow-md" : ""
-                    }`}
-                  >
-                    {done ? (
-                      <Check className="w-4 h-4 text-accent-foreground" />
-                    ) : (
-                      <span className={`${active ? "text-accent-foreground" : "text-muted-foreground"}`}>
-                        {s.icon}
-                      </span>
-                    )}
-                  </motion.div>
-                  <span className={`text-[9px] sm:text-[10px] font-semibold transition-colors ${
-                    active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"
-                  }`}>{s.label}</span>
+                        ? "border-2 border-accent text-accent bg-accent/10"
+                        : "border border-border text-muted-foreground bg-card"
+                    }`}>
+                      {done ? (
+                        <Check className="w-3.5 h-3.5" />
+                      ) : (
+                        <span className="scale-75">{s.icon}</span>
+                      )}
+                    </div>
+                    <span className={`text-[9px] sm:text-[10px] mt-1.5 font-medium transition-colors ${
+                      active ? "text-accent" : done ? "text-foreground" : "text-muted-foreground/60"
+                    }`}>{s.label}</span>
+                  </div>
+                  {i < stepsMeta.length - 1 && (
+                    <div className="flex-1 h-[2px] mx-1.5 sm:mx-2 mt-[-14px] relative overflow-hidden rounded-full bg-border">
+                      <motion.div
+                        className="absolute inset-y-0 left-0 bg-accent rounded-full"
+                        initial={false}
+                        animate={{ width: done ? "100%" : "0%" }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -532,8 +525,8 @@ const CategoryCalculator = () => {
                     {/* Radio selection cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-w-lg mx-auto">
                       {[
-                        { id: "samples" as const, label: "Order Samples with Site Visit", desc: "Get physical samples delivered to your location" },
-                        { id: "visit" as const, label: "Schedule Visit Only", desc: "Expert consultation at your space" },
+                        { id: "samples" as const, label: "Order Samples with Site Visit", desc: "Get physical samples delivered to your location", price: "AED 49" },
+                        { id: "visit" as const, label: "Schedule Visit Only", desc: "Expert consultation at your space", price: "AED 19" },
                       ].map((opt) => {
                         const sel = scheduleType === opt.id;
                         return (
@@ -546,8 +539,11 @@ const CategoryCalculator = () => {
                             }`}>
                               {sel && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
                             </div>
-                            <div>
-                              <p className={`font-bold text-sm ${sel ? "text-accent" : "text-foreground"}`}>{opt.label}</p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className={`font-bold text-sm ${sel ? "text-accent" : "text-foreground"}`}>{opt.label}</p>
+                                <span className="text-xs font-bold text-accent whitespace-nowrap">{opt.price}</span>
+                              </div>
                               <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
                             </div>
                           </button>
@@ -622,8 +618,8 @@ const CategoryCalculator = () => {
                 {step === 6 && (
                   <div>
                     <div className="text-center mb-8">
-                      <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle2 className="w-8 h-8 text-accent" />
+                      <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 shadow-md">
+                        <CheckCircle2 className="w-8 h-8 text-green-600" />
                       </div>
                       <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1">What happens next?</h3>
                       <p className="text-sm text-muted-foreground">Here's what to expect after you confirm.</p>
@@ -676,7 +672,8 @@ const CategoryCalculator = () => {
                       ))}
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground text-center mb-6 max-w-lg mx-auto">Note: Final quote based on selection & site condition.</p>
+                    <p className="text-[11px] text-muted-foreground text-center mb-2 max-w-lg mx-auto">Note: Final quote based on selection & site condition.</p>
+                    <p className="text-[10px] text-muted-foreground/70 text-center mb-6 max-w-lg mx-auto">Why Cost -- For mutual commitment and respect for time, refundable upon order placement.</p>
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
