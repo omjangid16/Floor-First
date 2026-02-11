@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight } from "lucide-react";
-import floorFirstLogo from "@/assets/floor-first-logo.png";
+import { ArrowRight } from "lucide-react";
 import onboardWelcome from "@/assets/onboard-welcome.jpg";
 import onboardBrowse from "@/assets/onboard-browse.jpg";
 import onboardExpert from "@/assets/onboard-expert.jpg";
@@ -10,21 +9,21 @@ import onboardExpert from "@/assets/onboard-expert.jpg";
 const slides = [
   {
     image: onboardWelcome,
-    title: "Welcome to Floor First",
+    title: "Elevate Your\nLiving Space",
     description:
-      "Premium flooring solutions for modern residential, commercial, and industrial spaces across the UAE.",
+      "Premium flooring solutions crafted for modern homes, offices, and commercial spaces across the UAE.",
   },
   {
     image: onboardBrowse,
-    title: "Browse & Compare",
+    title: "Discover &\nCompare",
     description:
-      "Explore flooring by material, type, and pattern. Compare prices and find the perfect match for your space.",
+      "Explore materials, patterns, and finishes. Find the perfect flooring that matches your vision.",
   },
   {
     image: onboardExpert,
-    title: "Get Expert Help",
+    title: "Expert Guidance\nAt Your Fingertips",
     description:
-      "Use our smart calculator, schedule site visits, and get instant quotes — all from your phone.",
+      "Smart calculators, site visits, and instant quotes — everything you need, simplified.",
   },
 ];
 
@@ -43,77 +42,82 @@ const Welcome = () => {
   };
 
   return (
-    <main className="min-h-screen bg-card flex flex-col">
-      {/* Top: Logo bar */}
-      <div className="px-6 pt-10 pb-4 flex items-center justify-center">
-        <img
-          src={floorFirstLogo}
-          alt="Floor First"
-          className="h-10 w-auto object-contain"
-        />
-      </div>
+    <main className="fixed inset-0 bg-foreground overflow-hidden">
+      {/* Full-screen background image */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+          <img
+            src={slides[current].image}
+            alt={slides[current].title}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Slide */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+      {/* Cinematic gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+
+      {/* Content positioned at bottom */}
+      <div className="absolute inset-0 flex flex-col justify-end pb-10 px-6">
         <AnimatePresence mode="wait">
           <motion.div
-            key={current}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.35 }}
-            className="w-full max-w-sm flex flex-col items-center"
+            key={`text-${current}`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
           >
-            {/* Image */}
-            <div className="w-full aspect-square max-w-[280px] rounded-3xl overflow-hidden mb-8 shadow-lg">
-              <img
-                src={slides[current].image}
-                alt={slides[current].title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Text */}
-            <h2 className="text-xl font-bold text-foreground mb-2 text-center">
+            {/* Headline */}
+            <h1 className="text-[2rem] leading-[1.1] font-bold text-white tracking-tight whitespace-pre-line mb-3">
               {slides[current].title}
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed text-center px-4">
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-white/70 text-[0.95rem] leading-relaxed max-w-[300px] mb-10">
               {slides[current].description}
             </p>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* Bottom controls */}
-      <div className="px-6 pb-10 w-full max-w-sm mx-auto">
-        {/* Dots */}
-        <div className="flex justify-center gap-2 mb-6">
-          {slides.map((_, i) => (
-            <div
-              key={i}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === current ? "w-6 bg-foreground" : "w-2 bg-border"
-              }`}
-            />
-          ))}
+        {/* Bottom bar: Skip — Dots — Next */}
+        <div className="flex items-center justify-between">
+          {/* Skip */}
+          <Link
+            to="/"
+            className="text-white/50 text-sm font-medium tracking-wide hover:text-white/80 transition-colors"
+          >
+            Skip All
+          </Link>
+
+          {/* Dot indicators */}
+          <div className="flex gap-2">
+            {slides.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === current
+                    ? "w-7 bg-accent"
+                    : "w-1.5 bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Next button */}
+          <button
+            onClick={handleNext}
+            className="w-14 h-14 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/30 hover:brightness-110 active:scale-95 transition-all"
+          >
+            <ArrowRight className="w-5 h-5 text-accent-foreground" />
+          </button>
         </div>
-
-        {/* Next / Get Started */}
-        <button
-          onClick={handleNext}
-          className="w-full py-4 rounded-2xl bg-foreground text-card text-base font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-        >
-          {isLast ? "Get Started" : "Next"}
-          <ChevronRight className="w-4 h-4" />
-        </button>
-
-        {/* Skip */}
-        <Link
-          to="/"
-          className="block mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors text-center"
-        >
-          Skip All
-        </Link>
       </div>
     </main>
   );
