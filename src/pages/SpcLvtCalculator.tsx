@@ -5,15 +5,16 @@ import {
   ArrowLeft, ArrowRight, Check, Minus, Plus,
   CheckCircle2, Layers, Home, Palette, Box,
   Ruler, ClipboardCheck, ChevronDown, ChevronUp,
-  HelpCircle, MessageCircle, Phone,
+  HelpCircle, MessageCircle, Phone, Building2, Factory,
 } from "lucide-react";
 import {
-  spcLvtCatalog,
-  type ProductTypeOption,
+  flooringCatalog,
+  industrialPlaceholder,
+  type FlooringTypeOption,
   type PropertyTypeOption,
   type PatternOption,
   type ShadeCategory,
-  type SpcLvtProduct,
+  type DesignSample,
 } from "@/data/spcLvtProducts";
 
 /* ─── Constants ─── */
@@ -31,19 +32,33 @@ const sqftToSqm = (sqft: number) => Math.round(sqft / CONVERSION);
 const sqmToSqft = (sqm: number) => Math.round(sqm * CONVERSION);
 const clampSqft = (val: number) => Math.max(SQFT_MIN, Math.min(SQFT_MAX, Math.round(val)));
 
-const WHATSAPP_URL = "https://wa.me/971501234567?text=Hi%2C%20I%20need%20help%20with%20SPC%20LVT%20flooring";
+const WHATSAPP_URL = "https://wa.me/971501234567?text=Hi%2C%20I%20need%20help%20with%20flooring";
 
 const stepsMeta = [
-  { id: 1, label: "Type" },
+  { id: 1, label: "Flooring Type" },
   { id: 2, label: "Property" },
   { id: 3, label: "Pattern" },
   { id: 4, label: "Shade" },
-  { id: 5, label: "Product" },
+  { id: 5, label: "Design Sample" },
   { id: 6, label: "Area" },
   { id: 7, label: "Summary" },
 ];
 
-/* ─── Touch-safe Area Slider (reused from CategoryCalculator) ─── */
+const FLOORING_DESCRIPTIONS: Record<string, string> = {
+  spc: "Rigid core, waterproof, click-lock",
+  lvt: "Flexible, glue-down, realistic look",
+  pvc: "Durable, moisture-resistant sheets & tiles",
+  wpc: "Wood-plastic composite, premium feel",
+  "vinyl-sheet": "Affordable roll-based vinyl flooring",
+};
+
+const PROPERTY_ICONS = {
+  residential: Home,
+  commercial: Building2,
+  industrial: Factory,
+};
+
+/* ─── Touch-safe Area Slider ─── */
 const TOUCH_SLOP = 10;
 
 interface AreaSliderProps {
@@ -121,11 +136,12 @@ const AreaSlider = ({ min, max, step, value, onChange, minLabel, maxLabel }: Are
 };
 
 /* ─── Selectable Card ─── */
-const SelectCard = ({ selected, onClick, children, className = "" }: {
-  selected: boolean; onClick: () => void; children: React.ReactNode; className?: string;
+const SelectCard = ({ selected, onClick, children, className = "", disabled = false }: {
+  selected: boolean; onClick: () => void; children: React.ReactNode; className?: string; disabled?: boolean;
 }) => (
-  <button onClick={onClick}
+  <button onClick={onClick} disabled={disabled}
     className={`relative text-left rounded-2xl p-5 border-2 transition-all ${
+      disabled ? "opacity-50 cursor-not-allowed border-border bg-muted" :
       selected ? "border-accent bg-accent/5 shadow-lg ring-2 ring-accent/20" : "border-border bg-card hover:border-accent/40"
     } ${className}`}>
     <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -146,22 +162,25 @@ const SpcLvtCalculator = () => {
 
   /* State */
   const [step, setStep] = useState(1);
-  const [productType, setProductType] = useState<string>("");        // "spc" | "lvt"
-  const [propertyType, setPropertyType] = useState<string>("");      // "residential" | "commercial"
+  const [flooringType, setFlooringType] = useState<string>("");
+  const [propertyType, setPropertyType] = useState<string>("");
   const [patternId, setPatternId] = useState<string>("");
   const [shadeId, setShadeId] = useState<string>("");
-  const [selectedSku, setSelectedSku] = useState<string>("");
+  const [selectedCode, setSelectedCode] = useState<string>("");
   const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
   const [wastePct, setWastePct] = useState(DEFAULT_WASTE);
   const [areaHelpOpen, setAreaHelpOpen] = useState(false);
 
   /* Derived data */
-  const typeData: ProductTypeOption | undefined = spcLvtCatalog.find((t) => t.id === productType);
+  const typeData: FlooringTypeOption | undefined = flooringCatalog.find((t) => t.id === flooringType);
+  const allPropertyTypes: PropertyTypeOption[] = typeData
+    ? [...typeData.propertyTypes, industrialPlaceholder]
+    : [];
   const propData: PropertyTypeOption | undefined = typeData?.propertyTypes.find((p) => p.id === propertyType);
   const patternData: PatternOption | undefined = propData?.patterns.find((p) => p.id === patternId);
   const shadeData: ShadeCategory | undefined = patternData?.shades.find((s) => s.id === shadeId);
-  const selectedProduct: SpcLvtProduct | undefined = shadeData?.products.find((p) => p.sku === selectedSku);
+  const selectedSample: DesignSample | undefined = shadeData?.samples.find((s) => s.code === selectedCode);
 
   /* Area helpers */
   const displayArea = unit === "sqm" ? sqftToSqm(areaSqft) : areaSqft;
@@ -179,17 +198,17 @@ const SpcLvtCalculator = () => {
   const areaSqm = areaSqft / CONVERSION;
   const wasteArea = areaSqm * (wastePct / 100);
   const finalArea = areaSqm + wasteArea;
-  const requiredBoxes = selectedProduct?.boxCoverage ? Math.ceil(finalArea / selectedProduct.boxCoverage) : null;
-  const totalCost = selectedProduct ? Math.round(finalArea * selectedProduct.pricePerSqm) : 0;
+  const requiredBoxes = selectedSample?.boxCoverage ? Math.ceil(finalArea / selectedSample.boxCoverage) : null;
+  const totalCost = selectedSample ? Math.round(finalArea * selectedSample.pricePerSqm) : 0;
 
   /* Navigation */
   const canNext = () => {
     switch (step) {
-      case 1: return !!productType;
-      case 2: return !!propertyType;
+      case 1: return !!flooringType;
+      case 2: return !!propertyType && propertyType !== "industrial";
       case 3: return !!patternId;
       case 4: return !!shadeId;
-      case 5: return !!selectedSku;
+      case 5: return !!selectedCode;
       case 6: return areaSqft > 0;
       default: return false;
     }
@@ -204,21 +223,21 @@ const SpcLvtCalculator = () => {
   };
 
   /* Reset downstream on change */
-  const selectType = (id: string) => {
-    setProductType(id);
-    setPropertyType(""); setPatternId(""); setShadeId(""); setSelectedSku("");
+  const selectFlooring = (id: string) => {
+    setFlooringType(id);
+    setPropertyType(""); setPatternId(""); setShadeId(""); setSelectedCode("");
   };
   const selectProperty = (id: string) => {
     setPropertyType(id);
-    setPatternId(""); setShadeId(""); setSelectedSku("");
+    setPatternId(""); setShadeId(""); setSelectedCode("");
   };
   const selectPattern = (id: string) => {
     setPatternId(id);
-    setShadeId(""); setSelectedSku("");
+    setShadeId(""); setSelectedCode("");
   };
   const selectShade = (id: string) => {
     setShadeId(id);
-    setSelectedSku("");
+    setSelectedCode("");
   };
 
   return (
@@ -230,7 +249,7 @@ const SpcLvtCalculator = () => {
         </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-base font-bold text-foreground">SPC / LVT Calculator</h1>
-          <p className="text-[10px] text-muted-foreground">Step-by-step product selection</p>
+          <p className="text-[10px] text-muted-foreground">Step-by-step flooring selection</p>
         </div>
       </div>
 
@@ -267,44 +286,48 @@ const SpcLvtCalculator = () => {
             <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}
               className="p-5 md:p-8">
 
-              {/* ─── STEP 1: SPC or LVT ─── */}
+              {/* ─── STEP 1: Flooring Type ─── */}
               {step === 1 && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Product Type</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Choose between SPC and LVT flooring</p>
-                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                    {spcLvtCatalog.map((t) => (
-                      <SelectCard key={t.id} selected={productType === t.id} onClick={() => selectType(t.id)}>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Flooring Type</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6">Choose your flooring category</p>
+                  <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
+                    {flooringCatalog.map((t) => (
+                      <SelectCard key={t.id} selected={flooringType === t.id} onClick={() => selectFlooring(t.id)}>
                         <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
                           <Layers className="w-6 h-6 text-accent" />
                         </div>
-                        <p className="font-bold text-lg text-foreground">{t.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {t.id === "spc" ? "Rigid core, waterproof, click-lock" : "Flexible, glue-down, realistic look"}
-                        </p>
+                        <p className="font-bold text-base text-foreground">{t.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{FLOORING_DESCRIPTIONS[t.id] || ""}</p>
                       </SelectCard>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* ─── STEP 2: Residential or Commercial ─── */}
+              {/* ─── STEP 2: Property Type (Residential / Commercial / Industrial) ─── */}
               {step === 2 && typeData && (
                 <div>
                   <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Property Type</h3>
                   <p className="text-sm text-muted-foreground text-center mb-6">{typeData.name} — Choose your space</p>
-                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                    {typeData.propertyTypes.map((p) => (
-                      <SelectCard key={p.id} selected={propertyType === p.id} onClick={() => selectProperty(p.id)}>
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                          <Home className="w-6 h-6 text-accent" />
-                        </div>
-                        <p className="font-bold text-lg text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {p.id === "residential" ? "Homes, villas, apartments" : "Offices, retail, hospitality"}
-                        </p>
-                      </SelectCard>
-                    ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto">
+                    {allPropertyTypes.map((p) => {
+                      const Icon = PROPERTY_ICONS[p.id as keyof typeof PROPERTY_ICONS] || Building2;
+                      const isIndustrial = p.id === "industrial";
+                      return (
+                        <SelectCard key={p.id} selected={propertyType === p.id} onClick={() => selectProperty(p.id)} disabled={isIndustrial}>
+                          <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
+                            <Icon className="w-6 h-6 text-accent" />
+                          </div>
+                          <p className="font-bold text-base text-foreground">{p.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {p.id === "residential" ? "Homes, villas, apartments" :
+                             p.id === "commercial" ? "Offices, retail, hospitality" :
+                             "Coming soon"}
+                          </p>
+                        </SelectCard>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -322,7 +345,7 @@ const SpcLvtCalculator = () => {
                         <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
                           <Palette className="w-6 h-6 text-accent" />
                         </div>
-                        <p className="font-bold text-base text-foreground">{p.name}</p>
+                        <p className="font-bold text-sm text-foreground">{p.name}</p>
                         <p className="text-xs text-muted-foreground mt-1">{p.shades.length} shade{p.shades.length !== 1 ? "s" : ""} available</p>
                       </SelectCard>
                     ))}
@@ -333,7 +356,7 @@ const SpcLvtCalculator = () => {
               {/* ─── STEP 4: Shade Category ─── */}
               {step === 4 && patternData && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Shade</h3>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Shade / Series</h3>
                   <p className="text-sm text-muted-foreground text-center mb-6">
                     {typeData?.name} → {propData?.name} → {patternData.name}
                   </p>
@@ -341,31 +364,31 @@ const SpcLvtCalculator = () => {
                     {patternData.shades.map((s) => (
                       <SelectCard key={s.id} selected={shadeId === s.id} onClick={() => selectShade(s.id)} className="p-4">
                         <p className="font-bold text-sm text-foreground pr-6">{s.name}</p>
-                        <p className="text-[11px] text-muted-foreground mt-1">{s.products.length} product{s.products.length !== 1 ? "s" : ""}</p>
+                        <p className="text-[11px] text-muted-foreground mt-1">{s.samples.length} design{s.samples.length !== 1 ? "s" : ""}</p>
                       </SelectCard>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* ─── STEP 5: Exact Product (Name + SKU) ─── */}
+              {/* ─── STEP 5: Design Sample Code ─── */}
               {step === 5 && shadeData && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Product</h3>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Design Sample</h3>
                   <p className="text-sm text-muted-foreground text-center mb-6">
-                    {shadeData.name} — Choose exact product
+                    {shadeData.name} — Choose a sample code
                   </p>
                   <div className="space-y-3 max-w-lg mx-auto">
-                    {shadeData.products.map((p) => (
-                      <SelectCard key={p.sku} selected={selectedSku === p.sku} onClick={() => setSelectedSku(p.sku)} className="p-4">
+                    {shadeData.samples.map((s) => (
+                      <SelectCard key={s.code} selected={selectedCode === s.code} onClick={() => setSelectedCode(s.code)} className="p-4">
                         <div className="pr-8">
-                          <p className="font-bold text-sm text-foreground">{p.name}</p>
-                          <p className="text-xs text-muted-foreground mt-1 font-mono">{p.sku}</p>
+                          <p className="font-bold text-sm text-foreground">{s.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1 font-mono">{s.code}</p>
                           <div className="flex items-center gap-4 mt-2">
-                            <span className="text-xs font-semibold text-accent">AED {p.pricePerSqm}/sqm</span>
-                            {p.boxCoverage && (
+                            <span className="text-xs font-semibold text-accent">AED {s.pricePerSqm}/sqm</span>
+                            {s.boxCoverage && (
                               <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                <Box className="w-3 h-3" /> {p.boxCoverage} sqm/box
+                                <Box className="w-3 h-3" /> {s.boxCoverage} sqm/box
                               </span>
                             )}
                           </div>
@@ -477,26 +500,26 @@ const SpcLvtCalculator = () => {
               )}
 
               {/* ─── STEP 7: Summary ─── */}
-              {step === 7 && selectedProduct && (
+              {step === 7 && selectedSample && (
                 <div>
                   <div className="flex flex-col items-center mb-6">
                     <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
                       <CheckCircle2 className="w-8 h-8 text-green-600" />
                     </div>
                     <h3 className="font-bold text-xl text-foreground text-center">Calculation Summary</h3>
-                    <p className="text-sm text-muted-foreground text-center">Your SPC / LVT flooring estimate</p>
+                    <p className="text-sm text-muted-foreground text-center">Your flooring estimate</p>
                   </div>
 
                   <div className="max-w-lg mx-auto space-y-4">
                     {/* Selection Details */}
                     <div className="bg-background border border-border rounded-2xl divide-y divide-border">
                       {[
-                        { label: "Product Type", value: typeData?.name || "" },
+                        { label: "Flooring Type", value: typeData?.name || "" },
                         { label: "Property", value: propData?.name || "" },
                         { label: "Pattern", value: patternData?.name || "" },
-                        { label: "Shade", value: shadeData?.name || "" },
-                        { label: "Product Name", value: selectedProduct.name },
-                        { label: "SKU Code", value: selectedProduct.sku, mono: true },
+                        { label: "Shade / Series", value: shadeData?.name || "" },
+                        { label: "Design Sample", value: selectedSample.name },
+                        { label: "Sample Code", value: selectedSample.code, mono: true },
                       ].map((row) => (
                         <div key={row.label} className="flex justify-between px-5 py-3.5">
                           <span className="text-sm text-muted-foreground">{row.label}</span>
@@ -512,7 +535,7 @@ const SpcLvtCalculator = () => {
                         { label: "Waste %", value: `${wastePct}%` },
                         { label: "Waste Area", value: `${wasteArea.toFixed(1)} sqm` },
                         { label: "Final Required Area", value: `${finalArea.toFixed(1)} sqm`, accent: true },
-                        ...(requiredBoxes !== null ? [{ label: `Required Boxes (${selectedProduct.boxCoverage} sqm/box)`, value: `${requiredBoxes} boxes`, accent: true }] : []),
+                        ...(requiredBoxes !== null ? [{ label: `Required Boxes (${selectedSample.boxCoverage} sqm/box)`, value: `${requiredBoxes} boxes`, accent: true }] : []),
                       ].map((row) => (
                         <div key={row.label} className="flex justify-between px-5 py-3.5">
                           <span className="text-sm text-muted-foreground">{row.label}</span>
@@ -530,7 +553,7 @@ const SpcLvtCalculator = () => {
                       <div className="space-y-2 text-sm mb-4">
                         <div className="flex justify-between">
                           <span className="text-background/60">Price per sqm</span>
-                          <span className="font-semibold">AED {selectedProduct.pricePerSqm}</span>
+                          <span className="font-semibold">AED {selectedSample.pricePerSqm}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-background/60">Final Area</span>
@@ -546,7 +569,7 @@ const SpcLvtCalculator = () => {
 
                     {/* Actions */}
                     <div className="flex gap-3">
-                      <button onClick={() => setStep(1)}
+                      <button onClick={() => { setStep(1); selectFlooring(""); }}
                         className="flex-1 py-3.5 rounded-xl border-2 border-border text-foreground font-semibold text-sm hover:border-accent/40 transition-colors">
                         Start Over
                       </button>
