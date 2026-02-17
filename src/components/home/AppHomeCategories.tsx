@@ -33,7 +33,7 @@ const AppHomeCategories = () => {
         animate={{ opacity: 1, y: 0 }}
       >
         <Link
-          to="/calculator/vinyl"
+          to="/calculator/spc-lvt"
           className="block relative rounded-3xl overflow-hidden h-52 mb-2"
         >
           <img
