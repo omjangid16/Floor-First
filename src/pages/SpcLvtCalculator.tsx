@@ -6,6 +6,7 @@ import {
   CheckCircle2, Layers, Palette, Box,
   Ruler, Crown, Wrench, CalendarDays, ClipboardCheck,
   ChevronDown, ChevronUp, HelpCircle, MessageCircle, Phone,
+  Calendar, Clock, User, Mail, Smartphone,
 } from "lucide-react";
 import {
   flooringCatalog,
@@ -214,7 +215,7 @@ const SpcLvtCalculator = () => {
   const [patternId, setPatternId] = useState("");
   const [shadeId, setShadeId] = useState("");
   const [selectedCode, setSelectedCode] = useState("");
-  const [gradeId, setGradeId] = useState("standard");
+  const [gradeId, setGradeId] = useState("premium");
   const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
   const [wastePct, setWastePct] = useState(DEFAULT_WASTE);
@@ -227,6 +228,8 @@ const SpcLvtCalculator = () => {
   const [visitName, setVisitName] = useState("");
   const [visitPhone, setVisitPhone] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
+  const [visitEmail, setVisitEmail] = useState("");
+  const [visitType, setVisitType] = useState<"samples" | "visit">("samples");
 
   /* Derived data */
   const typeData: FlooringTypeOption | undefined = flooringCatalog.find((t) => t.id === flooringType);
@@ -429,30 +432,46 @@ const SpcLvtCalculator = () => {
               {/* ─── STEP 4: Grade ─── */}
               {step === 4 && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Grade</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Choose the quality tier for your flooring</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Material Grade</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6">Choose the quality level that fits your needs</p>
+                  <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
                     {gradeOptions.map((g) => (
-                      <SelectCard key={g.id} selected={gradeId === g.id} onClick={() => setGradeId(g.id)}>
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                          <Crown className="w-6 h-6 text-accent" />
+                      <button key={g.id} onClick={() => setGradeId(g.id)}
+                        className={`relative text-left rounded-2xl border-2 overflow-hidden transition-all ${
+                          gradeId === g.id ? "border-accent bg-accent/5 shadow-lg" : "border-border bg-card hover:border-accent/40"
+                        }`}>
+                        <div className={`h-1.5 w-full ${gradeId === g.id ? "bg-accent" : "bg-border"}`} />
+                        <div className="p-4 pt-5">
+                          <p className={`font-bold text-base ${gradeId === g.id ? "text-accent" : "text-foreground"}`}>{g.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{g.description}</p>
+                          <span className="inline-block mt-3 px-3 py-1 rounded-lg bg-muted text-xs font-semibold text-foreground">
+                            {g.priceMultiplier}x base price
+                          </span>
                         </div>
-                        <p className="font-bold text-base text-foreground">{g.name}</p>
-                        <p className="text-xs text-muted-foreground mt-2">{g.description}</p>
-                        {g.priceMultiplier > 1 && (
-                          <p className="text-[11px] text-accent font-semibold mt-2">+{Math.round((g.priceMultiplier - 1) * 100)}% material cost</p>
-                        )}
-                      </SelectCard>
+                      </button>
                     ))}
                   </div>
+
+                  {/* Consult adviser */}
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-card border border-border rounded-2xl p-4 mt-6 max-w-lg mx-auto hover:border-accent/40 transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                      <MessageCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground">New to Flooring?</p>
+                      <p className="text-sm font-bold text-foreground">Consult a Flooring Adviser</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                  </a>
                 </div>
               )}
 
               {/* ─── STEP 5: Area ─── */}
               {step === 5 && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Enter Area Details</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Specify total area to be covered</p>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Enter Your Area</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6">Specify the total area to be covered</p>
 
                   {/* Unit toggle */}
                   <div className="flex justify-center mb-8">
@@ -508,18 +527,6 @@ const SpcLvtCalculator = () => {
                     })}
                   </div>
 
-                  {/* Waste % */}
-                  <div className="max-w-md mx-auto mt-8">
-                    <label className="text-sm font-semibold text-foreground mb-2 block">Waste Allowance</label>
-                    <div className="flex items-center gap-3">
-                      <input type="range" min={0} max={15} step={1} value={wastePct}
-                        onChange={(e) => setWastePct(Number(e.target.value))}
-                        className="flex-1 accent-[hsl(var(--accent))] h-2 rounded-full" />
-                      <span className="text-sm font-bold text-accent w-10 text-right">{wastePct}%</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground mt-1">Recommended 5–10% for cuts & fitting</p>
-                  </div>
-
                   {/* Area Help */}
                   <div className="mt-8 max-w-md mx-auto">
                     <button onClick={() => setAreaHelpOpen(!areaHelpOpen)}
@@ -545,31 +552,46 @@ const SpcLvtCalculator = () => {
                       )}
                     </AnimatePresence>
                   </div>
+
+                  {/* Consult adviser */}
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-card border border-border rounded-2xl p-4 mt-6 max-w-md mx-auto hover:border-accent/40 transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                      <MessageCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground">New to Flooring?</p>
+                      <p className="text-sm font-bold text-foreground">Consult a Flooring Adviser</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                  </a>
                 </div>
               )}
 
-              {/* ─── STEP 6: Accessories / Installation ─── */}
+              {/* ─── STEP 6: Additional Options ─── */}
               {step === 6 && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Accessories & Installation</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Select additional services (optional)</p>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Additional Options</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6">Enhance your flooring project with these services</p>
                   <div className="space-y-3 max-w-lg mx-auto">
                     {accessoryOptions.map((acc) => {
                       const isSelected = selectedAccessories.includes(acc.id);
                       return (
                         <button key={acc.id} onClick={() => toggleAccessory(acc.id)}
-                          className={`w-full text-left rounded-2xl p-4 border-2 transition-all flex items-start gap-4 ${
+                          className={`w-full text-left rounded-2xl px-5 py-4 border transition-all flex items-center gap-4 ${
                             isSelected ? "border-accent bg-accent/5" : "border-border bg-card hover:border-accent/40"
                           }`}>
-                          <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                            isSelected ? "bg-accent border-accent" : "bg-muted border-border"
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                            isSelected ? "border-accent" : "border-muted-foreground/40"
                           }`}>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
+                            {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-sm text-foreground">{acc.name}</p>
+                            <div className="flex items-center justify-between">
+                              <p className="font-bold text-sm text-foreground">{acc.name}</p>
+                              <p className="text-sm font-bold text-accent">+AED {acc.pricePerUnit}/{acc.unit.replace("per ", "")}</p>
+                            </div>
                             <p className="text-xs text-muted-foreground mt-0.5">{acc.description}</p>
-                            <p className="text-xs font-semibold text-accent mt-1">AED {acc.pricePerUnit} {acc.unit}</p>
                           </div>
                         </button>
                       );
@@ -602,6 +624,35 @@ const SpcLvtCalculator = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Price Estimate */}
+                  {selectedSample && (
+                    <div className="mt-6 max-w-lg mx-auto bg-foreground text-background rounded-2xl p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="font-bold text-sm">Price Estimate</p>
+                        <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 rounded-full px-3 py-1 text-[10px] font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                          Transparent Pricing
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-background/60">Material Cost</span>
+                          <span className="font-semibold">AED {materialCost.toLocaleString()}</span>
+                        </div>
+                        {accessoryCost > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-background/60">Additional Services</span>
+                            <span className="font-semibold">AED {accessoryCost.toLocaleString()}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between pt-2 border-t border-background/20">
+                          <span className="font-bold">Estimated Total</span>
+                          <span className="font-bold text-accent">AED {totalCost.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -609,48 +660,98 @@ const SpcLvtCalculator = () => {
               {step === 7 && (
                 <div>
                   <h3 className="font-bold text-xl text-foreground text-center mb-1">Schedule a Visit</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Our expert will visit your site for precise measurement (optional)</p>
-                  <div className="max-w-md mx-auto space-y-4">
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Your Name</label>
-                      <input type="text" value={visitName} onChange={(e) => setVisitName(e.target.value)} placeholder="Full name"
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
+                  <p className="text-sm text-muted-foreground text-center mb-6">Book a time for our floor advisor to visit you</p>
+                  <div className="max-w-md mx-auto space-y-5">
+                    {/* Visit type selection */}
+                    <div className="space-y-3">
+                      <button onClick={() => setVisitType("samples")}
+                        className={`w-full text-left rounded-2xl px-5 py-4 border-2 transition-all flex items-center gap-4 ${
+                          visitType === "samples" ? "border-accent bg-accent/5" : "border-border bg-card hover:border-accent/40"
+                        }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          visitType === "samples" ? "border-accent" : "border-muted-foreground/40"
+                        }`}>
+                          {visitType === "samples" && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-bold text-sm text-foreground">Order Samples with Site Visit</p>
+                            <p className="text-sm font-bold text-accent">AED 49</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">Get physical samples delivered to your location</p>
+                        </div>
+                      </button>
+
+                      <button onClick={() => setVisitType("visit")}
+                        className={`w-full text-left rounded-2xl px-5 py-4 border-2 transition-all flex items-center gap-4 ${
+                          visitType === "visit" ? "border-accent bg-accent/5" : "border-border bg-card hover:border-accent/40"
+                        }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          visitType === "visit" ? "border-accent" : "border-muted-foreground/40"
+                        }`}>
+                          {visitType === "visit" && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-bold text-sm text-foreground">Schedule Visit Only</p>
+                            <p className="text-sm font-bold text-accent">AED 19</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">Expert consultation at your space</p>
+                        </div>
+                      </button>
                     </div>
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Phone Number</label>
-                      <input type="tel" value={visitPhone} onChange={(e) => setVisitPhone(e.target.value)} placeholder="+971 5X XXX XXXX"
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Preferred Date</label>
-                      <input type="date" value={visitDate} onChange={(e) => setVisitDate(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Preferred Time</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { id: "morning", label: "Morning", sub: "9 AM – 12 PM" },
-                          { id: "afternoon", label: "Afternoon", sub: "12 – 4 PM" },
-                          { id: "evening", label: "Evening", sub: "4 – 7 PM" },
-                        ].map((t) => (
-                          <button key={t.id} onClick={() => setVisitTime(t.id)}
-                            className={`px-3 py-3 rounded-xl border-2 text-center transition-all ${
-                              visitTime === t.id ? "border-accent bg-accent/5" : "border-border hover:border-accent/40"
-                            }`}>
-                            <p className={`text-sm font-semibold ${visitTime === t.id ? "text-accent" : "text-foreground"}`}>{t.label}</p>
-                            <p className="text-[10px] text-muted-foreground">{t.sub}</p>
-                          </button>
-                        ))}
+
+                    <p className="text-[11px] text-muted-foreground text-center italic">
+                      Why Cost? For mutual commitment and respect for time, refundable upon order placement.
+                    </p>
+
+                    {/* Date & Time side by side */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Date <span className="text-accent">*</span>
+                        </label>
+                        <input type="date" value={visitDate} onChange={(e) => setVisitDate(e.target.value)}
+                          className="w-full px-3 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-muted-foreground" /> Time
+                        </label>
+                        <input type="time" value={visitTime === "morning" ? "" : visitTime} onChange={(e) => setVisitTime(e.target.value)}
+                          className="w-full px-3 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
                       </div>
                     </div>
+
+                    {/* Full Name */}
                     <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Notes (optional)</label>
-                      <textarea value={visitNotes} onChange={(e) => setVisitNotes(e.target.value)} placeholder="Any specific requirements..."
-                        rows={3}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none resize-none" />
+                      <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-muted-foreground" /> Full Name <span className="text-accent">*</span>
+                      </label>
+                      <input type="text" value={visitName} onChange={(e) => setVisitName(e.target.value)} placeholder="Your name"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground text-center">You can skip this step and schedule later.</p>
+
+                    {/* Email */}
+                    <div>
+                      <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-muted-foreground" /> Email <span className="text-accent">*</span>
+                      </label>
+                      <input type="email" value={visitEmail} onChange={(e) => setVisitEmail(e.target.value)} placeholder="your@email.com"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
+                    </div>
+
+                    {/* Mobile Number */}
+                    <div>
+                      <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                        <Smartphone className="w-3.5 h-3.5 text-muted-foreground" /> Mobile Number <span className="text-accent">*</span>
+                      </label>
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 py-3 rounded-l-xl border border-r-0 border-border bg-muted text-sm font-semibold text-foreground">+971</span>
+                        <input type="tel" value={visitPhone} onChange={(e) => setVisitPhone(e.target.value)} placeholder="Enter your mobile number"
+                          className="flex-1 px-4 py-3 rounded-r-xl border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-accent outline-none" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
