@@ -19,6 +19,63 @@ import {
   type AccessoryOption,
 } from "@/data/spcLvtProducts";
 
+/* Pattern images */
+import imgSpc from "@/assets/shade-spc.jpg";
+import imgParquet from "@/assets/shade-parquet.jpg";
+import imgEngineered from "@/assets/shade-engineered-wood.jpg";
+import imgLaminate from "@/assets/shade-laminate.jpg";
+import imgVinylSheet from "@/assets/shade-vinyl-sheets.jpg";
+import imgMosaic from "@/assets/shade-mosaic-tiles.jpg";
+import imgPvc from "@/assets/shade-pvc.jpg";
+import imgCeramic from "@/assets/shade-ceramic-tiles.jpg";
+import imgPorcelain from "@/assets/shade-porcelain-tiles.jpg";
+
+/* Shade images */
+import imgLvt from "@/assets/shade-lvt.jpg";
+import imgSolidHardwood from "@/assets/shade-solid-hardwood.jpg";
+import imgMarble from "@/assets/shade-marble.jpg";
+import imgCement from "@/assets/shade-cement-tiles.jpg";
+import imgSandstone from "@/assets/shade-sandstone.jpg";
+import imgSlate from "@/assets/shade-slate.jpg";
+import imgWpc from "@/assets/shade-wpc.jpg";
+import imgLimestone from "@/assets/shade-limestone.jpg";
+import imgTerrazzo from "@/assets/shade-terrazzo-tiles.jpg";
+import imgGranite from "@/assets/shade-granite.jpg";
+
+/* Image maps for patterns and shades */
+const patternImages: Record<string, string> = {
+  "straight-plank": imgSpc,
+  "herringbone": imgParquet,
+  "chevron": imgEngineered,
+  "tile-format": imgCeramic,
+  "roll-format": imgVinylSheet,
+  "wood-print": imgLaminate,
+  "marble-print": imgMarble,
+  "plain-colour": imgPvc,
+};
+
+const shadeImages: Record<string, string> = {
+  "light-oak": imgLaminate,
+  "dark-oak": imgSolidHardwood,
+  "grey-wood": imgLvt,
+  "walnut": imgParquet,
+  "ash-white": imgSpc,
+  "natural-oak": imgEngineered,
+  "rustic-oak": imgSolidHardwood,
+  "marble-look": imgMarble,
+  "concrete-look": imgCement,
+  "white-marble": imgMarble,
+  "grey-marble": imgSlate,
+  "grey-stone": imgGranite,
+  "beige": imgSandstone,
+  "grey": imgSlate,
+  "black": imgSlate,
+  "light-grey": imgLimestone,
+  "brown": imgSolidHardwood,
+  "warm-oak": imgWpc,
+  "natural-beige": imgSandstone,
+};
+
 /* ─── Constants ─── */
 const SQFT_MIN = 50;
 const SQFT_MAX = 5000;
@@ -37,9 +94,9 @@ const clampSqft = (val: number) => Math.max(SQFT_MIN, Math.min(SQFT_MAX, Math.ro
 const WHATSAPP_URL = "https://wa.me/971501234567?text=Hi%2C%20I%20need%20help%20with%20flooring";
 
 const stepsMeta = [
-  { id: 1, label: "Flooring Type", icon: <Layers className="w-4 h-4" /> },
+  { id: 1, label: "Designs", icon: <Layers className="w-4 h-4" /> },
   { id: 2, label: "Pattern", icon: <Palette className="w-4 h-4" /> },
-  { id: 3, label: "Shade / Design", icon: <Box className="w-4 h-4" /> },
+  { id: 3, label: "Shades", icon: <Box className="w-4 h-4" /> },
   { id: 4, label: "Grade", icon: <Crown className="w-4 h-4" /> },
   { id: 5, label: "Area", icon: <Ruler className="w-4 h-4" /> },
   { id: 6, label: "Accessories", icon: <Wrench className="w-4 h-4" /> },
@@ -220,11 +277,11 @@ const SpcLvtCalculator = () => {
   };
 
   /* Navigation */
-  const canNext = () => {
+    const canNext = () => {
     switch (step) {
       case 1: return !!flooringType;
       case 2: return !!patternId;
-      case 3: return !!selectedCode;
+      case 3: return !!shadeId;
       case 4: return !!gradeId;
       case 5: return areaSqft > 0;
       case 6: return true; // accessories are optional
@@ -252,7 +309,13 @@ const SpcLvtCalculator = () => {
   };
   const selectShade = (id: string) => {
     setShadeId(id);
-    setSelectedCode("");
+    // Auto-select first sample of chosen shade
+    const shade = patternData?.shades.find((s) => s.id === id);
+    if (shade && shade.samples.length > 0) {
+      setSelectedCode(shade.samples[0].code);
+    } else {
+      setSelectedCode("");
+    }
   };
 
   return (
@@ -298,19 +361,21 @@ const SpcLvtCalculator = () => {
             <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}
               className="p-5 md:p-8">
 
-              {/* ─── STEP 1: Flooring Type ─── */}
+              {/* ─── STEP 1: Designs (Flooring Type) ─── */}
               {step === 1 && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Flooring Type</h3>
-                  <p className="text-sm text-muted-foreground text-center mb-6">Choose your flooring category</p>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select SPC / LVT Design</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6">Choose from our curated collection</p>
                   <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
                     {flooringCatalog.map((t) => (
-                      <SelectCard key={t.id} selected={flooringType === t.id} onClick={() => selectFlooring(t.id)}>
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                          <Layers className="w-6 h-6 text-accent" />
+                      <SelectCard key={t.id} selected={flooringType === t.id} onClick={() => selectFlooring(t.id)} className="p-0 overflow-hidden">
+                        <div className="aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
+                          <img src={patternImages[t.patterns[0]?.id] || imgSpc} alt={t.name} className="w-full h-full object-cover" />
                         </div>
-                        <p className="font-bold text-base text-foreground">{t.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{t.description}</p>
+                        <div className="p-4 pt-3">
+                          <p className="font-bold text-base text-foreground">{t.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t.description}</p>
+                        </div>
                       </SelectCard>
                     ))}
                   </div>
@@ -324,68 +389,38 @@ const SpcLvtCalculator = () => {
                   <p className="text-sm text-muted-foreground text-center mb-6">{typeData.name} — Choose your pattern style</p>
                   <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
                     {typeData.patterns.map((p) => (
-                      <SelectCard key={p.id} selected={patternId === p.id} onClick={() => selectPattern(p.id)}>
-                        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                          <Palette className="w-6 h-6 text-accent" />
+                      <SelectCard key={p.id} selected={patternId === p.id} onClick={() => selectPattern(p.id)} className="p-0 overflow-hidden">
+                        <div className="aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
+                          <img src={patternImages[p.id] || imgSpc} alt={p.name} className="w-full h-full object-cover" />
                         </div>
-                        <p className="font-bold text-sm text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{p.shades.length} shade{p.shades.length !== 1 ? "s" : ""} available</p>
+                        <div className="p-4 pt-3">
+                          <p className="font-bold text-sm text-foreground">{p.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{p.shades.length} shade{p.shades.length !== 1 ? "s" : ""} available</p>
+                        </div>
                       </SelectCard>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* ─── STEP 3: Shade + Design Sample (combined) ─── */}
+              {/* ─── STEP 3: Shades ─── */}
               {step === 3 && patternData && (
                 <div>
-                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Shade & Design</h3>
+                  <h3 className="font-bold text-xl text-foreground text-center mb-1">Select Shade</h3>
                   <p className="text-sm text-muted-foreground text-center mb-6">
                     {typeData?.name} → {patternData.name}
                   </p>
-
-                  {/* Shade filter pills */}
-                  <div className="flex flex-wrap gap-2 justify-center mb-6">
-                    <button
-                      onClick={() => { setShadeId(""); setSelectedCode(""); }}
-                      className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                        !shadeId ? "bg-accent text-accent-foreground border-accent" : "bg-background border-border text-foreground hover:border-accent/40"
-                      }`}
-                    >All Shades</button>
-                    {patternData.shades.map((s) => (
-                      <button key={s.id} onClick={() => { selectShade(s.id); }}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                          shadeId === s.id ? "bg-accent text-accent-foreground border-accent" : "bg-background border-border text-foreground hover:border-accent/40"
-                        }`}
-                      >{s.name}</button>
-                    ))}
-                  </div>
-
-                  {/* Design sample cards */}
-                  <div className="space-y-3 max-w-lg mx-auto max-h-[400px] overflow-y-auto pr-1">
-                    {(shadeId ? [patternData.shades.find((s) => s.id === shadeId)!] : patternData.shades).filter(Boolean).map((shade) => (
-                      <div key={shade.id}>
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">{shade.name}</p>
-                        <div className="space-y-2">
-                          {shade.samples.map((s) => (
-                            <SelectCard key={s.code} selected={selectedCode === s.code}
-                              onClick={() => { setShadeId(shade.id); setSelectedCode(s.code); }} className="p-4">
-                              <div className="pr-8">
-                                <p className="font-bold text-sm text-foreground">{s.name}</p>
-                                <p className="text-xs text-muted-foreground mt-1 font-mono">{s.code}</p>
-                                <div className="flex items-center gap-4 mt-2">
-                                  <span className="text-xs font-semibold text-accent">AED {s.pricePerSqm}/sqm</span>
-                                  {s.boxCoverage && (
-                                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                      <Box className="w-3 h-3" /> {s.boxCoverage} sqm/box
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </SelectCard>
-                          ))}
+                  <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                    {patternData.shades.map((shade) => (
+                      <SelectCard key={shade.id} selected={shadeId === shade.id} onClick={() => selectShade(shade.id)} className="p-0 overflow-hidden">
+                        <div className="aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
+                          <img src={shadeImages[shade.id] || imgSpc} alt={shade.name} className="w-full h-full object-cover" />
                         </div>
-                      </div>
+                        <div className="p-4 pt-3">
+                          <p className="font-bold text-sm text-foreground">{shade.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{shade.samples.length} sample{shade.samples.length !== 1 ? "s" : ""}</p>
+                        </div>
+                      </SelectCard>
                     ))}
                   </div>
                 </div>
