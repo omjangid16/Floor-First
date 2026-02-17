@@ -17,7 +17,6 @@ import Inspiration from "./pages/Inspiration";
 import InspirationDetail from "./pages/InspirationDetail";
 import Calculator from "./pages/Calculator";
 import CategoryCalculator from "./pages/CategoryCalculator";
-import SpcLvtCalculator from "./pages/SpcLvtCalculator";
 import OurWorks from "./pages/OurWorks";
 import ProjectDetail from "./pages/ProjectDetail";
 import GetQuote from "./pages/GetQuote";
@@ -57,7 +56,6 @@ const AppLayout = () => {
           <Route path="/inspiration" element={<Inspiration />} />
           <Route path="/inspiration/:id" element={<InspirationDetail />} />
           <Route path="/calculator" element={<Calculator />} />
-          <Route path="/calculator/spc-lvt" element={<SpcLvtCalculator />} />
           <Route path="/calculator/:categoryId" element={<CategoryCalculator />} />
           <Route path="/our-works" element={<OurWorks />} />
           <Route path="/our-works/:id" element={<ProjectDetail />} />
