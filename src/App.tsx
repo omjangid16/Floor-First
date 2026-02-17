@@ -58,6 +58,7 @@ const AppLayout = () => {
           <Route path="/inspiration/:id" element={<InspirationDetail />} />
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/calculator/spc-lvt" element={<SpcLvtCalculator />} />
+          <Route path="/calculator/vinyl" element={<SpcLvtCalculator />} />
           <Route path="/calculator/:categoryId" element={<CategoryCalculator />} />
           <Route path="/our-works" element={<OurWorks />} />
           <Route path="/our-works/:id" element={<ProjectDetail />} />
