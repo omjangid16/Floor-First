@@ -38,9 +38,10 @@ export interface GradeOption {
 }
 
 export const gradeOptions: GradeOption[] = [
-  { id: "standard", name: "Standard", description: "Entry-level quality, suitable for light traffic areas", priceMultiplier: 1.0 },
-  { id: "premium", name: "Premium", description: "High durability, enhanced wear layer for moderate traffic", priceMultiplier: 1.25 },
-  { id: "luxury", name: "Luxury", description: "Top-tier finish, maximum thickness & wear resistance", priceMultiplier: 1.5 },
+  { id: "economy", name: "Economy", description: "Budget-friendly option", priceMultiplier: 1.0 },
+  { id: "standard", name: "Standard", description: "Quality meets value", priceMultiplier: 1.5 },
+  { id: "premium", name: "Premium", description: "Superior materials", priceMultiplier: 2.2 },
+  { id: "luxury", name: "Luxury", description: "Top-tier excellence", priceMultiplier: 3.5 },
 ];
 
 // ─── Accessory options ───
