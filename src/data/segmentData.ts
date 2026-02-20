@@ -286,6 +286,49 @@ export const segments: Segment[] = [
 
 export const getSegmentById = (id: string) => segments.find((s) => s.id === id);
 
+// ─── Shade-to-Pattern mapping for calculator ───
+
+const shadePatternMap: Record<string, FlooringPattern[]> = {
+  // Vinyl / SPC / LVT
+  "spc": spcPatterns,
+  "lvt": lvtPatterns,
+  "pvc": rigidCorePatterns,
+  "vinyl-sheets": glueDownPatterns,
+  "wpc": clickLockPatterns,
+  // Wooden
+  "engineered-wood": engineeredWoodPatterns,
+  "laminate": laminatePatterns,
+  "parquet": parquetPatterns,
+  "solid-hardwood": solidHardwoodPatterns,
+  // Tiles
+  "ceramic-tiles": ceramicPatterns,
+  "porcelain-tiles": porcelainPatterns,
+  "vitrified-tiles": porcelainPatterns,
+  "mosaic-tiles": mosaicPatterns,
+  "terrazzo-tiles": ceramicPatterns,
+  "cement-tiles": ceramicPatterns,
+  // Carpet
+  "carpet-tiles": carpetTilePatterns,
+  "wall-to-wall": wallToWallPatterns,
+  "area-rugs": areaRugPatterns,
+  // Outdoor
+  "outdoor-tiles": outdoorTilePatterns,
+  "timber-decking": timberDeckingPatterns,
+  "wpc-decking": wpcDeckingPatterns,
+  "stone-pavers": stonePaverPatterns,
+  // Stone
+  "granite": stonePaverPatterns,
+  "limestone": stonePaverPatterns,
+  "marble": porcelainPatterns,
+  "sandstone": stonePaverPatterns,
+  "slate": stonePaverPatterns,
+  "travertine": porcelainPatterns,
+};
+
+export const getPatternsByShadeId = (shadeId: string): FlooringPattern[] => {
+  return shadePatternMap[shadeId] || [];
+};
+
 // ─── Space-specific configs (Kitchen/Stairs/Bathroom) ───
 
 export interface SpaceConfig {
