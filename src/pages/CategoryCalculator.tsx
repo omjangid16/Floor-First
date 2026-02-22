@@ -303,6 +303,9 @@ const CategoryCalculator = () => {
                           }`}>
                           <div className="relative aspect-[4/5] overflow-hidden">
                             <img src={s.image} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            {s.popular && (
+                              <span className="absolute top-3 left-3 bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">Popular</span>
+                            )}
                             <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                               selectedShade === s.id ? "bg-accent border-accent" : "bg-background/80 border-background/60"
                             }`}>
