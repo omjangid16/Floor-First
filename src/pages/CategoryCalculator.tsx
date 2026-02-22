@@ -13,6 +13,7 @@ import { packageTiers } from "@/data/packageTiers";
 import { getCalculatorConfig } from "@/data/calculatorOptions";
 import { getCategoryShades, type CategoryShade } from "@/data/categoryShades";
 import { getPatternsByShadeId, type FlooringPattern } from "@/data/segmentData";
+import { getPatternShades } from "@/data/patternShades";
 
 const SQFT_PRESETS = [100, 250, 500, 1000, 2000];
 const SQFT_MIN = 50;
@@ -26,16 +27,17 @@ const CONVERSION = 10.764;
 const sqftToSqm = (sqft: number) => Math.round(sqft / CONVERSION);
 const sqmToSqft = (sqm: number) => Math.round(sqm * CONVERSION);
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
 
 const stepsMeta = [
   { id: 1, label: "Type", icon: <Palette className="w-4 h-4" /> },
   { id: 2, label: "Pattern", icon: <Layers className="w-4 h-4" /> },
-  { id: 3, label: "Grade", icon: <Layers className="w-4 h-4" /> },
-  { id: 4, label: "Area", icon: <Ruler className="w-4 h-4" /> },
-  { id: 5, label: "Options", icon: <Settings className="w-4 h-4" /> },
-  { id: 6, label: "Schedule", icon: <Calendar className="w-4 h-4" /> },
-  { id: 7, label: "Confirm", icon: <ClipboardCheck className="w-4 h-4" /> },
+  { id: 3, label: "Shade", icon: <Palette className="w-4 h-4" /> },
+  { id: 4, label: "Grade", icon: <Layers className="w-4 h-4" /> },
+  { id: 5, label: "Area", icon: <Ruler className="w-4 h-4" /> },
+  { id: 6, label: "Options", icon: <Settings className="w-4 h-4" /> },
+  { id: 7, label: "Schedule", icon: <Calendar className="w-4 h-4" /> },
+  { id: 8, label: "Confirm", icon: <ClipboardCheck className="w-4 h-4" /> },
 ];
 
 const gradeBarStyles: Record<string, { color: string; width: string }> = {
@@ -136,6 +138,7 @@ const CategoryCalculator = () => {
   const [step, setStep] = useState(1);
   const [selectedShade, setSelectedShade] = useState("");
   const [selectedPattern, setSelectedPattern] = useState<FlooringPattern | null>(null);
+  const [selectedShadeOption, setSelectedShadeOption] = useState("");
   const [packageTier, setPackageTier] = useState(categoryId === "vinyl" ? "premium" : "standard");
   const [areaSqft, setAreaSqft] = useState(500);
   const [unit, setUnit] = useState<"sqft" | "sqm">("sqft");
@@ -166,22 +169,25 @@ const CategoryCalculator = () => {
   };
 
   const availablePatterns = selectedShade ? getPatternsByShadeId(selectedShade) : [];
+  const availableShadeOptions = selectedPattern ? getPatternShades(selectedPattern.id) : [];
 
   const canNext = () => {
     switch (step) {
       case 1: return !!selectedShade;
       case 2: return !!selectedPattern;
-      case 3: return !!packageTier;
-      case 4: return areaSqft > 0;
-      case 5: return true;
-      case 6: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "" && scheduleData.phone.trim().length >= 7;
+      case 3: return !!selectedShadeOption;
+      case 4: return !!packageTier;
+      case 5: return areaSqft > 0;
+      case 6: return true;
+      case 7: return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "" && scheduleData.phone.trim().length >= 7;
       default: return false;
     }
   };
 
   const handleNext = () => {
     if (step < TOTAL_STEPS && canNext()) {
-      if (step === 1) setSelectedPattern(null); // reset pattern when changing type
+      if (step === 1) { setSelectedPattern(null); setSelectedShadeOption(""); }
+      if (step === 2) { setSelectedShadeOption(""); }
       setStep((s) => s + 1);
     }
   };
@@ -291,7 +297,7 @@ const CategoryCalculator = () => {
                     <p className="text-sm text-muted-foreground text-center mb-6">Choose from our curated collection</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                       {shades.map((s) => (
-                        <button key={s.id} onClick={() => { setSelectedShade(s.id); setSelectedPattern(null); }}
+                        <button key={s.id} onClick={() => { setSelectedShade(s.id); setSelectedPattern(null); setSelectedShadeOption(""); }}
                           className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
                             selectedShade === s.id ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
                           }`}>
@@ -324,7 +330,7 @@ const CategoryCalculator = () => {
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                       {availablePatterns.map((p) => (
-                        <button key={p.id} onClick={() => setSelectedPattern(p)}
+                        <button key={p.id} onClick={() => { setSelectedPattern(p); setSelectedShadeOption(""); }}
                           className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
                             selectedPattern?.id === p.id ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
                           }`}>
@@ -346,8 +352,39 @@ const CategoryCalculator = () => {
                   </div>
                 )}
 
-                {/* STEP 3: Material Grade */}
+                {/* STEP 3: Shade Selection */}
                 {step === 3 && (
+                  <div>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
+                      Select Shade
+                    </h3>
+                    <p className="text-sm text-muted-foreground text-center mb-6">
+                      Choose a shade for {selectedPattern?.name || "your selection"}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                      {availableShadeOptions.map((shadeName) => (
+                        <button key={shadeName} onClick={() => setSelectedShadeOption(shadeName)}
+                          className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
+                            selectedShadeOption === shadeName ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
+                          }`}>
+                          <div className="relative aspect-[4/5] overflow-hidden">
+                            <img src={selectedPattern?.image || ""} alt={shadeName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                              selectedShadeOption === shadeName ? "bg-accent border-accent" : "bg-background/80 border-background/60"
+                            }`}>
+                              {selectedShadeOption === shadeName && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
+                            </div>
+                            <p className={`absolute bottom-3 left-3 right-3 text-sm font-bold leading-tight ${selectedShadeOption === shadeName ? "text-accent" : "text-white"}`}>{shadeName}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 4: Material Grade */}
+                {step === 4 && (
                   <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Select Material Grade</h3>
                     <p className="text-sm text-muted-foreground text-center mb-6">Choose the quality level that fits your needs</p>
@@ -373,8 +410,8 @@ const CategoryCalculator = () => {
                   </div>
                 )}
 
-                {/* STEP 4: Area */}
-                {step === 4 && (
+                {/* STEP 5: Area */}
+                {step === 5 && (
                   <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Enter Your Area</h3>
                     <p className="text-sm text-muted-foreground text-center mb-6">Specify the total area to be covered</p>
@@ -468,8 +505,8 @@ const CategoryCalculator = () => {
                   </div>
                 )}
 
-                {/* STEP 5: Additional Options */}
-                {step === 5 && (
+                {/* STEP 6: Additional Options */}
+                {step === 6 && (
                   <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Additional Options</h3>
                     <p className="text-sm text-muted-foreground text-center mb-6">Enhance your flooring project with these services</p>
@@ -534,8 +571,8 @@ const CategoryCalculator = () => {
                   </div>
                 )}
 
-                {/* STEP 6: Schedule */}
-                {step === 6 && (
+                {/* STEP 7: Schedule */}
+                {step === 7 && (
                   <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Schedule a Visit</h3>
                     <p className="text-sm text-muted-foreground text-center mb-6">Book a time for our floor advisor to visit you</p>
@@ -636,8 +673,8 @@ const CategoryCalculator = () => {
                   </div>
                 )}
 
-                {/* STEP 7: Confirmation */}
-                {step === 7 && (
+                {/* STEP 8: Confirmation */}
+                {step === 8 && (
                   <div>
                     <div className="text-center mb-8">
                       <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 shadow-md">
@@ -664,6 +701,7 @@ const CategoryCalculator = () => {
                         <div><span className="text-muted-foreground">Category:</span> <span className="font-bold text-foreground">{config.categoryName}</span></div>
                         {shade && <div><span className="text-muted-foreground">Type:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
                         {selectedPattern && <div><span className="text-muted-foreground">Pattern:</span> <span className="font-bold text-foreground">{selectedPattern.name}</span></div>}
+                        {selectedShadeOption && <div><span className="text-muted-foreground">Shade:</span> <span className="font-bold text-foreground">{selectedShadeOption}</span></div>}
                         <div><span className="text-muted-foreground">Grade:</span> <span className="font-bold text-foreground">{pkg?.name}</span></div>
                         <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaSqft} sqft</span></div>
                       </div>
