@@ -31,12 +31,13 @@ export interface CategoryShade {
   name: string;
   description: string;
   image: string;
+  popular?: boolean;
 }
 
 export const categoryShades: Record<string, CategoryShade[]> = {
   vinyl: [
+    { id: "spc", name: "SPC (Stone Plastic Composite)", description: "Rigid core, waterproof planks", image: shadeSpc, popular: true },
     { id: "lvt", name: "LVT (Luxury Vinyl Tile)", description: "Realistic wood & stone look", image: shadeLvt },
-    { id: "spc", name: "SPC (Stone Plastic Composite)", description: "Rigid core, waterproof planks", image: shadeSpc },
     { id: "wpc", name: "WPC (Wood Plastic Composite)", description: "Wood-plastic composite", image: shadeWpc },
     { id: "pvc", name: "PVC Flooring", description: "Durable, easy to maintain", image: shadePvc },
     { id: "vinyl-sheets", name: "Vinyl Roll / Sheet Vinyl", description: "Seamless coverage", image: shadeVinylSheets },
