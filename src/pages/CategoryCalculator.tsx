@@ -254,23 +254,22 @@ const CategoryCalculator = () => {
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2 flex items-center gap-3 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
-        <button onClick={handleBack} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+      <div className="px-5 pt-5 pb-3 flex items-center gap-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
+        <button onClick={handleBack} className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+          <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-base font-bold text-foreground">{config.categoryName}</h1>
-          <p className="text-[10px] text-muted-foreground">{config.categoryName} Calculator</p>
+          <h1 className="text-lg font-bold text-foreground tracking-tight">{config.categoryName}</h1>
+          <p className="text-[11px] text-muted-foreground tracking-wide">
+            Step {step} of {TOTAL_STEPS} &mdash; {stepsMeta[step - 1]?.label}
+          </p>
         </div>
       </div>
 
       {/* ═══ LINEAR PROGRESS BAR ═══ */}
-      <div className="px-4 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
-        <div className="py-4">
-          <p className="text-xs text-muted-foreground mb-2">
-            Step {step} of {TOTAL_STEPS} — <span className="font-semibold text-foreground">{stepsMeta[step - 1]?.label}</span>
-          </p>
-          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="px-5 lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12">
+        <div className="pb-2 pt-1">
+          <div className="h-1 rounded-full bg-border overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-accent"
               initial={false}
@@ -283,38 +282,38 @@ const CategoryCalculator = () => {
 
       {/* Layout */}
       <div className="lg:max-w-7xl lg:mx-auto lg:px-8 xl:px-12 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8 lg:items-start">
-        <div className="px-4 lg:px-0 pb-28 lg:pb-8 mt-4">
+        <div className="px-5 lg:px-0 pb-28 lg:pb-8 mt-5">
           <div className="lg:bg-card lg:rounded-2xl lg:border lg:border-border lg:p-8 lg:shadow-luxury">
             <AnimatePresence mode="wait">
-              <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25, ease: "easeOut" }}>
 
                 {/* STEP 1: Shades / Designs */}
                 {step === 1 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
-                      Select {config.categoryName} {config.shadeLabel}
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">
+                      Select Flooring Type
                     </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">Choose from our curated collection</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                    <p className="text-sm text-muted-foreground mb-8">Choose from our curated collection</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 md:gap-4">
                       {shades.map((s) => (
                         <button key={s.id} onClick={() => { setSelectedShade(s.id); setSelectedPattern(null); setSelectedShadeOption(""); }}
-                          className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
-                            selectedShade === s.id ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
+                          className={`group rounded-2xl overflow-hidden border transition-all text-left shadow-sm hover:shadow-luxury ${
+                            selectedShade === s.id ? "border-accent shadow-luxury ring-1 ring-accent/20" : "border-border hover:border-accent/30"
                           }`}>
                           <div className="relative aspect-[4/5] overflow-hidden">
-                            <img src={s.image} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <img src={s.image} alt={s.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" />
                             {s.popular && (
-                              <span className="absolute top-3 left-3 bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">Popular</span>
+                              <span className="absolute top-3 left-3 bg-accent text-accent-foreground text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-sm">Popular</span>
                             )}
-                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              selectedShade === s.id ? "bg-accent border-accent" : "bg-background/80 border-background/60"
+                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all backdrop-blur-sm ${
+                              selectedShade === s.id ? "bg-accent border-accent shadow-md" : "bg-background/70 border-background/50"
                             }`}>
-                              {selectedShade === s.id && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
+                              {selectedShade === s.id && <Check className="w-3 h-3 text-accent-foreground" />}
                             </div>
                           </div>
-                          <div className="px-3 py-3 bg-card">
-                            <p className={`text-sm font-bold leading-tight ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>{s.name}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{s.description}</p>
+                          <div className="px-3.5 py-3.5 bg-card">
+                            <p className={`text-[13px] font-semibold leading-tight tracking-tight ${selectedShade === s.id ? "text-accent" : "text-foreground"}`}>{s.name}</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{s.description}</p>
                           </div>
                         </button>
                       ))}
@@ -325,29 +324,29 @@ const CategoryCalculator = () => {
                 {/* STEP 2: Pattern Selection */}
                 {step === 2 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">
                       Select Pattern
                     </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
+                    <p className="text-sm text-muted-foreground mb-8">
                       Choose a pattern for {shades.find(s => s.id === selectedShade)?.name || config.categoryName}
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 md:gap-4">
                       {availablePatterns.map((p) => (
                         <button key={p.id} onClick={() => { setSelectedPattern(p); setSelectedShadeOption(""); }}
-                          className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
-                            selectedPattern?.id === p.id ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
+                          className={`group rounded-2xl overflow-hidden border transition-all text-left shadow-sm hover:shadow-luxury ${
+                            selectedPattern?.id === p.id ? "border-accent shadow-luxury ring-1 ring-accent/20" : "border-border hover:border-accent/30"
                           }`}>
                           <div className="relative aspect-[4/5] overflow-hidden">
-                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              selectedPattern?.id === p.id ? "bg-accent border-accent" : "bg-background/80 border-background/60"
+                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" />
+                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all backdrop-blur-sm ${
+                              selectedPattern?.id === p.id ? "bg-accent border-accent shadow-md" : "bg-background/70 border-background/50"
                             }`}>
-                              {selectedPattern?.id === p.id && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
+                              {selectedPattern?.id === p.id && <Check className="w-3 h-3 text-accent-foreground" />}
                             </div>
                           </div>
-                          <div className="px-3 py-3 bg-card">
-                            <p className={`text-sm font-bold leading-tight ${selectedPattern?.id === p.id ? "text-accent" : "text-foreground"}`}>{p.name}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.description}</p>
+                          <div className="px-3.5 py-3.5 bg-card">
+                            <p className={`text-[13px] font-semibold leading-tight tracking-tight ${selectedPattern?.id === p.id ? "text-accent" : "text-foreground"}`}>{p.name}</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{p.description}</p>
                           </div>
                         </button>
                       ))}
@@ -358,27 +357,27 @@ const CategoryCalculator = () => {
                 {/* STEP 3: Shade Selection */}
                 {step === 3 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">
                       Select Shade
                     </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">
+                    <p className="text-sm text-muted-foreground mb-8">
                       Choose a shade for {selectedPattern?.name || "your selection"}
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 md:gap-4">
                       {availableShadeOptions.map((shadeName) => (
                         <button key={shadeName} onClick={() => setSelectedShadeOption(shadeName)}
-                          className={`group rounded-2xl overflow-hidden border-2 transition-all text-left ${
-                            selectedShadeOption === shadeName ? "border-accent shadow-lg ring-2 ring-accent/20" : "border-border hover:border-accent/40"
+                          className={`group rounded-2xl overflow-hidden border transition-all text-left shadow-sm hover:shadow-luxury ${
+                            selectedShadeOption === shadeName ? "border-accent shadow-luxury ring-1 ring-accent/20" : "border-border hover:border-accent/30"
                           }`}>
                           <div className="relative aspect-[4/5] overflow-hidden">
-                            <img src={selectedPattern?.image || ""} alt={shadeName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              selectedShadeOption === shadeName ? "bg-accent border-accent" : "bg-background/80 border-background/60"
+                            <img src={selectedPattern?.image || ""} alt={shadeName} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                            <div className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all backdrop-blur-sm ${
+                              selectedShadeOption === shadeName ? "bg-accent border-accent shadow-md" : "bg-background/70 border-background/50"
                             }`}>
-                              {selectedShadeOption === shadeName && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
+                              {selectedShadeOption === shadeName && <Check className="w-3 h-3 text-accent-foreground" />}
                             </div>
-                            <p className={`absolute bottom-3 left-3 right-3 text-sm font-bold leading-tight ${selectedShadeOption === shadeName ? "text-accent" : "text-white"}`}>{shadeName}</p>
+                            <p className={`absolute bottom-3 left-3.5 right-3.5 text-[13px] font-semibold leading-tight tracking-tight ${selectedShadeOption === shadeName ? "text-accent" : "text-white"}`}>{shadeName}</p>
                           </div>
                         </button>
                       ))}
@@ -389,23 +388,23 @@ const CategoryCalculator = () => {
                 {/* STEP 4: Material Grade */}
                 {step === 4 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Select Material Grade</h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">Choose the quality level that fits your needs</p>
-                    <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-lg mx-auto">
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Select Material Grade</h3>
+                    <p className="text-sm text-muted-foreground mb-8">Choose the quality level that fits your needs</p>
+                    <div className="grid grid-cols-2 gap-3.5 md:gap-4 max-w-lg mx-auto">
                       {packageTiers.map((tier) => {
                         const selected = packageTier === tier.id;
                         const barStyle = gradeBarStyles[tier.id];
                         return (
                           <button key={tier.id} onClick={() => setPackageTier(tier.id)}
-                            className={`rounded-2xl p-5 border-2 transition-all text-left relative ${
-                              selected ? "border-accent bg-accent/5 shadow-lg" : "border-border bg-card hover:border-accent/40"
+                            className={`rounded-2xl p-5 border transition-all text-left relative shadow-sm hover:shadow-luxury ${
+                              selected ? "border-accent bg-accent/5 shadow-luxury ring-1 ring-accent/20" : "border-border bg-card hover:border-accent/30"
                             }`}>
-                            <div className="h-2 bg-muted rounded-full mb-4 overflow-hidden relative">
+                            <div className="h-1.5 bg-muted rounded-full mb-4 overflow-hidden relative">
                               <div className={`h-full rounded-full ${barStyle.color} ${barStyle.width} transition-all`} />
                             </div>
-                            <p className={`font-bold text-lg mb-1 ${selected ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
-                            <p className="text-xs text-muted-foreground mb-3">{tier.description}</p>
-                            <span className="inline-block text-[11px] font-semibold bg-muted px-3 py-1 rounded-full text-muted-foreground">{tier.badge}</span>
+                            <p className={`font-semibold text-base mb-1 tracking-tight ${selected ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
+                            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">{tier.description}</p>
+                            <span className="inline-block text-[10px] font-semibold bg-muted px-3 py-1 rounded-lg text-muted-foreground">{tier.badge}</span>
                           </button>
                         );
                       })}
@@ -416,8 +415,8 @@ const CategoryCalculator = () => {
                 {/* STEP 5: Area */}
                 {step === 5 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Enter Your Area</h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">Specify the total area to be covered</p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Enter Your Area</h3>
+                    <p className="text-sm text-muted-foreground mb-8">Specify the total area to be covered</p>
 
                     {/* Unit toggle */}
                     <div className="flex justify-center mb-8">
@@ -511,15 +510,15 @@ const CategoryCalculator = () => {
                 {/* STEP 6: Additional Options */}
                 {step === 6 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Additional Options</h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">Enhance your flooring project with these services</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Additional Options</h3>
+                    <p className="text-sm text-muted-foreground mb-8">Enhance your flooring project with these services</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       {config.additionalOptions.map((opt) => {
                         const sel = selectedOptions.includes(opt.id);
                         return (
                           <button key={opt.id} onClick={() => toggleOption(opt.id)}
-                            className={`flex items-start gap-3 text-left rounded-2xl p-5 border-2 transition-all ${
-                              sel ? "border-accent bg-accent/5 shadow-md" : "border-border bg-card hover:border-accent/40"
+                            className={`flex items-start gap-3 text-left rounded-2xl p-5 border transition-all shadow-sm hover:shadow-luxury ${
+                              sel ? "border-accent bg-accent/5 shadow-luxury ring-1 ring-accent/20" : "border-border bg-card hover:border-accent/30"
                             }`}>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
                               sel ? "bg-accent border-accent" : "border-muted-foreground/40"
@@ -577,11 +576,11 @@ const CategoryCalculator = () => {
                 {/* STEP 7: Schedule */}
                 {step === 7 && (
                   <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground text-center mb-1">Schedule a Visit</h3>
-                    <p className="text-sm text-muted-foreground text-center mb-6">Book a time for our floor advisor to visit you</p>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Schedule a Visit</h3>
+                    <p className="text-sm text-muted-foreground mb-8">Book a time for our floor advisor to visit you</p>
 
                     {/* Radio selection cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-w-lg mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6 max-w-lg mx-auto">
                       {[
                         { id: "samples" as const, label: "Order Samples with Site Visit", desc: "Get physical samples delivered to your location", price: "AED 49" },
                         { id: "visit" as const, label: "Schedule Visit Only", desc: "Expert consultation at your space", price: "AED 19" },
@@ -589,8 +588,8 @@ const CategoryCalculator = () => {
                         const sel = scheduleType === opt.id;
                         return (
                           <button key={opt.id} onClick={() => setScheduleType(opt.id)}
-                            className={`flex items-start gap-3 text-left rounded-2xl p-5 border-2 transition-all ${
-                              sel ? "border-accent bg-accent/5 shadow-md" : "border-border bg-card hover:border-accent/40"
+                            className={`flex items-start gap-3 text-left rounded-2xl p-5 border transition-all shadow-sm hover:shadow-luxury ${
+                              sel ? "border-accent bg-accent/5 shadow-luxury ring-1 ring-accent/20" : "border-border bg-card hover:border-accent/30"
                             }`}>
                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
                               sel ? "border-accent" : "border-muted-foreground/40"
@@ -772,13 +771,13 @@ const CategoryCalculator = () => {
 
           {/* Desktop Navigation */}
           {step < TOTAL_STEPS && (
-            <div className="hidden lg:flex items-center justify-between mt-6">
+            <div className="hidden lg:flex items-center justify-between mt-8">
               <button onClick={handleBack}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-all">
-                <ArrowLeft className="w-4 h-4" /> Back
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+                Back
               </button>
               <button onClick={handleNext} disabled={!canNext()}
-                className={`flex items-center gap-1.5 px-8 py-3 rounded-xl text-sm font-bold transition-all ${
+                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-semibold transition-all ${
                   canNext() ? "bg-accent text-accent-foreground hover:opacity-90 shadow-lg" : "bg-muted text-muted-foreground cursor-not-allowed"
                 }`}>
                 Continue <ArrowRight className="w-4 h-4" />
@@ -828,13 +827,13 @@ const CategoryCalculator = () => {
 
       {/* Mobile Bottom Navigation */}
       {step < TOTAL_STEPS && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50 safe-area-bottom">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-5 py-3.5 flex items-center justify-between z-50 safe-area-bottom shadow-[0_-4px_20px_-4px_hsl(220_15%_15%/0.08)]">
           <button onClick={handleBack}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-all">
-            <ArrowLeft className="w-4 h-4" /> Back
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            Back
           </button>
           <button onClick={handleNext} disabled={!canNext()}
-            className={`flex items-center gap-1.5 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
+            className={`flex items-center gap-2 px-7 py-3 rounded-2xl text-sm font-semibold transition-all ${
               canNext() ? "bg-accent text-accent-foreground hover:opacity-90 shadow-lg" : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}>
             Continue <ArrowRight className="w-4 h-4" />
@@ -843,13 +842,13 @@ const CategoryCalculator = () => {
       )}
 
       {step === TOTAL_STEPS && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex items-center justify-between z-50">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-5 py-3.5 flex items-center justify-between z-50 shadow-[0_-4px_20px_-4px_hsl(220_15%_15%/0.08)]">
           <button onClick={handleBack}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted transition-all">
-            <ArrowLeft className="w-4 h-4" /> Back
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            Back
           </button>
           <button onClick={() => navigate("/")}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-accent text-accent-foreground hover:opacity-90 shadow-lg">
+            className="flex items-center gap-2 px-7 py-3 rounded-2xl text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 shadow-lg">
             <Phone className="w-4 h-4" /> Confirm Request
           </button>
         </div>
