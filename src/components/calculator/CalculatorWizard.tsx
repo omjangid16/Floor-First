@@ -16,20 +16,29 @@ import typeCarpet from "@/assets/type-carpet.jpg";
 import typeOutdoor from "@/assets/type-outdoor.jpg";
 import typeRubber from "@/assets/type-rubber.jpg";
 
+import spaceLiving from "@/assets/space-living.jpg";
+import spaceBedroom from "@/assets/space-bedroom.jpg";
+import spaceKitchen from "@/assets/space-kitchen.jpg";
+import spaceBathroom from "@/assets/space-bathroom.jpg";
+import spaceOffice from "@/assets/space-office.jpg";
+import spaceWarehouse from "@/assets/space-warehouse.jpg";
+import spaceHotel from "@/assets/space-hotel.jpg";
+import spaceGym from "@/assets/space-gym.jpg";
+
 const typeImages: Record<string, string> = {
   tile: typeTile, stone: typeStone, wood: typeWood, vinyl: typeVinyl,
   resin: typeResin, carpet: typeCarpet, outdoor: typeOutdoor, rubber: typeRubber,
 };
 
 const spaceTypes = [
-  { id: "living", label: "Living Room", icon: "🛋️" },
-  { id: "bedroom", label: "Bedroom", icon: "🛏️" },
-  { id: "kitchen", label: "Kitchen", icon: "🍳" },
-  { id: "bathroom", label: "Bathroom", icon: "🚿" },
-  { id: "office", label: "Office", icon: "💼" },
-  { id: "warehouse", label: "Warehouse", icon: "🏭" },
-  { id: "hotel", label: "Hotel Lobby", icon: "🏨" },
-  { id: "gym", label: "Gym", icon: "🏋️" },
+  { id: "living", label: "Living Room", image: spaceLiving },
+  { id: "bedroom", label: "Bedroom", image: spaceBedroom },
+  { id: "kitchen", label: "Kitchen", image: spaceKitchen },
+  { id: "bathroom", label: "Bathroom", image: spaceBathroom },
+  { id: "office", label: "Office", image: spaceOffice },
+  { id: "warehouse", label: "Warehouse", image: spaceWarehouse },
+  { id: "hotel", label: "Hotel Lobby", image: spaceHotel },
+  { id: "gym", label: "Gym", image: spaceGym },
 ];
 
 const steps = [
@@ -164,7 +173,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
                           : "border-border bg-background text-foreground hover:border-accent/40"
                       }`}
                     >
-                      <span className="text-2xl">{s.icon}</span>
+                      <img src={s.image} alt={s.label} className="w-12 h-12 object-contain rounded-lg" />
                       <span className="text-xs">{s.label}</span>
                     </button>
                   ))}
