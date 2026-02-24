@@ -44,7 +44,7 @@ const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
                     : "bg-muted text-muted-foreground border border-border"
                 }`}
               >
-                {isComplete ? <Check className="w-4 h-4" /> : step.id}
+                {isComplete ? <Check className="w-4 h-4" /> : null}
               </div>
               <span
                 className={`text-[11px] font-body whitespace-nowrap ${
