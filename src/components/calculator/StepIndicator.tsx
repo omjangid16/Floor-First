@@ -12,51 +12,59 @@ interface StepIndicatorProps {
 }
 
 const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
-  return (
-    <div className="flex items-center justify-between w-full mb-8">
-      {steps.map((step, index) => {
-        const isComplete = currentStep > step.id;
-        const isActive = currentStep === step.id;
+  const progress = Math.round(((currentStep - 1) / (steps.length - 1)) * 100);
 
-        return (
-          <div key={step.id} className="flex items-center flex-1 last:flex-none">
-            <div className="flex flex-col items-center">
+  return (
+    <div className="space-y-4">
+      {/* Progress text */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-body font-semibold text-muted-foreground tracking-wide uppercase">
+          Step {currentStep} of {steps.length} — {steps[currentStep - 1]?.label}
+        </p>
+        <span className="text-xs font-body font-bold text-accent">{progress}%</span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="relative h-1.5 w-full rounded-full bg-border overflow-hidden">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, hsl(var(--accent)), hsl(var(--burnt-orange-light)))",
+          }}
+        />
+      </div>
+
+      {/* Step dots */}
+      <div className="flex items-center justify-between">
+        {steps.map((step, index) => {
+          const isComplete = currentStep > step.id;
+          const isActive = currentStep === step.id;
+
+          return (
+            <div key={step.id} className="flex flex-col items-center gap-1.5">
               <div
-                className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-body font-bold transition-all duration-300 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-body font-bold transition-all duration-300 ${
                   isComplete
-                    ? "bg-accent text-accent-foreground shadow-lg"
+                    ? "bg-accent text-accent-foreground"
                     : isActive
-                    ? "bg-accent text-accent-foreground shadow-lg ring-4 ring-accent/20"
-                    : "bg-secondary text-muted-foreground"
+                    ? "bg-accent text-accent-foreground ring-4 ring-accent/15"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
-                {isComplete ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="text-xs">{step.icon}</span>
-                )}
+                {isComplete ? <Check className="w-3.5 h-3.5" /> : index + 1}
               </div>
               <span
-                className={`text-[10px] font-body mt-2 whitespace-nowrap font-semibold ${
-                  isActive ? "text-accent" : isComplete ? "text-foreground" : "text-muted-foreground"
+                className={`text-[10px] font-body font-medium whitespace-nowrap ${
+                  isActive ? "text-accent font-semibold" : isComplete ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {step.label}
               </span>
             </div>
-
-            {index < steps.length - 1 && (
-              <div className="flex-1 h-[2px] mx-3 mt-[-16px]">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    isComplete ? "bg-accent" : "bg-border"
-                  }`}
-                />
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
