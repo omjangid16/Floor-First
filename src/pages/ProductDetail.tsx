@@ -1,25 +1,57 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ShoppingCart, FileText, Calendar, Wrench, Check } from "lucide-react";
+import { ArrowLeft, ShoppingCart, FileText, Calendar, Wrench, Check, Shield, Star } from "lucide-react";
 import { products, flooringTypes } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { shadeGroups, getShadeById, type Shade } from "@/data/shades";
 
-import typeTile from "@/assets/type-tile.jpg";
-import typeStone from "@/assets/type-stone.jpg";
-import typeWood from "@/assets/type-wood.jpg";
-import typeVinyl from "@/assets/type-vinyl.jpg";
-import typeResin from "@/assets/type-resin.jpg";
-import typeCarpet from "@/assets/type-carpet.jpg";
-import typeOutdoor from "@/assets/type-outdoor.jpg";
-import typeRubber from "@/assets/type-rubber.jpg";
+import productDetailVinyl from "@/assets/product-detail-vinyl.jpg";
+import productDetailTile from "@/assets/product-detail-tile.jpg";
+import productDetailWood from "@/assets/product-detail-wood.jpg";
+import productDetailStone from "@/assets/product-detail-stone.jpg";
+import productDetailCarpet from "@/assets/product-detail-carpet.jpg";
+import productDetailOutdoor from "@/assets/product-detail-outdoor.jpg";
+import productDetailResin from "@/assets/product-detail-resin.jpg";
+import productDetailRubber from "@/assets/product-detail-rubber.jpg";
 
-const typeImages: Record<string, string> = {
-  tile: typeTile, stone: typeStone, wood: typeWood, vinyl: typeVinyl,
-  resin: typeResin, carpet: typeCarpet, outdoor: typeOutdoor, rubber: typeRubber,
+const detailImages: Record<string, string> = {
+  tile: productDetailTile,
+  stone: productDetailStone,
+  wood: productDetailWood,
+  vinyl: productDetailVinyl,
+  resin: productDetailResin,
+  carpet: productDetailCarpet,
+  outdoor: productDetailOutdoor,
+  rubber: productDetailRubber,
 };
+
+/* ── Score Bar ──────────────────────────────────────────────── */
+const ScoreBar = ({ label, score, max = 10 }: { label: string; score: number; max?: number }) => (
+  <div>
+    <div className="flex justify-between text-sm mb-1.5">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-semibold text-foreground">{score}/{max}</span>
+    </div>
+    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${(score / max) * 100}%` }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="h-full gradient-accent rounded-full"
+      />
+    </div>
+  </div>
+);
+
+/* ── Spec Card ──────────────────────────────────────────────── */
+const SpecCard = ({ label, value }: { label: string; value: string }) => (
+  <div className="bg-secondary/50 border border-border rounded-xl p-4">
+    <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+    <p className="font-semibold text-foreground text-sm">{value}</p>
+  </div>
+);
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -36,8 +68,8 @@ const ProductDetail = () => {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-3xl font-display font-bold mb-4">Product Not Found</h1>
-          <Link to="/products" className="text-accent font-body font-medium hover:underline">← Back to Products</Link>
+          <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
+          <Link to="/products" className="text-accent font-medium hover:underline">← Back to Products</Link>
         </div>
       </main>
     );
@@ -57,203 +89,235 @@ const ProductDetail = () => {
     window.location.href = "/cart";
   };
 
-  // Get shades relevant to this product type
-  const relevantShades = shadeGroups.flatMap((g) => g.shades).slice(0, 12);
+  const relevantShades = shadeGroups.flatMap((g) => g.shades);
   const currentShade = selectedShade ? getShadeById(selectedShade) : null;
-
   const floorType = flooringTypes.find((t) => t.id === product.type);
-
-  // Related products
-  const related = products
-    .filter((p) => p.type === product.type && p.id !== product.id)
-    .slice(0, 4);
-
-  const ScoreBar = ({ label, score, max = 10 }: { label: string; score: number; max?: number }) => (
-    <div>
-      <div className="flex justify-between text-sm font-body mb-1">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-semibold text-foreground">{score}/{max}</span>
-      </div>
-      <div className="h-2 bg-secondary rounded-full overflow-hidden">
-        <div className="h-full gradient-accent rounded-full transition-all duration-500" style={{ width: `${(score / max) * 100}%` }} />
-      </div>
-    </div>
-  );
+  const related = products.filter((p) => p.type === product.type && p.id !== product.id).slice(0, 4);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background pb-24">
       <div className="container-luxury py-6">
-        <Link to={`/products${floorType ? `?type=${floorType.id}` : ""}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground font-body text-sm transition-colors mb-6">
+        {/* Back Link */}
+        <Link
+          to={`/products${floorType ? `?type=${floorType.id}` : ""}`}
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors mb-6"
+        >
           <ArrowLeft className="w-4 h-4" /> Back to {floorType?.name || "Products"}
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          {/* Image Gallery */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="rounded-2xl overflow-hidden shadow-luxury-lg relative">
-              <img src={typeImages[product.type] || typeTile} alt={product.name} className="w-full h-[400px] lg:h-[500px] object-cover" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
+          {/* ── Product Image ───────────────────────────────── */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <div className="rounded-2xl overflow-hidden relative bg-card shadow-luxury-lg">
+              <img
+                src={detailImages[product.type] || productDetailTile}
+                alt={product.name}
+                className="w-full h-[350px] sm:h-[420px] lg:h-[520px] object-cover"
+              />
               {currentShade && (
-                <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 shadow-luxury">
-                  <div className="w-6 h-6 rounded-sm" style={{ background: currentShade.gradient }} />
-                  <span className="text-xs font-body font-semibold text-foreground">Shade: {currentShade.name}</span>
+                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-luxury">
+                  <div className="w-8 h-8 rounded-lg border border-border" style={{ background: currentShade.gradient }} />
+                  <span className="text-sm font-medium text-foreground">Shade: {currentShade.name}</span>
                 </div>
               )}
             </div>
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {[
+                { icon: Shield, label: "Genuine Product" },
+                { icon: Star, label: "Premium Quality" },
+                { icon: Wrench, label: "Expert Install" },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-1.5 py-3 bg-card border border-border rounded-xl">
+                  <Icon className="w-4 h-4 text-accent" />
+                  <span className="text-[10px] text-muted-foreground font-medium text-center">{label}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Product Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
-            {product.badge && (
-              <span className="inline-block gradient-accent text-accent-foreground text-xs font-body font-bold px-4 py-1.5 rounded-full">{product.badge}</span>
-            )}
-
+          {/* ── Product Info ─────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="space-y-6"
+          >
+            {/* Badge + Title */}
             <div>
-              <p className="text-sm text-accent font-body font-bold uppercase tracking-wider mb-1">{product.category}</p>
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">{product.name}</h1>
+              <p className="text-sm text-accent font-bold uppercase tracking-widest mb-1">{product.category}</p>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">{product.name}</h1>
+              {product.badge && (
+                <span className="inline-block mt-2 gradient-accent text-accent-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  {product.badge}
+                </span>
+              )}
             </div>
 
-            <p className="text-muted-foreground font-body leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground leading-relaxed text-sm lg:text-base">{product.description}</p>
 
+            {/* Price */}
             <div className="flex items-baseline gap-2">
-              <span className="text-sm text-muted-foreground font-body">from</span>
-              <span className="text-4xl font-display font-bold text-foreground">{product.currency} {product.pricePerSqft}</span>
-              <span className="text-muted-foreground font-body">/sqft</span>
+              <span className="text-sm text-muted-foreground">from</span>
+              <span className="text-3xl lg:text-4xl font-bold text-foreground">{product.currency} {product.pricePerSqft}</span>
+              <span className="text-muted-foreground">/sqft</span>
             </div>
 
-            {/* Shade Selector */}
+            {/* ── Shade Selector (Circular Swatches) ──────── */}
             <div>
-              <label className="block text-sm font-body font-semibold text-foreground mb-2">Select Shade</label>
-              <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Select Shade</h3>
+              <div className="flex flex-wrap gap-3">
                 {relevantShades.map((shade) => {
                   const isSelected = selectedShade === shade.id;
                   return (
                     <button
                       key={shade.id}
                       onClick={() => setSelectedShade(shade.id)}
-                      className={`relative flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
-                        isSelected ? "ring-2 ring-accent bg-accent/5" : "hover:bg-secondary"
-                      }`}
+                      className="group flex flex-col items-center gap-1"
                     >
                       <div
-                        className="w-full aspect-square rounded-md shadow-sm"
+                        className={`w-11 h-11 rounded-full border-2 transition-all duration-200 relative ${
+                          isSelected
+                            ? "border-accent shadow-md scale-110"
+                            : "border-border hover:border-accent/50 hover:scale-105"
+                        }`}
                         style={{ background: shade.gradient }}
                       >
                         {isSelected && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-4 h-4 rounded-full bg-accent flex items-center justify-center">
-                              <Check className="w-2.5 h-2.5 text-accent-foreground" />
+                            <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
+                              <Check className="w-3 h-3 text-accent-foreground" />
                             </div>
                           </div>
                         )}
                       </div>
-                      <span className="text-[9px] font-body text-muted-foreground truncate w-full text-center">{shade.name}</span>
+                      <span className={`text-[9px] font-medium transition-colors ${
+                        isSelected ? "text-accent" : "text-muted-foreground"
+                      }`}>
+                        {shade.name}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Specs Grid */}
+            {/* ── Specs Grid ─────────────────────────────── */}
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Material", value: product.material },
-                { label: "Finish", value: product.finish },
-                { label: "Pattern", value: product.pattern },
-                { label: "Warranty", value: product.warranty },
-              ].map((spec) => (
-                <div key={spec.label} className="bg-secondary rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground font-body mb-0.5">{spec.label}</p>
-                  <p className="font-body font-semibold text-foreground text-sm">{spec.value}</p>
-                </div>
-              ))}
+              <SpecCard label="Material" value={product.material} />
+              <SpecCard label="Finish" value={product.finish} />
+              <SpecCard label="Pattern" value={product.pattern} />
+              <SpecCard label="Warranty" value={product.warranty} />
             </div>
 
-            {/* Scores */}
+            {/* ── Score Bars ─────────────────────────────── */}
             <div className="space-y-3">
               <ScoreBar label="Durability" score={product.durabilityScore} />
               <ScoreBar label="Maintenance" score={product.maintenanceScore} />
             </div>
 
-            {/* Use Cases */}
+            {/* ── Use Cases ──────────────────────────────── */}
             <div>
-              <p className="text-sm font-body font-semibold text-foreground mb-2">Ideal For</p>
+              <h3 className="text-sm font-semibold text-foreground mb-2">Ideal For</h3>
               <div className="flex flex-wrap gap-2">
                 {product.useCases.map((uc) => (
-                  <span key={uc} className="text-xs bg-secondary text-secondary-foreground px-3 py-1.5 rounded-full font-body">{uc}</span>
+                  <span key={uc} className="text-xs bg-secondary text-secondary-foreground px-3 py-1.5 rounded-full border border-border">
+                    {uc}
+                  </span>
                 ))}
               </div>
             </div>
 
-            {/* Installation */}
-            <div className="bg-secondary rounded-lg p-4 flex items-center gap-3">
-              <Wrench className="w-5 h-5 text-accent shrink-0" />
+            {/* ── Installation Info ──────────────────────── */}
+            <div className="bg-secondary/50 border border-border rounded-xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg gradient-accent flex items-center justify-center shrink-0">
+                <Wrench className="w-5 h-5 text-accent-foreground" />
+              </div>
               <div>
-                <p className="text-sm font-body font-semibold text-foreground">Installation: {product.installationOption}</p>
-                <p className="text-xs text-muted-foreground font-body">Professional team available across UAE</p>
+                <p className="text-sm font-semibold text-foreground">{product.installationOption}</p>
+                <p className="text-xs text-muted-foreground">Professional team available across UAE</p>
               </div>
             </div>
 
-            {/* Area Calculator + Add-ons */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-luxury space-y-4">
-              <h3 className="font-display font-bold text-foreground">Calculate Your Cost</h3>
+            {/* ── Cost Calculator ─────────────────────────── */}
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-luxury space-y-5">
+              <h3 className="text-lg font-bold text-foreground">Calculate Your Cost</h3>
 
+              {/* Area Slider */}
               <div>
-                <label className="text-sm font-body text-muted-foreground mb-2 block">
-                  Area: <span className="font-bold text-foreground">{area} sqft</span>
-                </label>
-                <input type="range" min="5" max="500" value={area} onChange={(e) => setArea(Number(e.target.value))} className="w-full accent-burnt-orange" />
-                <div className="flex justify-between text-xs text-muted-foreground font-body">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Area</span>
+                  <span className="font-bold text-foreground">{area} sqft</span>
+                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="500"
+                  value={area}
+                  onChange={(e) => setArea(Number(e.target.value))}
+                  className="w-full h-2 bg-secondary rounded-full appearance-none cursor-pointer accent-[hsl(var(--accent))]"
+                />
+                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
                   <span>5 sqft</span><span>500 sqft</span>
                 </div>
               </div>
 
               {/* Add-ons */}
-              <div className="space-y-2">
-                <p className="text-sm font-body font-semibold text-foreground">Add-ons</p>
+              <div className="space-y-2.5">
+                <p className="text-sm font-semibold text-foreground">Add-ons</p>
                 {[
-                  { label: "Installation (+AED 25/sqft)", checked: includeInstallation, onChange: setIncludeInstallation },
-                  { label: "Underlay (+AED 8/sqft)", checked: includeUnderlay, onChange: setIncludeUnderlay },
-                  { label: "Skirting (+AED 15/linear ft)", checked: includeSkirting, onChange: setIncludeSkirting },
+                  { label: "Installation", detail: "+AED 25/sqft", checked: includeInstallation, onChange: setIncludeInstallation },
+                  { label: "Underlay", detail: "+AED 8/sqft", checked: includeUnderlay, onChange: setIncludeUnderlay },
+                  { label: "Skirting", detail: "+AED 15/linear ft", checked: includeSkirting, onChange: setIncludeSkirting },
                 ].map((addon) => (
-                  <label key={addon.label} className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={addon.checked}
-                      onChange={(e) => addon.onChange(e.target.checked)}
-                      className="w-4 h-4 accent-burnt-orange"
-                    />
-                    <span className="text-sm font-body text-foreground">{addon.label}</span>
+                  <label key={addon.label} className="flex items-center justify-between cursor-pointer group">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                        addon.checked ? "bg-accent border-accent" : "border-border group-hover:border-accent/50"
+                      }`}>
+                        {addon.checked && <Check className="w-3 h-3 text-accent-foreground" />}
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={addon.checked}
+                        onChange={(e) => addon.onChange(e.target.checked)}
+                        className="sr-only"
+                      />
+                      <span className="text-sm text-foreground">{addon.label}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{addon.detail}</span>
                   </label>
                 ))}
               </div>
 
               {/* Cost Breakdown */}
-              <div className="border-t border-border pt-4 space-y-1">
-                <div className="flex justify-between text-sm font-body text-muted-foreground">
+              <div className="border-t border-border pt-4 space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Flooring ({area} sqft)</span>
                   <span>AED {(product.pricePerSqft * area).toLocaleString()}</span>
                 </div>
                 {includeInstallation && (
-                  <div className="flex justify-between text-sm font-body text-muted-foreground">
+                  <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Installation</span>
                     <span>AED {(area * 25).toLocaleString()}</span>
                   </div>
                 )}
                 {includeUnderlay && (
-                  <div className="flex justify-between text-sm font-body text-muted-foreground">
+                  <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Underlay</span>
                     <span>AED {underlayPrice.toLocaleString()}</span>
                   </div>
                 )}
                 {includeSkirting && (
-                  <div className="flex justify-between text-sm font-body text-muted-foreground">
+                  <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Skirting</span>
                     <span>AED {skirtingPrice.toLocaleString()}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-display font-bold text-lg text-foreground mt-2 pt-2 border-t border-border">
+                <div className="flex justify-between font-bold text-lg text-foreground mt-3 pt-3 border-t border-border">
                   <span>Total</span>
-                  <span>AED {totalCost.toLocaleString()}</span>
+                  <span className="text-accent">AED {totalCost.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -261,13 +325,13 @@ const ProductDetail = () => {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleAddToCart}
-                  className="gradient-accent text-accent-foreground py-3.5 rounded-lg font-body font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                  className="gradient-accent text-accent-foreground py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity text-sm"
                 >
-                  <ShoppingCart className="w-5 h-5" /> Add to Cart
+                  <ShoppingCart className="w-4 h-4" /> Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="bg-foreground text-background py-3.5 rounded-lg font-body font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                  className="bg-foreground text-background py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity text-sm"
                 >
                   Buy Now
                 </button>
@@ -276,35 +340,43 @@ const ProductDetail = () => {
               <div className="grid grid-cols-2 gap-3">
                 <Link
                   to="/get-quote"
-                  className="text-center border-2 border-accent text-accent py-2.5 rounded-lg font-body font-semibold text-sm flex items-center justify-center gap-2 hover:bg-accent/10 transition-colors"
+                  className="text-center border-2 border-accent text-accent py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 hover:bg-accent/5 transition-colors"
                 >
-                  <FileText className="w-4 h-4" /> Add to Quote
+                  <FileText className="w-3.5 h-3.5" /> Add to Quote
                 </Link>
                 <Link
                   to="/get-quote"
-                  className="text-center border-2 border-border text-foreground py-2.5 rounded-lg font-body font-semibold text-sm flex items-center justify-center gap-2 hover:border-accent hover:text-accent transition-colors"
+                  className="text-center border-2 border-border text-foreground py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 hover:border-accent hover:text-accent transition-colors"
                 >
-                  <Calendar className="w-4 h-4" /> Consultation
+                  <Calendar className="w-3.5 h-3.5" /> Consultation
                 </Link>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Related Products */}
+        {/* ── Related Products ────────────────────────────── */}
         {related.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-display font-bold text-foreground mb-6">You May Also Like</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h2 className="text-2xl font-bold text-foreground mb-6">You May Also Like</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {related.map((p) => (
-                <Link key={p.id} to={`/products/${p.id}`} className="group bg-card rounded-xl overflow-hidden shadow-luxury hover-lift border border-border">
-                  <div className="h-40 overflow-hidden">
-                    <img src={typeImages[p.type] || typeTile} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Link
+                  key={p.id}
+                  to={`/products/${p.id}`}
+                  className="group bg-card rounded-xl overflow-hidden shadow-luxury hover-lift border border-border"
+                >
+                  <div className="h-36 lg:h-44 overflow-hidden">
+                    <img
+                      src={detailImages[p.type] || productDetailTile}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
-                  <div className="p-4">
-                    <p className="text-xs text-accent font-body font-bold uppercase mb-1">{p.category}</p>
-                    <h3 className="text-sm font-display font-bold text-foreground group-hover:text-accent transition-colors">{p.name}</h3>
-                    <p className="text-sm font-display font-bold text-foreground mt-2">AED {p.pricePerSqft}/sqft</p>
+                  <div className="p-3 lg:p-4">
+                    <p className="text-[10px] text-accent font-bold uppercase tracking-wider mb-1">{p.category}</p>
+                    <h3 className="text-xs lg:text-sm font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2">{p.name}</h3>
+                    <p className="text-sm font-bold text-foreground mt-2">AED {p.pricePerSqft}/sqft</p>
                   </div>
                 </Link>
               ))}
