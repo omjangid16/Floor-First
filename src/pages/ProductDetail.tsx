@@ -5,7 +5,7 @@ import { ArrowLeft, ShoppingCart, FileText, Calendar, Wrench, Check, Shield, Sta
 import { products, flooringTypes } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { shadeGroups, getShadeById, type Shade } from "@/data/shades";
+import { getAttributesForType } from "@/data/productAttributes";
 
 import productDetailVinyl from "@/assets/product-detail-vinyl.jpg";
 import productDetailTile from "@/assets/product-detail-tile.jpg";
@@ -53,6 +53,42 @@ const SpecCard = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
+/* ── Attribute Selector ────────────────────────────────────── */
+const AttributeSelector = ({
+  label,
+  options,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  options: { id: string; label: string }[];
+  selected: string | null;
+  onSelect: (id: string) => void;
+}) => (
+  <div>
+    <h3 className="text-sm font-semibold text-foreground mb-2.5">{label}</h3>
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const isSelected = selected === opt.id;
+        return (
+          <button
+            key={opt.id}
+            onClick={() => onSelect(opt.id)}
+            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all duration-200 ${
+              isSelected
+                ? "border-accent bg-accent/10 text-accent shadow-sm"
+                : "border-border bg-card text-foreground hover:border-accent/40 hover:bg-secondary/50"
+            }`}
+          >
+            {isSelected && <Check className="w-3 h-3 inline-block mr-1.5 -mt-0.5" />}
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -62,7 +98,9 @@ const ProductDetail = () => {
   const [includeInstallation, setIncludeInstallation] = useState(false);
   const [includeUnderlay, setIncludeUnderlay] = useState(false);
   const [includeSkirting, setIncludeSkirting] = useState(false);
-  const [selectedShade, setSelectedShade] = useState<string | null>(product?.shade || null);
+
+  // Attribute selections (keyed by attribute key)
+  const [selections, setSelections] = useState<Record<string, string>>({});
 
   if (!product) {
     return (
@@ -89,8 +127,11 @@ const ProductDetail = () => {
     window.location.href = "/cart";
   };
 
-  const relevantShades = shadeGroups.flatMap((g) => g.shades);
-  const currentShade = selectedShade ? getShadeById(selectedShade) : null;
+  const handleSelectAttribute = (key: string, value: string) => {
+    setSelections((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const attributes = getAttributesForType(product.type);
   const floorType = flooringTypes.find((t) => t.id === product.type);
   const related = products.filter((p) => p.type === product.type && p.id !== product.id).slice(0, 4);
 
@@ -114,12 +155,6 @@ const ProductDetail = () => {
                 alt={product.name}
                 className="w-full h-[350px] sm:h-[420px] lg:h-[520px] object-cover"
               />
-              {currentShade && (
-                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-luxury">
-                  <div className="w-8 h-8 rounded-lg border border-border" style={{ background: currentShade.gradient }} />
-                  <span className="text-sm font-medium text-foreground">Shade: {currentShade.name}</span>
-                </div>
-              )}
             </div>
 
             {/* Trust Badges */}
@@ -144,7 +179,7 @@ const ProductDetail = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="space-y-6"
           >
-            {/* Badge + Title */}
+            {/* Title + Badge */}
             <div>
               <p className="text-sm text-accent font-bold uppercase tracking-widest mb-1">{product.category}</p>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">{product.name}</h1>
@@ -164,43 +199,17 @@ const ProductDetail = () => {
               <span className="text-muted-foreground">/sqft</span>
             </div>
 
-            {/* ── Shade Selector (Circular Swatches) ──────── */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">Select Shade</h3>
-              <div className="flex flex-wrap gap-3">
-                {relevantShades.map((shade) => {
-                  const isSelected = selectedShade === shade.id;
-                  return (
-                    <button
-                      key={shade.id}
-                      onClick={() => setSelectedShade(shade.id)}
-                      className="group flex flex-col items-center gap-1"
-                    >
-                      <div
-                        className={`w-11 h-11 rounded-full border-2 transition-all duration-200 relative ${
-                          isSelected
-                            ? "border-accent shadow-md scale-110"
-                            : "border-border hover:border-accent/50 hover:scale-105"
-                        }`}
-                        style={{ background: shade.gradient }}
-                      >
-                        {isSelected && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                              <Check className="w-3 h-3 text-accent-foreground" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <span className={`text-[9px] font-medium transition-colors ${
-                        isSelected ? "text-accent" : "text-muted-foreground"
-                      }`}>
-                        {shade.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+            {/* ── Product Attributes (replaces shade swatches) ── */}
+            <div className="space-y-4">
+              {attributes.map((attr) => (
+                <AttributeSelector
+                  key={attr.key}
+                  label={attr.label}
+                  options={attr.options}
+                  selected={selections[attr.key] || null}
+                  onSelect={(val) => handleSelectAttribute(attr.key, val)}
+                />
+              ))}
             </div>
 
             {/* ── Specs Grid ─────────────────────────────── */}
