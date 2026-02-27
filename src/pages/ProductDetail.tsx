@@ -65,24 +65,42 @@ const AttributeSelector = ({
   selected: string | null;
   onSelect: (id: string) => void;
 }) => (
-  <div>
-    <h3 className="text-sm font-semibold text-foreground mb-2.5">{label}</h3>
-    <div className="flex flex-wrap gap-2">
+  <div className="space-y-3">
+    <div className="flex items-center justify-between">
+      <h3 className="text-sm font-heading font-bold tracking-wide text-foreground uppercase">
+        {label}
+      </h3>
+      {selected && (
+        <span className="text-xs font-body text-muted-foreground">
+          {options.find((o) => o.id === selected)?.label}
+        </span>
+      )}
+    </div>
+    <div className="flex flex-wrap gap-2.5">
       {options.map((opt) => {
         const isSelected = selected === opt.id;
         return (
-          <button
+          <motion.button
             key={opt.id}
             onClick={() => onSelect(opt.id)}
-            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all duration-200 ${
+            whileTap={{ scale: 0.96 }}
+            className={`relative px-4 py-2.5 rounded-xl text-xs font-body font-medium transition-all duration-250 ${
               isSelected
-                ? "border-accent bg-accent/10 text-accent shadow-sm"
-                : "border-border bg-card text-foreground hover:border-accent/40 hover:bg-secondary/50"
+                ? "bg-accent text-accent-foreground shadow-md ring-1 ring-accent/30"
+                : "bg-secondary/60 text-foreground border border-border/50 hover:bg-secondary hover:border-accent/30 hover:shadow-sm"
             }`}
           >
-            {isSelected && <Check className="w-3 h-3 inline-block mr-1.5 -mt-0.5" />}
+            {isSelected && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent border-2 border-background flex items-center justify-center"
+              >
+                <Check className="w-2.5 h-2.5 text-accent-foreground" />
+              </motion.span>
+            )}
             {opt.label}
-          </button>
+          </motion.button>
         );
       })}
     </div>
