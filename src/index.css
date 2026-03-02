@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
@@ -138,40 +138,11 @@
     box-shadow: 0 8px 30px -8px hsl(220 15% 15% / 0.12);
   }
 
-  .shadow-luxury-xl {
-    box-shadow: 0 20px 50px -15px hsl(220 15% 15% / 0.15), 0 8px 20px -8px hsl(220 15% 15% / 0.08);
-  }
-
-  .shadow-glow-accent {
-    box-shadow: 0 4px 20px -4px hsl(24 85% 50% / 0.25);
-  }
-
   .text-gradient-gold {
     background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(40 60% 70%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  .glass-card {
-    background: hsl(var(--card) / 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-
-  .glass-dark {
-    background: hsl(var(--foreground) / 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  .premium-border {
-    border: 1px solid hsl(var(--border));
-    background-image: linear-gradient(
-      to bottom right,
-      hsl(var(--card) / 0.8),
-      hsl(var(--card))
-    );
   }
 
   .scrollbar-hide {
@@ -180,10 +151,6 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-  }
-
-  .font-display {
-    font-family: 'Playfair Display', 'Georgia', serif;
   }
 }
 
@@ -194,12 +161,5 @@
   .hover-lift:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px -6px hsl(220 15% 15% / 0.12);
-  }
-
-  .hover-glow {
-    @apply transition-all duration-300 ease-out;
-  }
-  .hover-glow:hover {
-    box-shadow: 0 0 0 1px hsl(var(--accent) / 0.2), 0 8px 24px -6px hsl(24 85% 50% / 0.15);
   }
 }

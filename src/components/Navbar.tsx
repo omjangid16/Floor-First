@@ -39,12 +39,12 @@ const Navbar = () => {
   };
 
   return (
-    <header className="hidden lg:block sticky top-0 z-50 bg-card/90 backdrop-blur-2xl border-b border-border/60">
+    <header className="hidden lg:block sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
       <div className="max-w-7xl mx-auto px-8 xl:px-12">
-        <div className="flex items-center justify-between h-[76px]">
+        <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center shrink-0 group">
-            <img src={floorFirstLogo} alt="Floor First" className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+          <Link to="/" className="flex items-center shrink-0">
+            <img src={floorFirstLogo} alt="Floor First" className="h-9 w-auto object-contain" />
           </Link>
 
           {/* Center Nav */}
@@ -58,37 +58,36 @@ const Navbar = () => {
               >
                 <Link
                   to={item.path}
-                  className={`px-3.5 py-2 text-[13px] font-medium transition-all duration-200 rounded-lg flex items-center gap-1 ${
+                  className={`px-3 py-2 text-[13px] font-medium transition-colors rounded-lg flex items-center gap-1 ${
                     isActive(item.path)
                       ? "text-foreground bg-muted"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   {item.label}
-                  {item.submenu && <ChevronDown className={`w-3 h-3 opacity-50 transition-transform duration-200 ${openSubmenu === item.label ? "rotate-180" : ""}`} />}
+                  {item.submenu && <ChevronDown className="w-3 h-3 opacity-50" />}
                 </Link>
 
                 {item.submenu && openSubmenu === item.label && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-80 glass-card rounded-2xl shadow-luxury-xl border border-border/60 py-2 mt-3"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-card rounded-xl shadow-luxury-lg border border-border py-2 mt-2"
                   >
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-card border-l border-t border-border/60" />
                     {item.submenu.map((sub) => (
                       <Link
                         key={sub.label}
                         to={sub.path}
-                        className="flex items-center justify-between px-5 py-3.5 hover:bg-accent/5 transition-colors group mx-1 rounded-xl"
+                        className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+                          <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
                             {sub.label}
                           </p>
                           <p className="text-[11px] text-muted-foreground mt-0.5">{sub.desc}</p>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </Link>
                     ))}
                   </motion.div>
@@ -98,45 +97,40 @@ const Navbar = () => {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               to="/products"
-              className="w-10 h-10 rounded-xl hover:bg-muted/70 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-200"
+              className="w-9 h-9 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <Search className="w-[18px] h-[18px]" />
             </Link>
 
             <Link
               to="/cart"
-              className="relative w-10 h-10 rounded-xl hover:bg-muted/70 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-200"
+              className="relative w-9 h-9 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <ShoppingCart className="w-[18px] h-[18px]" />
               {totalItems > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow-glow-accent"
-                >
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
                   {totalItems}
-                </motion.span>
+                </span>
               )}
             </Link>
 
             <Link
               to="/sign-in"
-              className="w-10 h-10 rounded-xl hover:bg-muted/70 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-200"
+              className="w-9 h-9 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <User className="w-[18px] h-[18px]" />
             </Link>
 
-            <div className="w-px h-6 bg-border/60 mx-2" />
+            <div className="w-px h-5 bg-border mx-1" />
 
             <Link
               to="/get-quote"
-              className="inline-flex items-center gap-2 gradient-accent text-accent-foreground px-5 py-2.5 rounded-xl text-[13px] font-bold hover:shadow-glow-accent transition-all duration-300"
+              className="inline-flex items-center gap-1.5 bg-foreground text-card px-4 py-2 rounded-lg text-[13px] font-semibold hover:opacity-90 transition-opacity"
             >
               Get Quote
-              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

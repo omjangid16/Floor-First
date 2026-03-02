@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Grid3X3, Calculator, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { motion } from "framer-motion";
 
 const tabs = [
   { label: "Home", path: "/", icon: Home },
@@ -21,38 +20,29 @@ const MobileBottomNav = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card/90 backdrop-blur-2xl border-t border-border/50">
-      <div className="flex items-center justify-around h-[68px] max-w-md mx-auto">
-        {tabs.map((tab) => {
-          const active = isActive(tab.path);
-          return (
-            <Link
-              key={tab.label}
-              to={tab.path}
-              className="flex flex-col items-center gap-1 px-3 py-1.5 relative transition-colors"
-            >
-              <div className="relative">
-                {active && (
-                  <motion.div
-                    layoutId="bottomNavIndicator"
-                    className="absolute -inset-1.5 rounded-xl bg-accent/10"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <tab.icon className={`w-5 h-5 relative z-10 transition-colors ${active ? "text-accent stroke-[2.5]" : "text-muted-foreground"}`} />
-                {tab.label === "Cart" && totalItems > 0 && (
-                  <span className="absolute -top-1.5 -right-2 w-4 h-4 gradient-accent text-accent-foreground text-[9px] font-bold rounded-full flex items-center justify-center shadow-glow-accent">
-                    {totalItems}
-                  </span>
-                )}
-              </div>
-              <span className={`text-[10px] font-medium transition-colors ${active ? "text-accent font-bold" : "text-muted-foreground"}`}>
-                {tab.label}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card border-t border-border">
+      <div className="flex items-center justify-around h-16 max-w-md mx-auto">
+        {tabs.map((tab) => (
+          <Link
+            key={tab.label}
+            to={tab.path}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 relative transition-colors ${
+              isActive(tab.path) ? "text-foreground" : "text-muted-foreground"
+            }`}
+          >
+            <tab.icon className={`w-5 h-5 ${isActive(tab.path) ? "stroke-[2.5]" : ""}`} />
+            {tab.label === "Cart" && totalItems > 0 && (
+              <span className="absolute -top-0.5 right-1 w-4 h-4 bg-accent text-accent-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
+                {totalItems}
               </span>
-            </Link>
-          );
-        })}
+            )}
+            <span className={`text-[10px] font-medium ${isActive(tab.path) ? "font-bold" : ""}`}>
+              {tab.label}
+            </span>
+          </Link>
+        ))}
       </div>
+      {/* Safe area for devices with home indicator */}
       <div className="h-safe-area-bottom" />
     </nav>
   );
