@@ -14,37 +14,39 @@ const spaces = [
 
 const DesktopSpaces = () => {
   return (
-    <section className="py-16 bg-background">
+    <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-8 xl:px-12">
-        <div className="mb-8">
-          <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">Browse by</p>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">Spaces</h2>
+        <div className="mb-10">
+          <p className="text-xs font-bold text-accent uppercase tracking-[0.15em] mb-1.5">Browse by</p>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Spaces</h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-3 gap-6">
           {spaces.map((space, i) => (
             <motion.div
               key={space.title}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
+              transition={{ delay: i * 0.1 }}
             >
               <Link
                 to={space.link}
-                className="group relative block rounded-2xl overflow-hidden h-72 hover:shadow-luxury-lg transition-shadow"
+                className="group relative block rounded-3xl overflow-hidden h-80 shadow-luxury hover:shadow-luxury-xl transition-all duration-300"
               >
                 <img
                   src={space.image}
                   alt={space.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="text-[11px] text-accent font-semibold mb-1">{space.count}</p>
-                  <h3 className="text-xl font-bold text-card mb-0.5">{space.title}</h3>
-                  <p className="text-xs text-card/60 mb-3">{space.subtitle}</p>
-                  <span className="inline-flex items-center gap-1 text-card text-xs font-medium group-hover:gap-2 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/25 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7">
+                  <span className="inline-block gradient-accent text-accent-foreground text-[10px] font-bold px-3 py-1 rounded-full mb-3 shadow-glow-accent">
+                    {space.count}
+                  </span>
+                  <h3 className="font-display text-2xl font-bold text-card italic mb-0.5">{space.title}</h3>
+                  <p className="text-xs text-card/60 mb-4 font-medium">{space.subtitle}</p>
+                  <span className="inline-flex items-center gap-1.5 text-card text-xs font-semibold group-hover:gap-2.5 transition-all duration-300">
                     Explore <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
