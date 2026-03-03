@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Truck, Shield, Clock, Award } from "lucide-react";
 
@@ -11,8 +10,8 @@ const benefits = [
 
 const DesktopBenefits = () => {
   return (
-    <section className="bg-background py-4">
-      <div className="max-w-7xl mx-auto px-8 xl:px-12">
+    <section className="bg-background pb-2">
+      <div className="max-w-[1280px] mx-auto px-6 xl:px-8">
         <div className="grid grid-cols-4 gap-4">
           {benefits.map((b, i) => (
             <motion.div
@@ -23,8 +22,8 @@ const DesktopBenefits = () => {
               transition={{ delay: i * 0.05 }}
               className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border"
             >
-              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                <b.icon className="w-5 h-5 text-foreground" />
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                <b.icon className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{b.title}</p>
