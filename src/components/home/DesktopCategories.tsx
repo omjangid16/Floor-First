@@ -28,8 +28,8 @@ const services = [
 
 const DesktopCategories = () => {
   return (
-    <section className="py-16 bg-background">
-      <div className="max-w-7xl mx-auto px-8 xl:px-12">
+    <section className="py-10 bg-background">
+      <div className="max-w-[1280px] mx-auto px-6 xl:px-8">
         {/* Featured Hero Card */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -38,42 +38,39 @@ const DesktopCategories = () => {
         >
           <Link
             to="/category/vinyl"
-            className="group block relative rounded-2xl overflow-hidden h-72 mb-6"
+            className="group block relative rounded-2xl overflow-hidden h-64 mb-8"
           >
             <img
               src={catFeatured}
               alt="SPC / LVT Flooring"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/10 to-transparent" />
-            <div className="absolute top-6 left-6">
-              <span className="text-sm text-card/90 font-medium bg-foreground/30 backdrop-blur-sm px-3 py-1 rounded-full">
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
+            <div className="absolute top-5 left-5">
+              <span className="text-xs text-card font-semibold bg-accent px-3 py-1 rounded-full">
                 Popular
               </span>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <h2 className="text-4xl font-bold text-card leading-tight">SPC/LVT</h2>
-              <p className="text-base text-card/80 mt-1">Starting at AED 42/Sqmt</p>
+            <div className="absolute bottom-0 left-0 right-0 p-7">
+              <h2 className="text-3xl font-bold text-card leading-tight">SPC/LVT</h2>
+              <p className="text-sm text-card/80 mt-1">Starting at AED 42/Sqmt</p>
             </div>
           </Link>
         </motion.div>
 
         {/* Categories Header */}
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">Browse by</p>
-            <h2 className="text-3xl font-bold text-foreground tracking-tight">Categories</h2>
-          </div>
+        <div className="flex items-end justify-between mb-5">
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Shop by Category</h2>
           <Link
             to="/category/all"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline transition-colors"
           >
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {/* Category Grid */}
-        <div className="grid grid-cols-5 gap-5 mb-12">
+        <div className="grid grid-cols-5 gap-4 mb-10">
           {mainCategories.map((cat, i) => (
             <motion.div
               key={cat.title}
@@ -83,7 +80,7 @@ const DesktopCategories = () => {
               transition={{ delay: i * 0.04 }}
             >
               <Link to={cat.link} className="group block text-center">
-                <div className="aspect-square rounded-2xl overflow-hidden mb-2">
+                <div className="aspect-square rounded-xl overflow-hidden mb-2 border border-border">
                   <img
                     src={cat.image}
                     alt={cat.title}
@@ -99,32 +96,32 @@ const DesktopCategories = () => {
         </div>
 
         {/* Services */}
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-6">Services</h2>
-          <div className="grid grid-cols-3 gap-5">
-            {services.map((svc, i) => (
-              <motion.div
-                key={svc.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.04 }}
-              >
-                <Link to={svc.link} className="group block text-center">
-                  <div className="aspect-square rounded-2xl overflow-hidden mb-2">
-                    <img
-                      src={svc.image}
-                      alt={svc.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
-                    {svc.title}
-                  </p>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+        <div className="flex items-end justify-between mb-5">
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Services</h2>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {services.map((svc, i) => (
+            <motion.div
+              key={svc.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <Link to={svc.link} className="group block">
+                <div className="aspect-[16/9] rounded-xl overflow-hidden mb-2 border border-border">
+                  <img
+                    src={svc.image}
+                    alt={svc.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+                  {svc.title}
+                </p>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
