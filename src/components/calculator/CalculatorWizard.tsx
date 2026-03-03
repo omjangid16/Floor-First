@@ -114,7 +114,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-200px)]">
+    <div className="flex flex-col min-h-[calc(100vh-200px)] lg:max-w-3xl lg:mx-auto lg:w-full">
       {/* Stepper */}
       <div className="px-5 pt-6 pb-4">
         <StepIndicator steps={steps} currentStep={currentStep} />
@@ -135,7 +135,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
               <div>
                 <h2 className="font-display font-bold text-xl text-foreground tracking-tight">Select Your Space</h2>
                 <p className="text-sm font-body text-muted-foreground mt-1 mb-6">Where do you need flooring?</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {spaceTypes.map((s) => {
                     const isSelected = spaceType === s.id;
                     return (
@@ -185,7 +185,7 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
               <div>
                 <h2 className="font-display font-bold text-xl text-foreground tracking-tight">Choose Flooring Type</h2>
                 <p className="text-sm font-body text-muted-foreground mt-1 mb-6">Each type has unique designs and textures.</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {flooringTypes.map((t) => {
                     const isSelected = floorType === t.id;
                     return (
@@ -373,8 +373,8 @@ const CalculatorWizard = ({ onCalculate }: CalculatorWizardProps) => {
       </div>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-16 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border px-5 py-4 shadow-[0_-4px_20px_-4px_hsl(220_15%_15%_/_0.08)]">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border px-5 py-4 shadow-[0_-4px_20px_-4px_hsl(220_15%_15%_/_0.08)]">
+        <div className="lg:max-w-3xl lg:mx-auto lg:w-full flex items-center justify-between">
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
