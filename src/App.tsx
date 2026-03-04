@@ -7,6 +7,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import MobileHeader from "@/components/MobileHeader";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -41,8 +42,10 @@ const AppLayout = () => {
 
   return (
     <>
-      {/* Desktop navbar only - hidden on mobile via CSS inside Navbar */}
+      {/* Desktop navbar - hidden on mobile */}
       {!isAuth && <Navbar />}
+      {/* Mobile/tablet header - hidden on desktop */}
+      {!isAuth && <MobileHeader />}
       <div className={!isAuth ? "pb-16 lg:pb-0" : ""}>
         <Routes>
           <Route path="/" element={<Index />} />
