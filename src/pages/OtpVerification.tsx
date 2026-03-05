@@ -49,6 +49,8 @@ const OtpVerification = () => {
       toast({ title: "Error", description: "Please enter the full OTP.", variant: "destructive" });
       return;
     }
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("hasSeenIntro", "true");
     toast({ title: "Verified!", description: "Welcome to Floor First." });
     navigate("/");
   };

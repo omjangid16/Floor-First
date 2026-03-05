@@ -30,6 +30,7 @@ import OtpVerification from "./pages/OtpVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import CategoryPage from "./pages/CategoryPage";
 import CategoryModule from "./pages/CategoryModule";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,13 +40,14 @@ const authRoutes = ["/welcome", "/sign-in", "/sign-up", "/otp-verification", "/f
 const AppLayout = () => {
   const location = useLocation();
   const isAuth = authRoutes.includes(location.pathname);
+  const isProfile = location.pathname.startsWith("/profile");
 
   return (
     <>
       {/* Desktop navbar - hidden on mobile */}
       {!isAuth && <Navbar />}
       {/* Mobile/tablet header - hidden on desktop */}
-      {!isAuth && <MobileHeader />}
+      {!isAuth && !isProfile && <MobileHeader />}
       <div className={!isAuth ? "pb-16 lg:pb-0" : ""}>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -70,6 +72,7 @@ const AppLayout = () => {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/otp-verification" element={<OtpVerification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
