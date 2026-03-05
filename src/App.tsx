@@ -31,6 +31,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import CategoryPage from "./pages/CategoryPage";
 import CategoryModule from "./pages/CategoryModule";
 import Profile from "./pages/Profile";
+import MyAccount from "./pages/profile/MyAccount";
+import MyOrders from "./pages/profile/MyOrders";
+import Wishlist from "./pages/profile/Wishlist";
+import Addresses from "./pages/profile/Addresses";
+import ProfileSettings from "./pages/profile/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,9 +49,7 @@ const AppLayout = () => {
 
   return (
     <>
-      {/* Desktop navbar - hidden on mobile */}
       {!isAuth && <Navbar />}
-      {/* Mobile/tablet header - hidden on desktop */}
       {!isAuth && !isProfile && <MobileHeader />}
       <div className={!isAuth ? "pb-16 lg:pb-0" : ""}>
         <Routes>
@@ -73,12 +76,15 @@ const AppLayout = () => {
           <Route path="/otp-verification" element={<OtpVerification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/account" element={<MyAccount />} />
+          <Route path="/profile/orders" element={<MyOrders />} />
+          <Route path="/profile/wishlist" element={<Wishlist />} />
+          <Route path="/profile/addresses" element={<Addresses />} />
+          <Route path="/profile/settings" element={<ProfileSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      {/* Footer only on desktop */}
       {!isAuth && <div className="hidden lg:block"><Footer /></div>}
-      {/* Bottom nav only on non-auth pages, hidden on calculator */}
       {!isAuth && !location.pathname.startsWith("/calculator/") && <MobileBottomNav />}
     </>
   );
