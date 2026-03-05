@@ -39,6 +39,7 @@ const Welcome = () => {
 
   const handleNext = () => {
     if (isLast) {
+      localStorage.setItem("hasSeenIntro", "true");
       navigate("/sign-in");
     } else {
       setCurrent((p) => p + 1);

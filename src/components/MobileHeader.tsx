@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Menu,
   Search,
   ShoppingCart,
-  User,
   X,
   Home,
   Grid3X3,
@@ -13,12 +12,7 @@ import {
   Briefcase,
   Info,
   Phone,
-  Package,
-  Heart,
-  MapPin,
-  Settings,
-  LogOut,
-  LogIn,
+  User,
   ChevronRight,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
@@ -35,22 +29,12 @@ const menuItems = [
   { label: "Contact", path: "/contact", icon: Phone },
 ];
 
-const profileItems = [
-  { label: "My Account", icon: User, path: "/sign-in" },
-  { label: "My Orders", icon: Package, path: "/sign-in" },
-  { label: "Wishlist", icon: Heart, path: "/sign-in" },
-  { label: "Addresses", icon: MapPin, path: "/sign-in" },
-  { label: "Settings", icon: Settings, path: "/sign-in" },
-];
-
 const MobileHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
-  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
@@ -58,17 +42,6 @@ const MobileHeader = () => {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setProfileOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -96,7 +69,7 @@ const MobileHeader = () => {
             <img src={floorFirstLogo} alt="Floor First" className="h-7 w-auto" />
           </Link>
 
-          {/* Right: Search + Cart + Profile */}
+          {/* Right: Search + Cart */}
           <div className="flex items-center gap-0.5">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
@@ -116,63 +89,6 @@ const MobileHeader = () => {
                 </span>
               )}
             </Link>
-
-            <div ref={profileRef} className="relative">
-              <button
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <User className="w-[18px] h-[18px]" />
-              </button>
-
-              <AnimatePresence>
-                {profileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 6, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-52 bg-card rounded-xl border border-border shadow-luxury-lg overflow-hidden z-50"
-                  >
-                    <Link
-                      to="/sign-in"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 bg-muted/50 hover:bg-muted transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
-                        <LogIn className="w-4 h-4 text-accent" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">Login / Sign Up</p>
-                        <p className="text-[10px] text-muted-foreground">Access your account</p>
-                      </div>
-                    </Link>
-                    <div className="h-px bg-border" />
-                    <div className="py-1">
-                      {profileItems.map((item) => (
-                        <Link
-                          key={item.label}
-                          to={item.path}
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="h-px bg-border" />
-                    <button
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/5 transition-colors w-full"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
 
