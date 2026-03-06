@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import emptyWishlist from "@/assets/empty-wishlist.jpg";
 
 const Wishlist = () => (
   <div className="min-h-screen bg-muted/30">
@@ -9,9 +10,9 @@ const Wishlist = () => (
       </Link>
       <h1 className="text-base font-bold text-foreground">Wishlist</h1>
     </div>
-    <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Heart className="w-7 h-7 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="w-32 h-32 rounded-2xl overflow-hidden mb-5">
+        <img src={emptyWishlist} alt="Empty wishlist" className="w-full h-full object-cover" />
       </div>
       <h2 className="text-lg font-bold text-foreground mb-1">Your wishlist is empty</h2>
       <p className="text-sm text-muted-foreground mb-6">Save your favourite products here to find them easily later.</p>

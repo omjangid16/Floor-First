@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
+import emptyAddress from "@/assets/empty-address.jpg";
 
 const Addresses = () => (
   <div className="min-h-screen bg-muted/30">
@@ -14,9 +15,9 @@ const Addresses = () => (
         <Plus className="w-5 h-5 text-accent" />
       </button>
     </div>
-    <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <MapPin className="w-7 h-7 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="w-32 h-32 rounded-2xl overflow-hidden mb-5">
+        <img src={emptyAddress} alt="No addresses" className="w-full h-full object-cover" />
       </div>
       <h2 className="text-lg font-bold text-foreground mb-1">No addresses saved</h2>
       <p className="text-sm text-muted-foreground mb-6">Add a delivery address so we can ship your orders to the right place.</p>

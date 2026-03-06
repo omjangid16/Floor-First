@@ -8,6 +8,7 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react";
+import profileHeaderBg from "@/assets/profile-header-bg.jpg";
 
 const profileMenuItems = [
   { label: "My Account", icon: User, path: "/profile/account", description: "View & edit personal details" },
@@ -28,15 +29,21 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Profile header */}
-      <div className="bg-card px-5 pt-6 pb-5 border-b border-border">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-accent/10 border-2 border-accent/20 flex items-center justify-center">
-            <User className="w-6 h-6 text-accent" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-foreground">My Profile</h1>
-            <p className="text-sm text-muted-foreground">Manage your account</p>
+      {/* Profile header with real image */}
+      <div className="relative">
+        <div className="h-32 overflow-hidden">
+          <img src={profileHeaderBg} alt="Profile banner" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/40 to-primary/80" />
+        </div>
+        <div className="relative -mt-10 px-5 pb-5">
+          <div className="flex items-end gap-4">
+            <div className="w-16 h-16 rounded-full bg-card border-4 border-card flex items-center justify-center shadow-lg">
+              <User className="w-7 h-7 text-accent" />
+            </div>
+            <div className="pb-1">
+              <h1 className="text-lg font-bold text-foreground">My Profile</h1>
+              <p className="text-sm text-muted-foreground">Manage your account</p>
+            </div>
           </div>
         </div>
       </div>
