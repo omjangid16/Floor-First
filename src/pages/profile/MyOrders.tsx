@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import emptyOrders from "@/assets/empty-orders.jpg";
 
 const MyOrders = () => (
   <div className="min-h-screen bg-muted/30">
@@ -9,9 +10,9 @@ const MyOrders = () => (
       </Link>
       <h1 className="text-base font-bold text-foreground">My Orders</h1>
     </div>
-    <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Package className="w-7 h-7 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="w-32 h-32 rounded-2xl overflow-hidden mb-5">
+        <img src={emptyOrders} alt="No orders" className="w-full h-full object-cover" />
       </div>
       <h2 className="text-lg font-bold text-foreground mb-1">No orders yet</h2>
       <p className="text-sm text-muted-foreground mb-6">Your order history will appear here once you make a purchase.</p>

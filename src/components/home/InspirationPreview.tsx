@@ -1,22 +1,29 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Book, Lightbulb, Palette } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+import blogDda from "@/assets/blog-dda-approval.jpg";
+import blogOffice from "@/assets/blog-office-fitout.jpg";
+import blogKitchen from "@/assets/blog-kitchen-boq.jpg";
 
 const articles = [
   {
     title: "DDA Approvals for Interior Renovation — Step-by-Step Guide (2026)",
     date: "November 26, 2025",
     category: "General",
+    image: blogDda,
   },
   {
     title: "Office Fit-Out Cost in Dubai (2026 Guide) – Complete Price Breakdown & Sq Ft Rates",
     date: "November 25, 2025",
     category: "General",
+    image: blogOffice,
   },
   {
     title: "BOQ for Kitchen Renovation in Dubai (10 sqm) — Joinery, Appliances, Plumbing & Tiles",
     date: "November 22, 2025",
     category: "General",
+    image: blogKitchen,
   },
 ];
 
@@ -67,10 +74,12 @@ const InspirationPreview = () => {
                   to="/inspiration"
                   className="group block bg-card rounded-xl overflow-hidden shadow-luxury hover-lift border border-border"
                 >
-                  <div className="h-48 bg-secondary flex items-center justify-center">
-                    {i === 0 && <Book className="w-12 h-12 text-muted-foreground/30" />}
-                    {i === 1 && <Lightbulb className="w-12 h-12 text-muted-foreground/30" />}
-                    {i === 2 && <Palette className="w-12 h-12 text-muted-foreground/30" />}
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-3 text-xs text-muted-foreground font-body mb-3">
