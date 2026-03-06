@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingCart, ChevronDown, User, Search, ArrowRight, Package, Heart, MapPin, Settings, LogOut, LogIn } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,6 +43,15 @@ const Navbar = () => {
   const { totalItems } = useCart();
   const location = useLocation();
   const profileRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -71,7 +80,7 @@ const Navbar = () => {
           </Link>
 
           {/* Search Bar - Noon style centered */}
-          <div className="flex-1 max-w-xl">
+          <form onSubmit={handleSearch} className="flex-1 max-w-xl">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -82,7 +91,7 @@ const Navbar = () => {
                 className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
               />
             </div>
-          </div>
+          </form>
 
           {/* Right Actions */}
           <div className="flex items-center gap-1 ml-8 shrink-0">

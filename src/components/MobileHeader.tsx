@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   Search,
@@ -35,6 +35,16 @@ const MobileHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
@@ -102,7 +112,7 @@ const MobileHeader = () => {
               transition={{ duration: 0.2 }}
               className="overflow-hidden border-t border-border"
             >
-              <div className="px-4 py-2.5">
+              <form onSubmit={handleSearch} className="px-4 py-2.5">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
@@ -114,7 +124,7 @@ const MobileHeader = () => {
                     className="w-full h-10 pl-9 pr-4 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
                   />
                 </div>
-              </div>
+              </form>
             </motion.div>
           )}
         </AnimatePresence>

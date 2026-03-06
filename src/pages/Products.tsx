@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, Star, ShoppingCart, SlidersHorizontal, X } from "lucide-react";
@@ -34,7 +34,8 @@ const sortOptions = [
 const Products = () => {
   const [searchParams] = useSearchParams();
   const typeFilter = searchParams.get("type") || "";
-  const [search, setSearch] = useState("");
+  const searchFromUrl = searchParams.get("search") || "";
+  const [search, setSearch] = useState(searchFromUrl);
   const [selectedType, setSelectedType] = useState(typeFilter);
   const [sortBy, setSortBy] = useState("popular");
   const [selectedShade, setSelectedShade] = useState<string | null>(null);
@@ -42,6 +43,10 @@ const Products = () => {
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    setSearch(searchFromUrl);
+  }, [searchFromUrl]);
 
   const activeType = flooringTypes.find((t) => t.id === selectedType);
 
