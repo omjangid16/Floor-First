@@ -417,7 +417,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Product Attributes */}
-              <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury space-y-5">
+              <div className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury space-y-4 sm:space-y-5">
                 <h3 className="text-sm font-bold text-foreground">Select Options</h3>
                 {attributes.map((attr) => (
                   <AttributeSelector
