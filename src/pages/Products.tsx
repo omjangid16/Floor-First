@@ -1,9 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search, Star, ShoppingCart, SlidersHorizontal, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search, ShoppingCart, SlidersHorizontal, X, ChevronRight,
+  Star, Eye, Grid3X3, LayoutGrid
+} from "lucide-react";
 import { products, flooringTypes } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import ShadeSelector from "@/components/ShadeSelector";
 import type { Shade } from "@/data/shades";
 
@@ -25,9 +29,9 @@ const trafficLevels = ["Low", "Medium", "High", "Very High"];
 const spaceOptions = ["residential", "commercial", "industrial", "hospitality", "retail", "sports"];
 const sortOptions = [
   { value: "popular", label: "Popular" },
-  { value: "name", label: "Name A-Z" },
-  { value: "price-low", label: "Price: Low to High" },
-  { value: "price-high", label: "Price: High to Low" },
+  { value: "name", label: "Name A–Z" },
+  { value: "price-low", label: "Price: Low → High" },
+  { value: "price-high", label: "Price: High → Low" },
   { value: "new", label: "Newest" },
 ];
 
@@ -43,6 +47,7 @@ const Products = () => {
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
+  const { toast } = useToast();
 
   useEffect(() => {
     setSearch(searchFromUrl);
@@ -52,6 +57,11 @@ const Products = () => {
 
   const handleShadeSelect = (shade: Shade) => {
     setSelectedShade(selectedShade === shade.id ? null : shade.id);
+  };
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addToCart(product, 10, false);
+    toast({ title: "Added to Cart", description: `${product.name} added (10 sqft).` });
   };
 
   const filtered = useMemo(() => {
@@ -89,213 +99,313 @@ const Products = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="gradient-walnut py-12 lg:py-16">
-        <div className="container-luxury">
-          <p className="text-primary-foreground/50 font-body text-sm mb-2">Browse our collections</p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-primary-foreground">
-            {activeType ? activeType.name : "Premium Flooring Products"}
+    <main className="min-h-screen bg-background pb-24 lg:pb-0">
+      {/* ── Hero Header ────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 gradient-walnut" />
+        <div className="relative container-luxury py-8 sm:py-12 lg:py-16">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1.5 text-[11px] text-primary-foreground/40 mb-4">
+            <Link to="/" className="hover:text-primary-foreground/70 transition-colors">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-primary-foreground/70 font-medium">
+              {activeType ? activeType.name : "Products"}
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-foreground leading-tight">
+            {activeType ? activeType.name : "Premium Flooring"}
           </h1>
-          <p className="text-primary-foreground/60 font-body mt-3 max-w-xl">
+          <p className="text-primary-foreground/50 text-sm sm:text-base mt-2 max-w-xl leading-relaxed">
             {activeType
               ? `${activeType.description}. Best for: ${activeType.bestFor.join(", ")}.`
-              : "Choose the ideal flooring for your home or office and transform every corner with style and durability."}
+              : "Curated collections for every space and style."}
           </p>
+
           {activeType && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-1.5 mt-4">
               {activeType.subtypes.map((sub) => (
-                <span key={sub} className="text-xs bg-primary-foreground/10 text-primary-foreground/80 px-3 py-1.5 rounded-full font-body">{sub}</span>
+                <span key={sub} className="text-[10px] sm:text-xs bg-primary-foreground/10 text-primary-foreground/70 px-2.5 py-1 rounded-full font-medium">
+                  {sub}
+                </span>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      <div className="container-luxury py-8 lg:py-12">
-        {/* Top Bar */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-6">
+      {/* ── Type Chips (Horizontal Scroll on Mobile) ──────── */}
+      <div className="container-luxury pt-5 pb-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
+          <button
+            onClick={() => setSelectedType("")}
+            className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              !selectedType
+                ? "bg-foreground text-background shadow-md"
+                : "bg-card text-foreground border border-border hover:border-accent/40"
+            }`}
+          >
+            All
+          </button>
+          {flooringTypes.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setSelectedType(selectedType === t.id ? "" : t.id)}
+              className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                selectedType === t.id
+                  ? "bg-foreground text-background shadow-md"
+                  : "bg-card text-foreground border border-border hover:border-accent/40"
+              }`}
+            >
+              <img
+                src={typeImages[t.id]}
+                alt={t.name}
+                className="w-6 h-6 rounded-lg object-cover"
+              />
+              {t.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="container-luxury">
+        {/* ── Search & Controls ─────────────────────────────── */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-4">
+          {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search flooring products..."
-              className="w-full pl-12 pr-4 py-3 rounded-lg border border-border bg-card font-body text-foreground focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+              placeholder="Search products..."
+              className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-accent/30 focus:border-accent outline-none transition-all"
             />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex gap-3 flex-wrap">
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="px-4 py-3 rounded-lg border border-border bg-card font-body text-foreground focus:ring-2 focus:ring-accent outline-none"
-            >
-              <option value="">All Types</option>
-              {flooringTypes.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
+          {/* Sort (hidden on mobile, shown as icon) */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="hidden sm:block px-3 py-2.5 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:ring-2 focus:ring-accent/30 outline-none"
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-3 rounded-lg border border-border bg-card font-body text-foreground focus:ring-2 focus:ring-accent outline-none"
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg border font-body text-sm font-medium transition-all ${
-                showFilters || activeFilterCount > 0
-                  ? "border-accent bg-accent/10 text-accent"
-                  : "border-border bg-card text-foreground hover:border-accent"
-              }`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center">{activeFilterCount}</span>
-              )}
-            </button>
-          </div>
+          {/* Filter Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+              showFilters || activeFilterCount > 0
+                ? "bg-accent text-accent-foreground shadow-md"
+                : "bg-card text-foreground border border-border hover:border-accent/40"
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-background text-foreground text-[10px] flex items-center justify-center font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Expanded Filters */}
-        {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-card rounded-xl border border-border p-6 mb-6 shadow-luxury space-y-5"
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="font-display font-bold text-foreground">Filter Products</h3>
-              {activeFilterCount > 0 && (
-                <button onClick={clearFilters} className="text-xs font-body text-accent hover:underline flex items-center gap-1">
-                  <X className="w-3 h-3" /> Clear all
-                </button>
-              )}
-            </div>
+        {/* ── Expanded Filters ──────────────────────────────── */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden mb-4"
+            >
+              <div className="bg-card rounded-2xl border border-border p-4 sm:p-5 shadow-luxury space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-foreground">Refine Results</h3>
+                  {activeFilterCount > 0 && (
+                    <button onClick={clearFilters} className="text-[11px] text-accent font-semibold hover:underline flex items-center gap-1">
+                      <X className="w-3 h-3" /> Clear all
+                    </button>
+                  )}
+                </div>
 
-            {/* Traffic Suitability */}
-            <div>
-              <label className="block text-sm font-body font-semibold text-foreground mb-2">Traffic Suitability</label>
-              <div className="flex flex-wrap gap-2">
-                {trafficLevels.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setSelectedTraffic(selectedTraffic === t ? "" : t)}
-                    className={`px-3 py-2 rounded-lg text-sm font-body font-medium transition-all ${
-                      selectedTraffic === t ? "gradient-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-sand-dark"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
+                {/* Mobile Sort */}
+                <div className="sm:hidden">
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Sort By</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {sortOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setSortBy(opt.value)}
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                          sortBy === opt.value
+                            ? "bg-foreground text-background"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Traffic */}
+                <div>
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Traffic Level</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {trafficLevels.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setSelectedTraffic(selectedTraffic === t ? "" : t)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          selectedTraffic === t
+                            ? "bg-foreground text-background"
+                            : "bg-secondary text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Space */}
+                <div>
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Space Type</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {spaceOptions.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSpace(selectedSpace === s ? "" : s)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${
+                          selectedSpace === s
+                            ? "bg-foreground text-background"
+                            : "bg-secondary text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shade */}
+                <div>
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Shade</p>
+                  <ShadeSelector selectedShade={selectedShade} onSelect={handleShadeSelect} compact />
+                </div>
               </div>
-            </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* Space Suitability */}
-            <div>
-              <label className="block text-sm font-body font-semibold text-foreground mb-2">Space Suitability</label>
-              <div className="flex flex-wrap gap-2">
-                {spaceOptions.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSelectedSpace(selectedSpace === s ? "" : s)}
-                    className={`px-3 py-2 rounded-lg text-sm font-body font-medium transition-all capitalize ${
-                      selectedSpace === s ? "gradient-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-sand-dark"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* ── Results Count ──────────────────────────────────── */}
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">{filtered.length}</span> products
+            {activeFilterCount > 0 && (
+              <span className="text-accent ml-1">· {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""}</span>
+            )}
+          </p>
+        </div>
 
-            {/* Shade */}
-            <div>
-              <label className="block text-sm font-body font-semibold text-foreground mb-2">Shade</label>
-              <ShadeSelector selectedShade={selectedShade} onSelect={handleShadeSelect} compact />
-            </div>
-          </motion.div>
-        )}
-
-        {/* Results Count */}
-        <p className="text-sm text-muted-foreground font-body mb-6">
-          Showing {filtered.length} products
-          {activeFilterCount > 0 && <span className="text-accent"> · {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active</span>}
-        </p>
-
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* ── Product Grid ───────────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {filtered.map((product, i) => (
             <motion.div
               key={product.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.03, 0.3) }}
-              className="group bg-card rounded-xl overflow-hidden shadow-luxury hover-lift border border-border"
+              transition={{ delay: Math.min(i * 0.02, 0.2), duration: 0.3 }}
+              className="group bg-card rounded-2xl overflow-hidden shadow-luxury hover-lift border border-border"
             >
-              <Link to={`/products/${product.id}`}>
-                <div className="relative h-52 overflow-hidden">
+              <Link to={`/products/${product.id}`} className="block">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={typeImages[product.type] || typeTile}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  {/* Badge */}
                   {product.badge && (
-                    <span className="absolute top-3 left-3 gradient-accent text-accent-foreground text-xs font-body font-bold px-3 py-1 rounded-full">
+                    <span className="absolute top-2 left-2 gradient-accent text-accent-foreground text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md">
                       {product.badge}
                     </span>
                   )}
+                  {/* Quick View Overlay */}
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
+                      <Eye className="w-3 h-3 text-foreground" />
+                      <span className="text-[10px] font-semibold text-foreground">View Details</span>
+                    </div>
+                  </div>
                 </div>
               </Link>
 
-              <div className="p-5">
-                <p className="text-xs text-accent font-body font-bold uppercase tracking-wider mb-1">
+              <div className="p-3 sm:p-4">
+                {/* Category */}
+                <p className="text-[9px] sm:text-[10px] text-accent font-bold uppercase tracking-[0.15em] mb-1">
                   {product.category}
                 </p>
+
+                {/* Name */}
                 <Link to={`/products/${product.id}`}>
-                  <h3 className="text-base font-display font-bold text-foreground group-hover:text-accent transition-colors mb-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2 leading-snug mb-1.5 sm:mb-2">
                     {product.name}
                   </h3>
                 </Link>
 
-                <p className="text-sm text-muted-foreground font-body line-clamp-2 mb-3">
+                {/* Description - hidden on mobile for compactness */}
+                <p className="hidden sm:block text-[11px] text-muted-foreground line-clamp-2 mb-2.5 leading-relaxed">
                   {product.description}
                 </p>
 
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-muted-foreground font-body">Durability:</span>
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <Star
-                          key={j}
-                          className={`w-3 h-3 ${j < Math.round(product.durabilityScore / 2) ? "text-accent fill-accent" : "text-border"}`}
-                        />
-                      ))}
-                    </div>
+                {/* Durability Stars */}
+                <div className="flex items-center gap-1 mb-2 sm:mb-3">
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Star
+                        key={j}
+                        className={`w-2.5 sm:w-3 h-2.5 sm:h-3 ${
+                          j < Math.round(product.durabilityScore / 2)
+                            ? "text-accent fill-accent"
+                            : "text-border"
+                        }`}
+                      />
+                    ))}
                   </div>
+                  <span className="text-[9px] text-muted-foreground ml-0.5">{product.durabilityScore}/10</span>
                 </div>
 
+                {/* Price + Cart */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-muted-foreground font-body">from </span>
-                    <span className="text-lg font-display font-bold text-foreground">{product.currency} {product.pricePerSqft}</span>
-                    <span className="text-xs text-muted-foreground font-body">/sqft</span>
+                    <span className="text-sm sm:text-base font-bold text-foreground">
+                      {product.currency} {product.pricePerSqft}
+                    </span>
+                    <span className="text-[9px] sm:text-[10px] text-muted-foreground">/sqft</span>
                   </div>
                   <button
-                    onClick={() => addToCart(product, 10, false)}
-                    className="p-2.5 rounded-lg gradient-accent text-accent-foreground hover:opacity-90 transition-opacity"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAddToCart(product);
+                    }}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl gradient-accent text-accent-foreground flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
                   >
-                    <ShoppingCart className="w-4 h-4" />
+                    <ShoppingCart className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -303,11 +413,18 @@ const Products = () => {
           ))}
         </div>
 
+        {/* ── Empty State ────────────────────────────────────── */}
         {filtered.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-2xl font-display font-bold text-foreground mb-2">No products found</p>
-            <p className="text-muted-foreground font-body mb-4">Try adjusting your filters or search query.</p>
-            <button onClick={clearFilters} className="gradient-accent text-accent-foreground px-6 py-2.5 rounded-lg font-body font-semibold text-sm hover:opacity-90 transition-opacity">
+          <div className="text-center py-16 sm:py-20">
+            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
+              <Search className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <p className="text-lg font-bold text-foreground mb-1">No products found</p>
+            <p className="text-sm text-muted-foreground mb-5">Try adjusting your filters or search query.</p>
+            <button
+              onClick={clearFilters}
+              className="gradient-accent text-accent-foreground px-5 py-2.5 rounded-xl font-semibold text-xs hover:opacity-90 transition-opacity"
+            >
               Clear All Filters
             </button>
           </div>
