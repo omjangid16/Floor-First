@@ -363,7 +363,7 @@ const ProductDetail = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="bg-card rounded-2xl border border-border p-5 shadow-luxury"
+              className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury"
             >
               <h3 className="text-sm font-bold text-foreground mb-3">Specifications</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
