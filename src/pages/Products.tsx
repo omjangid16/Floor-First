@@ -95,7 +95,9 @@ const Products = () => {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.material.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q)
+          p.category.toLowerCase().includes(q) ||
+          p.type.toLowerCase().includes(q) ||
+          (p.shade && p.shade.toLowerCase().includes(q))
       );
     }
     switch (sortBy) {
