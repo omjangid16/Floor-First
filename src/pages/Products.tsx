@@ -1,15 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, ShoppingCart, SlidersHorizontal, X, ChevronRight,
-  Star, Eye, Grid3X3, LayoutGrid
+  Star, Eye, Grid3X3, LayoutGrid, Shield, Award, Wrench
 } from "lucide-react";
-import { products, flooringTypes } from "@/data/products";
+import { products, flooringTypes, type Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import ShadeSelector from "@/components/ShadeSelector";
 import type { Shade } from "@/data/shades";
+import {
+  Dialog, DialogContent, DialogTitle, DialogDescription
+} from "@/components/ui/dialog";
 
 import typeTile from "@/assets/type-tile.jpg";
 import typeStone from "@/assets/type-stone.jpg";
@@ -37,6 +40,7 @@ const sortOptions = [
 
 const Products = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const typeFilter = searchParams.get("type") || "";
   const searchFromUrl = searchParams.get("search") || "";
   const [search, setSearch] = useState(searchFromUrl);
@@ -46,6 +50,7 @@ const Products = () => {
   const [selectedTraffic, setSelectedTraffic] = useState<string>("");
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const { addToCart } = useCart();
   const { toast } = useToast();
 
@@ -349,12 +354,19 @@ const Products = () => {
                     </span>
                   )}
                   {/* Quick View Overlay */}
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setPreviewProduct(product);
+                    }}
+                    className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                  >
                     <div className="bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
                       <Eye className="w-3 h-3 text-foreground" />
-                      <span className="text-[10px] font-semibold text-foreground">View Details</span>
+                      <span className="text-[10px] font-semibold text-foreground">Quick View</span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </Link>
 
@@ -434,6 +446,123 @@ const Products = () => {
           </div>
         )}
       </div>
+
+      {/* ── Quick Preview Modal ──────────────────────────────── */}
+      <Dialog open={!!previewProduct} onOpenChange={(open) => !open && setPreviewProduct(null)}>
+        <DialogContent className="max-w-lg sm:max-w-xl p-0 rounded-2xl overflow-hidden border-border">
+          {previewProduct && (
+            <>
+              {/* Image */}
+              <div className="relative aspect-[16/10] overflow-hidden">
+                <img
+                  src={typeImages[previewProduct.type] || typeTile}
+                  alt={previewProduct.name}
+                  className="w-full h-full object-cover"
+                />
+                {previewProduct.badge && (
+                  <span className="absolute top-3 left-3 gradient-accent text-accent-foreground text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                    {previewProduct.badge}
+                  </span>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="p-5 sm:p-6 space-y-4">
+                <div>
+                  <DialogDescription className="text-[10px] text-accent font-bold uppercase tracking-[0.15em] mb-1">
+                    {previewProduct.category}
+                  </DialogDescription>
+                  <DialogTitle className="text-lg sm:text-xl font-bold text-foreground leading-tight">
+                    {previewProduct.name}
+                  </DialogTitle>
+                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
+                    {previewProduct.description}
+                  </p>
+                </div>
+
+                {/* Specs Grid */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Material", value: previewProduct.material },
+                    { label: "Finish", value: previewProduct.finish },
+                    { label: "Warranty", value: previewProduct.warranty },
+                  ].map((spec) => (
+                    <div key={spec.label} className="bg-secondary rounded-xl p-2.5 text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-medium">{spec.label}</p>
+                      <p className="text-[11px] font-bold text-foreground mt-0.5 truncate">{spec.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Score Bars */}
+                <div className="space-y-2">
+                  {[
+                    { label: "Durability", score: previewProduct.durabilityScore, icon: Shield },
+                    { label: "Maintenance", score: previewProduct.maintenanceScore, icon: Wrench },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center gap-2.5">
+                      <item.icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-[11px] font-medium text-foreground w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${item.score * 10}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className="h-full rounded-full gradient-accent"
+                        />
+                      </div>
+                      <span className="text-[10px] font-bold text-foreground w-8 text-right">{item.score}/10</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Trust Badges */}
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { icon: Shield, text: "Genuine" },
+                    { icon: Award, text: "Premium" },
+                    { icon: Wrench, text: "Expert Install" },
+                  ].map((badge) => (
+                    <div key={badge.text} className="flex items-center gap-1 bg-secondary rounded-lg px-2 py-1">
+                      <badge.icon className="w-3 h-3 text-accent" />
+                      <span className="text-[9px] font-semibold text-foreground">{badge.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Price + Actions */}
+                <div className="flex items-center gap-3 pt-1">
+                  <div className="flex-1">
+                    <span className="text-xl font-bold text-foreground">
+                      {previewProduct.currency} {previewProduct.pricePerSqft}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-1">/sqft</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleAddToCart(previewProduct);
+                      setPreviewProduct(null);
+                    }}
+                    className="gradient-accent text-accent-foreground px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity shadow-sm"
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                    Add to Cart
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPreviewProduct(null);
+                      navigate(`/products/${previewProduct.id}`);
+                    }}
+                    className="bg-foreground text-background px-4 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity"
+                  >
+                    Full Details
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
