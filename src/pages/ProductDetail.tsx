@@ -483,7 +483,7 @@ const ProductDetail = () => {
                     ].map((addon) => (
                       <label key={addon.label} className="flex items-center justify-between py-2 px-3 rounded-xl bg-secondary/50 cursor-pointer group hover:bg-secondary transition-colors">
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-4.5 h-4.5 rounded-md border-2 flex items-center justify-center transition-all ${
+                          <div className={`w-[18px] h-[18px] rounded-md border-2 flex items-center justify-center transition-all ${
                             addon.checked ? "bg-accent border-accent" : "border-border/80 group-hover:border-accent/40"
                           }`}>
                             {addon.checked && <Check className="w-2.5 h-2.5 text-accent-foreground" />}
