@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ShoppingCart, FileText, Calendar, Wrench, Check, Shield, Star,
@@ -161,6 +161,7 @@ const SpecItem = ({ label, value }: { label: string; value: string }) => (
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const product = products.find((p) => p.id === id);
   const [area, setArea] = useState(20);
@@ -194,7 +195,7 @@ const ProductDetail = () => {
 
   const handleBuyNow = () => {
     addToCart(product, area, includeInstallation);
-    window.location.href = "/cart";
+    navigate("/cart");
   };
 
   const handleSelectAttribute = (key: string, value: string) => {
