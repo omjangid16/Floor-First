@@ -466,7 +466,7 @@ const ProductDetail = () => {
                       max="500"
                       value={area}
                       onChange={(e) => setArea(Number(e.target.value))}
-                      className="w-full h-1.5 bg-secondary rounded-full appearance-none cursor-pointer accent-[hsl(var(--accent))]"
+                      className="w-full h-1.5 bg-secondary rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0"
                     />
                     <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
                       <span>5 sqft</span><span>500 sqft</span>
