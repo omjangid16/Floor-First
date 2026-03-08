@@ -1,15 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, ShoppingCart, SlidersHorizontal, X, ChevronRight,
-  Star, Eye, Grid3X3, LayoutGrid
+  Star, Eye, Grid3X3, LayoutGrid, Shield, Award, Wrench
 } from "lucide-react";
-import { products, flooringTypes } from "@/data/products";
+import { products, flooringTypes, type Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import ShadeSelector from "@/components/ShadeSelector";
 import type { Shade } from "@/data/shades";
+import {
+  Dialog, DialogContent, DialogTitle, DialogDescription
+} from "@/components/ui/dialog";
 
 import typeTile from "@/assets/type-tile.jpg";
 import typeStone from "@/assets/type-stone.jpg";
