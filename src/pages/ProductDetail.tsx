@@ -195,7 +195,7 @@ const ProductDetail = () => {
 
   const handleBuyNow = () => {
     addToCart(product, area, includeInstallation);
-    window.location.href = "/cart";
+    navigate("/cart");
   };
 
   const handleSelectAttribute = (key: string, value: string) => {
