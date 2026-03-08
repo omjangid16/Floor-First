@@ -58,6 +58,20 @@ const Products = () => {
     setSearch(searchFromUrl);
   }, [searchFromUrl]);
 
+  // Sync local search state back to URL
+  useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    if (search !== currentSearch) {
+      const newParams = new URLSearchParams(searchParams);
+      if (search) {
+        newParams.set("search", search);
+      } else {
+        newParams.delete("search");
+      }
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [search]);
+
   const activeType = flooringTypes.find((t) => t.id === selectedType);
 
   const handleShadeSelect = (shade: Shade) => {
