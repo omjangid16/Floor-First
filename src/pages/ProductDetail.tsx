@@ -394,7 +394,7 @@ const ProductDetail = () => {
               className="lg:sticky lg:top-6 space-y-5 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1 scrollbar-hide"
             >
               {/* Product Title Card */}
-              <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury">
+              <div className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury">
                 <p className="text-[10px] text-accent font-bold uppercase tracking-[0.2em] mb-2">{product.category}</p>
                 <h1 className="text-xl md:text-2xl font-bold text-foreground leading-snug">{product.name}</h1>
                 <p className="text-sm text-muted-foreground leading-relaxed mt-3">{product.description}</p>
