@@ -445,6 +445,7 @@ const Products = () => {
             </button>
           </div>
         )}
+      </div>
 
       {/* ── Quick Preview Modal ──────────────────────────────── */}
       <Dialog open={!!previewProduct} onOpenChange={(open) => !open && setPreviewProduct(null)}>
