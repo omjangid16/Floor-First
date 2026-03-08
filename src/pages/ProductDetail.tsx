@@ -433,7 +433,7 @@ const ProductDetail = () => {
 
               {/* ── Cost Calculator ─────────────────────────── */}
               <div className="bg-card rounded-2xl border border-border shadow-luxury overflow-hidden">
-                <div className="p-5 space-y-5">
+                <div className="p-3.5 sm:p-5 space-y-4 sm:space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold text-foreground">Cost Calculator</h3>
                     <span className="text-[10px] text-muted-foreground bg-secondary px-2.5 py-1 rounded-full">
