@@ -402,7 +402,7 @@ const ProductDetail = () => {
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mt-4 pt-4 border-t border-border/50">
                   <span className="text-[11px] text-muted-foreground uppercase tracking-wider">From</span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">{product.currency} {product.pricePerSqft}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{product.currency} {product.pricePerSqft}</span>
                   <span className="text-sm text-muted-foreground">/sqft</span>
                 </div>
 
