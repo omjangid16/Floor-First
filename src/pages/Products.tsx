@@ -40,6 +40,7 @@ const sortOptions = [
 
 const Products = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const typeFilter = searchParams.get("type") || "";
   const searchFromUrl = searchParams.get("search") || "";
   const [search, setSearch] = useState(searchFromUrl);
@@ -49,6 +50,7 @@ const Products = () => {
   const [selectedTraffic, setSelectedTraffic] = useState<string>("");
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const { addToCart } = useCart();
   const { toast } = useToast();
 
