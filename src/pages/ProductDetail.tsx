@@ -255,7 +255,7 @@ const ProductDetail = () => {
               <img
                 src={detailImages[product.type] || productDetailTile}
                 alt={product.name}
-                className="w-full h-[320px] sm:h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-[240px] sm:h-[360px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
               />
               {/* Floating actions */}
               <div className="absolute top-4 right-4 flex gap-2">
@@ -278,16 +278,16 @@ const ProductDetail = () => {
                 </div>
               )}
               {/* Bottom gradient overlay with quick info */}
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent h-28 flex items-end">
-                <div className="p-5 flex items-center gap-3">
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent h-20 sm:h-28 flex items-end">
+                <div className="p-3 sm:p-5 flex items-center gap-2 sm:gap-3 flex-wrap">
                   {[
                     { icon: Shield, label: "Genuine" },
                     { icon: Star, label: "Premium" },
                     { icon: Wrench, label: "Expert Install" },
                   ].map(({ icon: Icon, label }) => (
-                    <div key={label} className="flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-3 py-1.5">
-                      <Icon className="w-3 h-3 text-white" />
-                      <span className="text-[10px] text-white font-medium">{label}</span>
+                    <div key={label} className="flex items-center gap-1 sm:gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-2 sm:px-3 py-1 sm:py-1.5">
+                      <Icon className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-white" />
+                      <span className="text-[9px] sm:text-[10px] text-white font-medium">{label}</span>
                     </div>
                   ))}
                 </div>
@@ -299,7 +299,7 @@ const ProductDetail = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="bg-card rounded-2xl border border-border p-5 shadow-luxury"
+              className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury"
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -344,7 +344,7 @@ const ProductDetail = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2"
+                  className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2"
                 >
                   {filteredDesigns.map((design) => (
                     <DesignSwatch
@@ -363,7 +363,7 @@ const ProductDetail = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="bg-card rounded-2xl border border-border p-5 shadow-luxury"
+              className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury"
             >
               <h3 className="text-sm font-bold text-foreground mb-3">Specifications</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
@@ -394,7 +394,7 @@ const ProductDetail = () => {
               className="lg:sticky lg:top-6 space-y-5 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1 scrollbar-hide"
             >
               {/* Product Title Card */}
-              <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury">
+              <div className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury">
                 <p className="text-[10px] text-accent font-bold uppercase tracking-[0.2em] mb-2">{product.category}</p>
                 <h1 className="text-xl md:text-2xl font-bold text-foreground leading-snug">{product.name}</h1>
                 <p className="text-sm text-muted-foreground leading-relaxed mt-3">{product.description}</p>
@@ -402,7 +402,7 @@ const ProductDetail = () => {
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mt-4 pt-4 border-t border-border/50">
                   <span className="text-[11px] text-muted-foreground uppercase tracking-wider">From</span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">{product.currency} {product.pricePerSqft}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{product.currency} {product.pricePerSqft}</span>
                   <span className="text-sm text-muted-foreground">/sqft</span>
                 </div>
 
@@ -417,7 +417,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Product Attributes */}
-              <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury space-y-5">
+              <div className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury space-y-4 sm:space-y-5">
                 <h3 className="text-sm font-bold text-foreground">Select Options</h3>
                 {attributes.map((attr) => (
                   <AttributeSelector
@@ -433,7 +433,7 @@ const ProductDetail = () => {
 
               {/* ── Cost Calculator ─────────────────────────── */}
               <div className="bg-card rounded-2xl border border-border shadow-luxury overflow-hidden">
-                <div className="p-5 space-y-5">
+                <div className="p-3.5 sm:p-5 space-y-4 sm:space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold text-foreground">Cost Calculator</h3>
                     <span className="text-[10px] text-muted-foreground bg-secondary px-2.5 py-1 rounded-full">
@@ -530,10 +530,10 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Total + Actions */}
-                <div className="bg-foreground p-5 space-y-4">
+                <div className="bg-foreground p-3.5 sm:p-5 space-y-3 sm:space-y-4">
                   <div className="flex justify-between items-baseline">
-                    <span className="text-sm text-background/70">Estimated Total</span>
-                    <span className="text-2xl font-bold text-background">AED {totalCost.toLocaleString()}</span>
+                    <span className="text-xs sm:text-sm text-background/70">Estimated Total</span>
+                    <span className="text-xl sm:text-2xl font-bold text-background">AED {totalCost.toLocaleString()}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
