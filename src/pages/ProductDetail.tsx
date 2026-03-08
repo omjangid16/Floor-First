@@ -265,7 +265,7 @@ const ProductDetail = () => {
                   <Heart className={`w-[18px] h-[18px] transition-colors ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                 </button>
                 <button className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-card transition-colors">
-                  <Share2 className="w-4.5 h-4.5 text-foreground" />
+                  <Share2 className="w-[18px] h-[18px] text-foreground" />
                 </button>
               </div>
               {/* Badge */}
