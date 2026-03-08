@@ -344,7 +344,7 @@ const ProductDetail = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2"
+                  className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2"
                 >
                   {filteredDesigns.map((design) => (
                     <DesignSwatch
