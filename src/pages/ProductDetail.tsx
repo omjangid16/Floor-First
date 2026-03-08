@@ -278,16 +278,16 @@ const ProductDetail = () => {
                 </div>
               )}
               {/* Bottom gradient overlay with quick info */}
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent h-28 flex items-end">
-                <div className="p-5 flex items-center gap-3">
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent h-20 sm:h-28 flex items-end">
+                <div className="p-3 sm:p-5 flex items-center gap-2 sm:gap-3 flex-wrap">
                   {[
                     { icon: Shield, label: "Genuine" },
                     { icon: Star, label: "Premium" },
                     { icon: Wrench, label: "Expert Install" },
                   ].map(({ icon: Icon, label }) => (
-                    <div key={label} className="flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-3 py-1.5">
-                      <Icon className="w-3 h-3 text-white" />
-                      <span className="text-[10px] text-white font-medium">{label}</span>
+                    <div key={label} className="flex items-center gap-1 sm:gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-2 sm:px-3 py-1 sm:py-1.5">
+                      <Icon className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-white" />
+                      <span className="text-[9px] sm:text-[10px] text-white font-medium">{label}</span>
                     </div>
                   ))}
                 </div>
