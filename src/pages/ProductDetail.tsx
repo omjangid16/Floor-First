@@ -385,12 +385,12 @@ const ProductDetail = () => {
           </div>
 
           {/* ────────────────── RIGHT: Info + Calculator ────────────────── */}
-          <div className="lg:col-span-5 space-y-5">
+          <div className="lg:col-span-5">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="lg:sticky lg:top-6 space-y-5"
+              className="lg:sticky lg:top-6 space-y-5 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1 scrollbar-hide"
             >
               {/* Product Title Card */}
               <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury">
