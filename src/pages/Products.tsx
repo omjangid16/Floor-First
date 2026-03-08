@@ -192,11 +192,11 @@ const Products = () => {
           </div>
 
           {/* Sort + Filter Row */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:ring-2 focus:ring-accent/30 outline-none"
+              className="px-3 py-2 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:ring-2 focus:ring-accent/30 outline-none w-auto"
             >
               {sortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
