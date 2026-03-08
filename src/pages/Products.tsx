@@ -354,12 +354,19 @@ const Products = () => {
                     </span>
                   )}
                   {/* Quick View Overlay */}
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setPreviewProduct(product);
+                    }}
+                    className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                  >
                     <div className="bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
                       <Eye className="w-3 h-3 text-foreground" />
-                      <span className="text-[10px] font-semibold text-foreground">View Details</span>
+                      <span className="text-[10px] font-semibold text-foreground">Quick View</span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </Link>
 
