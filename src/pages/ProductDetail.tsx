@@ -530,10 +530,10 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Total + Actions */}
-                <div className="bg-foreground p-5 space-y-4">
+                <div className="bg-foreground p-3.5 sm:p-5 space-y-3 sm:space-y-4">
                   <div className="flex justify-between items-baseline">
-                    <span className="text-sm text-background/70">Estimated Total</span>
-                    <span className="text-2xl font-bold text-background">AED {totalCost.toLocaleString()}</span>
+                    <span className="text-xs sm:text-sm text-background/70">Estimated Total</span>
+                    <span className="text-xl sm:text-2xl font-bold text-background">AED {totalCost.toLocaleString()}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
