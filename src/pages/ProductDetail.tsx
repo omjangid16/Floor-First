@@ -255,7 +255,7 @@ const ProductDetail = () => {
               <img
                 src={detailImages[product.type] || productDetailTile}
                 alt={product.name}
-                className="w-full h-[320px] sm:h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-[240px] sm:h-[360px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
               />
               {/* Floating actions */}
               <div className="absolute top-4 right-4 flex gap-2">
