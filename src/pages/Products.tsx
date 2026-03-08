@@ -195,7 +195,7 @@ const Products = () => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="hidden sm:block px-3 py-2.5 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:ring-2 focus:ring-accent/30 outline-none"
+            className="hidden sm:block px-3 py-2.5 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:ring-2 focus:ring-accent/30 outline-none max-w-[180px]"
           >
             {sortOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
