@@ -262,10 +262,10 @@ const ProductDetail = () => {
                   onClick={() => setLiked(!liked)}
                   className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-card transition-colors"
                 >
-                  <Heart className={`w-4.5 h-4.5 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                  <Heart className={`w-[18px] h-[18px] transition-colors ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                 </button>
                 <button className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-card transition-colors">
-                  <Share2 className="w-4.5 h-4.5 text-foreground" />
+                  <Share2 className="w-[18px] h-[18px] text-foreground" />
                 </button>
               </div>
               {/* Badge */}
@@ -385,12 +385,12 @@ const ProductDetail = () => {
           </div>
 
           {/* ────────────────── RIGHT: Info + Calculator ────────────────── */}
-          <div className="lg:col-span-5 space-y-5">
+          <div className="lg:col-span-5">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="lg:sticky lg:top-6 space-y-5"
+              className="lg:sticky lg:top-6 space-y-5 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1 scrollbar-hide"
             >
               {/* Product Title Card */}
               <div className="bg-card rounded-2xl border border-border p-5 shadow-luxury">
@@ -466,7 +466,7 @@ const ProductDetail = () => {
                       max="500"
                       value={area}
                       onChange={(e) => setArea(Number(e.target.value))}
-                      className="w-full h-1.5 bg-secondary rounded-full appearance-none cursor-pointer accent-[hsl(var(--accent))]"
+                      className="w-full h-1.5 bg-secondary rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0"
                     />
                     <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
                       <span>5 sqft</span><span>500 sqft</span>
@@ -483,7 +483,7 @@ const ProductDetail = () => {
                     ].map((addon) => (
                       <label key={addon.label} className="flex items-center justify-between py-2 px-3 rounded-xl bg-secondary/50 cursor-pointer group hover:bg-secondary transition-colors">
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-4.5 h-4.5 rounded-md border-2 flex items-center justify-center transition-all ${
+                          <div className={`w-[18px] h-[18px] rounded-md border-2 flex items-center justify-center transition-all ${
                             addon.checked ? "bg-accent border-accent" : "border-border/80 group-hover:border-accent/40"
                           }`}>
                             {addon.checked && <Check className="w-2.5 h-2.5 text-accent-foreground" />}
