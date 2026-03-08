@@ -299,7 +299,7 @@ const ProductDetail = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="bg-card rounded-2xl border border-border p-5 shadow-luxury"
+              className="bg-card rounded-2xl border border-border p-3.5 sm:p-5 shadow-luxury"
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
