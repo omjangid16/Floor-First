@@ -39,12 +39,12 @@ const sortOptions = [
 ];
 
 const Products = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const typeFilter = searchParams.get("type") || "";
   const searchFromUrl = searchParams.get("search") || "";
   const [search, setSearch] = useState(searchFromUrl);
-  const [searchParams_unused, setSearchParams] = useSearchParams();
+  const [searchParams_unused] = [null]; // removed duplicate
   const [selectedType, setSelectedType] = useState(typeFilter);
   const [sortBy, setSortBy] = useState("popular");
   const [selectedShade, setSelectedShade] = useState<string | null>(null);
