@@ -9,6 +9,7 @@ import { products, flooringTypes, type Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import ShadeSelector from "@/components/ShadeSelector";
+import SearchAutocomplete from "@/components/SearchAutocomplete";
 import type { Shade } from "@/data/shades";
 import {
   Dialog, DialogContent, DialogTitle, DialogDescription

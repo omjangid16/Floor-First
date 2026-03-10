@@ -18,6 +18,7 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 import floorFirstLogo from "@/assets/floor-first-logo.png";
+import SearchAutocomplete from "@/components/SearchAutocomplete";
 
 const menuItems = [
   { label: "Home", path: "/", icon: Home },
