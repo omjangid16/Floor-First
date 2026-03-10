@@ -38,14 +38,6 @@ const MobileHeader = () => {
   const { totalItems } = useCart();
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-      setSearchQuery("");
-    }
-  };
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
