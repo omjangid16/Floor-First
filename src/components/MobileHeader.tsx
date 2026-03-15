@@ -100,10 +100,11 @@ const MobileHeader = () => {
           {searchOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1, overflow: "visible" }}
+              exit={{ height: 0, opacity: 0, overflow: "hidden" }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-border"
+              className="border-t border-border"
+              style={{ overflow: "hidden" }}
             >
               <div className="px-4 py-2.5">
                 <SearchAutocomplete
