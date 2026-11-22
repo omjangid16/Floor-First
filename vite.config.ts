@@ -13,9 +13,15 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  // Keep a single React copy and pre-bundle the Cloud auth subpath up front, so
+  // Vite never re-optimizes mid-session and hands the browser mismatched chunks.
   resolve: {
+    dedupe: ["react", "react-dom"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  optimizeDeps: {
+    include: ["@lovable.dev/cloud-auth-js/react"],
   },
 }));
