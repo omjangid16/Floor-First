@@ -8,6 +8,7 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import profileHeaderBg from "@/assets/profile-header-bg.jpg";
 
 const profileMenuItems = [
@@ -20,8 +21,15 @@ const profileMenuItems = [
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
-  const handleLogout = () => {
+  const displayName =
+    user?.user_metadata?.full_name?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Guest User";
+
+  const handleLogout = async () => {
+    await signOut();
     localStorage.removeItem("hasSeenIntro");
     localStorage.removeItem("isLoggedIn");
     navigate("/welcome");
@@ -41,8 +49,8 @@ const Profile = () => {
               <User className="w-7 h-7 text-accent" />
             </div>
             <div className="pb-1">
-              <h1 className="text-lg font-bold text-foreground">My Profile</h1>
-              <p className="text-sm text-muted-foreground">Manage your account</p>
+              <h1 className="text-lg font-bold text-foreground">{displayName}</h1>
+              <p className="text-sm text-muted-foreground">{user?.email ?? "Not signed in"}</p>
             </div>
           </div>
         </div>

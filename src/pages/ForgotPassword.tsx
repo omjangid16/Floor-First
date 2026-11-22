@@ -2,15 +2,33 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const ForgotPassword = () => {
   const { toast } = useToast();
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email.trim()) {
+      toast({ title: "Error", description: "Please enter your email address.", variant: "destructive" });
+      return;
+    }
+
+    setBusy(true);
+    const { error } = await resetPassword(email.trim());
+    setBusy(false);
+
+    if (error) {
+      toast({ title: "Could not send reset link", description: error, variant: "destructive" });
+      return;
+    }
+
     setSent(true);
     toast({ title: "Email Sent", description: "Check your inbox for a password reset link." });
   };

@@ -1,21 +1,60 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Phone, Lock, AtSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import floorFirstLogo from "@/assets/floor-first-logo.png";
 
 const SignUp = () => {
   const { toast } = useToast();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", username: "", password: "", confirm: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!form.name.trim() || !form.email.trim()) {
+      toast({ title: "Error", description: "Please add your name and email address.", variant: "destructive" });
+      return;
+    }
+    if (form.password.length < 6) {
+      toast({ title: "Error", description: "Please use a password of at least 6 characters.", variant: "destructive" });
+      return;
+    }
     if (form.password !== form.confirm) {
       toast({ title: "Error", description: "Passwords don't match.", variant: "destructive" });
       return;
     }
-    toast({ title: "Sign Up", description: "Authentication requires Lovable Cloud. Enable it to proceed." });
+
+    setBusy(true);
+    const { error, needsConfirmation } = await signUp({
+      fullName: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      username: form.username.trim(),
+      password: form.password,
+    });
+    setBusy(false);
+
+    if (error) {
+      toast({ title: "Could not create account", description: error, variant: "destructive" });
+      return;
+    }
+
+    if (needsConfirmation) {
+      toast({
+        title: "Check your inbox",
+        description: `We sent a confirmation link to ${form.email.trim()}. Open it to finish setting up your account.`,
+      });
+      navigate("/sign-in");
+      return;
+    }
+
+    toast({ title: "Welcome to Floor First", description: "Your account is ready." });
+    navigate("/profile");
   };
 
   const fields = [
@@ -84,8 +123,8 @@ const SignUp = () => {
             </div>
           </div>
 
-          <button type="submit" className="w-full gradient-accent text-accent-foreground py-3 rounded-xl font-body font-bold text-sm hover:opacity-90 transition-opacity shadow-lg mt-2">
-            Create Account
+          <button type="submit" disabled={busy} className="w-full gradient-accent text-accent-foreground py-3 rounded-xl font-body font-bold text-sm hover:opacity-90 transition-opacity shadow-lg mt-2 disabled:opacity-60">
+            {busy ? "Creating account…" : "Create Account"}
           </button>
 
           <p className="text-center text-sm font-body text-muted-foreground">
