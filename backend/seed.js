@@ -2,7 +2,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import User from "./models/User.js";
 import Product from "./models/Product.js";
-import { products } from "../src/data/products.js";
+import { products } from "./data/products.js";
 
 const seedDatabase = async () => {
   try {

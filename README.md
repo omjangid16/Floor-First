@@ -1,12 +1,58 @@
 # Floor First - Full Stack Web Application
 
-Premium Flooring Solutions - Web Application with React frontend and Node.js + Express + MongoDB backend.
+Premium Flooring Solutions - Modern full-stack architecture organized cleanly into dedicated **Frontend** and **Backend** directories.
 
 ## Architecture
 
 - **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, Framer Motion, React Router v6
-- **Backend**: Node.js, Express 5, MongoDB (Mongoose), JWT Authentication, bcryptjs
+- **Backend**: Node.js (ES Modules), Express 5, MongoDB (Mongoose), JWT Authentication, bcryptjs
 - **Database**: MongoDB (Local or MongoDB Atlas)
+
+---
+
+## Project Structure
+
+```text
+Floor First/
+├── frontend/                  # React + Vite frontend client
+│   ├── public/                # Static assets, logos, favicon, robots.txt
+│   ├── src/                   # Source code
+│   │   ├── assets/            # Images, banners, graphics
+│   │   ├── components/        # UI components, layout, sections
+│   │   ├── contexts/          # React contexts (AuthContext, CartContext)
+│   │   ├── data/              # Static content & catalog data
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── lib/               # Utility functions & API client
+│   │   ├── pages/             # Route pages (Products, Cart, Profile, etc.)
+│   │   ├── test/              # Frontend unit tests
+│   │   ├── App.jsx            # Main app component & routes
+│   │   └── main.jsx           # Entry point
+│   ├── .env                   # Frontend env vars (e.g. VITE_API_URL)
+│   ├── .env.example           # Example frontend env vars
+│   ├── index.html             # Vite HTML entry
+│   ├── package.json           # Frontend dependencies & scripts
+│   ├── tailwind.config.js     # Tailwind CSS configuration
+│   └── vite.config.js         # Vite configuration & proxy settings
+│
+├── backend/                   # Node.js + Express + MongoDB backend
+│   ├── config/                # Database connection & configurations
+│   ├── controllers/           # Request handlers for auth, products, cart, etc.
+│   ├── data/                  # Seed dataset for standalone backend seeding
+│   ├── middleware/            # Auth and error handling middlewares
+│   ├── models/                # Mongoose data models
+│   ├── routes/                # Express API routes
+│   ├── utils/                 # Utility helpers (e.g. JWT generator)
+│   ├── .env                   # Backend env vars (PORT, MONGO_URI, JWT_SECRET)
+│   ├── .env.example           # Example backend env vars
+│   ├── index.js               # Express server entry point
+│   ├── package.json           # Backend dependencies & scripts
+│   ├── seed.js                # Database seeding script
+│   └── test-api.js            # Automated API integration test suite
+│
+├── package.json               # Root orchestrator (npm workspaces)
+├── .gitignore                 # Git ignore rules
+└── README.md                  # Project documentation
+```
 
 ---
 
@@ -17,52 +63,96 @@ Premium Flooring Solutions - Web Application with React frontend and Node.js + E
 - MongoDB running locally on port 27017 or a MongoDB Atlas connection URI
 
 ### Installation
+Install all dependencies across the entire monorepo from the root directory:
 ```sh
 npm install
 ```
 
 ### Environment Configuration
-Copy `.env.example` to `.env` (or use the pre-configured `.env`):
-```env
-PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/floor_first
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRES_IN=30d
-NODE_ENV=development
-VITE_API_URL=http://localhost:5000/api
-```
+Both `frontend/` and `backend/` have their own environment configuration files:
 
-### Database Seeding (Optional)
-Seed initial products and a demo user (`demo@floorfirst.ae` / `password123`):
+- **Frontend (`frontend/.env`)**:
+  ```env
+  VITE_API_URL=http://localhost:5000/api
+  ```
+
+- **Backend (`backend/.env`)**:
+  ```env
+  PORT=5000
+  NODE_ENV=development
+  CLIENT_ORIGIN=http://localhost:8080
+  MONGO_URI=mongodb://127.0.0.1:27017/floor_first
+  JWT_SECRET=your_jwt_secret_here
+  JWT_EXPIRES_IN=30d
+  DEMO_USER_EMAIL=demo@floorfirst.ae
+  DEMO_USER_PASSWORD=password123
+  ```
+
+---
+
+## Running the Application
+
+### 1. Run Full Stack Concurrently (Frontend + Backend)
+From the root directory:
+```sh
+npm run dev
+```
+- **Frontend** runs on: `http://localhost:8080`
+- **Backend API** runs on: `http://localhost:5000`
+
+### 2. Run Individually from Root
+- **Frontend only**:
+  ```sh
+  npm run dev:frontend
+  # or: npm run frontend
+  ```
+- **Backend only**:
+  ```sh
+  npm run dev:backend
+  # or: npm run backend
+  ```
+
+### 3. Run from Subdirectories
+You can also navigate directly into either folder:
+- **Frontend**:
+  ```sh
+  cd frontend
+  npm run dev
+  ```
+- **Backend**:
+  ```sh
+  cd backend
+  npm run dev
+  ```
+
+---
+
+## Database Seeding (Optional)
+Populate MongoDB with demo user credentials (`demo@floorfirst.ae` / `password123`) and initial flooring products:
 ```sh
 npm run seed
 ```
 
 ---
 
-## Running the Application
+## Testing & Building
 
-### Option 1: Run Both Frontend & Backend Concurrently (Recommended)
-```sh
-npm run dev:all
-```
-
-### Option 2: Run Separately in Two Terminals
-- **Terminal 1 (Backend Server)**:
+- **Frontend Build**:
   ```sh
-  npm run server:dev
+  npm run build
   ```
-  Runs Express on `http://localhost:5000`.
-
-- **Terminal 2 (Frontend Client)**:
+- **Run Frontend Tests**:
   ```sh
-  npm run dev
+  npm test
   ```
-  Runs Vite dev server on `http://localhost:8080`.
+- **Run Backend API Integration Test**:
+  ```sh
+  npm run test:api
+  ```
 
 ---
 
-## Backend API Endpoints
+## Backend API Endpoints Summary
 
 ### Authentication (`/api/auth`)
 - `POST /api/auth/register` - Register a new user
@@ -98,7 +188,3 @@ npm run dev:all
 ### Quotes (`/api/quotes`)
 - `POST /api/quotes` - Submit a free quote consultation request
 - `GET /api/quotes` - View all quote requests
-
-### Products (`/api/products`)
-- `GET /api/products` - List all products with optional filters
-- `GET /api/products/:id` - Get single product details
