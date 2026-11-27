@@ -188,3 +188,54 @@ npm run seed
 ### Quotes (`/api/quotes`)
 - `POST /api/quotes` - Submit a free quote consultation request
 - `GET /api/quotes` - View all quote requests
+
+---
+
+## AWS Deployment Guide
+
+This project includes multi-stage Docker support, reverse proxy trust headers, and graceful shutdown handling for production AWS deployments.
+
+### Recommended AWS Options:
+
+#### 1. AWS App Runner (Fastest & Simplest Managed Containers)
+1. Push this repository to GitHub or Amazon ECR.
+2. In the AWS App Runner console, create a new service:
+   - **Source**: Select your GitHub repo or ECR image.
+   - **Configuration**: Use `Dockerfile` (already configured at repo root).
+   - **Port**: `5000`
+3. Add Environment Variables:
+   - `NODE_ENV=production`
+   - `PORT=5000`
+   - `MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/floor_first`
+   - `JWT_SECRET=your_production_secret`
+4. App Runner automatically provisions SSL, auto-scaling, and health monitoring on `/api/health`.
+
+#### 2. AWS Elastic Beanstalk
+1. Choose the **Docker** platform or **Node.js 20** platform.
+2. The root [Procfile](file:///d:/Projects/Floor%20Fusion/Floor%20First/Procfile) (`web: npm start`) and [Dockerfile](file:///d:/Projects/Floor%20Fusion/Floor%20First/Dockerfile) are pre-configured.
+3. In Software Configuration, set your environment variables (`PORT=5000`, `MONGO_URI`, `JWT_SECRET`).
+
+#### 3. AWS ECS Fargate
+1. Build and push the image to Amazon ECR:
+   ```bash
+   aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
+   docker build -t floor-first .
+   docker tag floor-first:latest <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/floor-first:latest
+   docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/floor-first:latest
+   ```
+2. Create an ECS Task Definition mapping container port `5000` to your Application Load Balancer (ALB).
+3. Set the ALB health check path to `/api/health`.
+
+#### 4. AWS EC2 / Lightsail (PM2 or Docker)
+- **Using Docker**:
+  ```bash
+  docker build -t floor-first .
+  docker run -d -p 80:5000 --env-file backend/.env floor-first
+  ```
+- **Using PM2**:
+  ```bash
+  npm run build
+  pm2 start ecosystem.config.cjs --env production
+  pm2 save
+  ```
+
