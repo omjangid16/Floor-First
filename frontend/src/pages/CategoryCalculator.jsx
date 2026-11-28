@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Minus, Plus, CheckCircle2, Shield, Truck, Award, Phone, MessageCircle, ChevronDown, ChevronUp, HelpCircle, Calendar, Clock, User, Mail, MapPin, Home, Smartphone, Palette, Layers, Ruler, Settings, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Minus, Plus, CheckCircle2, Shield, Truck, Award, Phone, MessageCircle, ChevronDown, ChevronUp, HelpCircle, Calendar, Clock, User, Mail, MapPin, Home, Smartphone, Palette, Layers, Ruler, Calculator, ClipboardCheck } from "lucide-react";
 import { categories } from "@/data/categories";
 import { packageTiers } from "@/data/packageTiers";
 import { getCalculatorConfig } from "@/data/calculatorOptions";
@@ -18,7 +18,7 @@ const SQM_STEP = 5;
 const CONVERSION = 10.764;
 const sqftToSqm = sqft => Math.round(sqft / CONVERSION);
 const sqmToSqft = sqm => Math.round(sqm * CONVERSION);
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 7;
 const stepsMeta = [{
   id: 1,
   label: "Type",
@@ -33,43 +33,21 @@ const stepsMeta = [{
   icon: <Palette className="w-4 h-4" />
 }, {
   id: 4,
-  label: "Grade",
-  icon: <Layers className="w-4 h-4" />
-}, {
-  id: 5,
   label: "Area",
   icon: <Ruler className="w-4 h-4" />
 }, {
-  id: 6,
-  label: "Options",
-  icon: <Settings className="w-4 h-4" />
+  id: 5,
+  label: "Estimate",
+  icon: <Calculator className="w-4 h-4" />
 }, {
-  id: 7,
+  id: 6,
   label: "Schedule",
   icon: <Calendar className="w-4 h-4" />
 }, {
-  id: 8,
+  id: 7,
   label: "Confirm",
   icon: <ClipboardCheck className="w-4 h-4" />
 }];
-const gradeBarStyles = {
-  economy: {
-    color: "bg-muted-foreground/40",
-    width: "w-3/5"
-  },
-  standard: {
-    color: "bg-accent/60",
-    width: "w-4/5"
-  },
-  premium: {
-    color: "bg-accent",
-    width: "w-[90%]"
-  },
-  luxury: {
-    color: "bg-accent",
-    width: "w-full"
-  }
-};
 
 /* ─── Custom touch-optimized Area Slider ─── */
 const TOUCH_SLOP = 10;
@@ -211,12 +189,10 @@ const CategoryCalculator = () => {
       case 3:
         return !!selectedShadeOption;
       case 4:
-        return !!packageTier;
-      case 5:
         return areaSqft > 0;
-      case 6:
+      case 5:
         return true;
-      case 7:
+      case 6:
         return scheduleData.name.trim() !== "" && scheduleData.email.trim() !== "" && scheduleData.date !== "" && scheduleData.phone.trim().length >= 7;
       default:
         return false;
@@ -426,28 +402,8 @@ const CategoryCalculator = () => {
                     </div>
                   </div>}
 
-                {/* STEP 4: Material Grade */}
+                {/* STEP 4: Area */}
                 {step === 4 && <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Select Material Grade</h3>
-                    <p className="text-sm text-muted-foreground mb-8">Choose the quality level that fits your needs</p>
-                    <div className="grid grid-cols-2 gap-3.5 md:gap-4 max-w-lg mx-auto">
-                      {packageTiers.map(tier => {
-                    const selected = packageTier === tier.id;
-                    const barStyle = gradeBarStyles[tier.id];
-                    return <button key={tier.id} onClick={() => setPackageTier(tier.id)} className={`rounded-2xl p-5 border transition-all text-left relative shadow-sm hover:shadow-luxury ${selected ? "border-accent bg-accent/5 shadow-luxury ring-1 ring-accent/20" : "border-border bg-card hover:border-accent/30"}`}>
-                            <div className="h-1.5 bg-muted rounded-full mb-4 overflow-hidden relative">
-                              <div className={`h-full rounded-full ${barStyle.color} ${barStyle.width} transition-all`} />
-                            </div>
-                            <p className={`font-semibold text-base mb-1 tracking-tight ${selected ? "text-accent" : "text-foreground"}`}>{tier.name}</p>
-                            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">{tier.description}</p>
-                            <span className="inline-block text-[10px] font-semibold bg-muted px-3 py-1 rounded-lg text-muted-foreground">{tier.badge}</span>
-                          </button>;
-                  })}
-                    </div>
-                  </div>}
-
-                {/* STEP 5: Area */}
-                {step === 5 && <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Enter Your Area</h3>
                     <p className="text-sm text-muted-foreground mb-8">Specify the total area to be covered</p>
 
@@ -527,68 +483,68 @@ const CategoryCalculator = () => {
                     </div>
                   </div>}
 
-                {/* STEP 6: Additional Options */}
-                {step === 6 && <div>
-                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Additional Options</h3>
-                    <p className="text-sm text-muted-foreground mb-8">Enhance your flooring project with these services</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      {config.additionalOptions.map(opt => {
-                    const sel = selectedOptions.includes(opt.id);
-                    return <button key={opt.id} onClick={() => toggleOption(opt.id)} className={`flex items-start gap-3 text-left rounded-2xl p-5 border transition-all shadow-sm hover:shadow-luxury ${sel ? "border-accent bg-accent/5 shadow-luxury ring-1 ring-accent/20" : "border-border bg-card hover:border-accent/30"}`}>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${sel ? "bg-accent border-accent" : "border-muted-foreground/40"}`}>
-                              {sel && <Check className="w-3.5 h-3.5 text-accent-foreground" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
-                                <p className="font-bold text-sm text-foreground truncate">{opt.label}</p>
-                                <p className="text-sm font-bold text-accent whitespace-nowrap">+AED {opt.pricePerSqft}{getPriceUnitLabel(opt.priceUnit)}</p>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">{opt.description}</p>
-                            </div>
-                          </button>;
-                  })}
-                    </div>
+                {/* STEP 5: Price Estimate */}
+                {step === 5 && <div>
+                    <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Price Estimate</h3>
+                    <p className="text-sm text-muted-foreground mb-8">
+                      Estimated cost based on your {displayArea.toLocaleString()} {unit === "sqm" ? "sq m" : "sq ft"} area selection
+                    </p>
 
-                    {/* Mobile Estimate Bar */}
-                    <div className="lg:hidden bg-[hsl(var(--foreground))] text-background rounded-2xl mx-0 mt-8 p-5">
+                    {/* Price Estimation Card */}
+                    <div className="bg-[hsl(var(--foreground))] text-background rounded-2xl max-w-lg mx-auto p-6 md:p-8 shadow-luxury">
                       <div className="flex items-center justify-between mb-4">
-                        <span className="font-bold text-sm">Price Estimate</span>
-                        <span className="text-[10px] border border-background/30 rounded-full px-2 py-0.5 flex items-center gap-1">
+                        <span className="font-bold text-base">Cost Breakdown</span>
+                        <span className="text-[10px] border border-background/30 rounded-full px-2.5 py-1 flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Transparent Pricing
                         </span>
                       </div>
-                      <div className="space-y-2.5 text-sm mb-4">
-                        <div className="flex justify-between"><span className="text-background/60">Material Cost</span><span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span className="text-background/60">Add-ons</span><span className="font-semibold">AED {Math.round(optionsCost).toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span className="text-background/60">Subtotal</span><span className="font-semibold">AED {Math.round(subtotal).toLocaleString()}</span></div>
-                        <div className="flex justify-between text-accent"><span>First Order Discount (10%)</span><span className="font-semibold">- AED {discount.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span className="text-background/60">VAT (5%)</span><span className="font-semibold">AED {vat.toLocaleString()}</span></div>
+                      <div className="space-y-3 text-sm mb-5">
+                        <div className="flex justify-between">
+                          <span className="text-background/60">Material Cost</span>
+                          <span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-background/60">Subtotal</span>
+                          <span className="font-semibold">AED {Math.round(subtotal).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-accent">
+                          <span>First Order Discount (10%)</span>
+                          <span className="font-semibold">- AED {discount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-background/60">VAT (5%)</span>
+                          <span className="font-semibold">AED {vat.toLocaleString()}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3 mb-4">
-                        <span className="font-bold">Total</span>
-                        <span className="font-bold text-accent text-lg">AED {totalEstimate.toLocaleString()}</span>
+                      <div className="flex justify-between items-center bg-background/10 rounded-xl px-4 py-3.5 mb-5">
+                        <span className="font-bold text-base">Total Estimate</span>
+                        <span className="font-bold text-accent text-xl">AED {totalEstimate.toLocaleString()}</span>
                       </div>
                       {/* Warranty badges */}
-                      <div className="flex justify-around pt-3 border-t border-background/20">
+                      <div className="flex justify-around pt-4 border-t border-background/20">
                         {[{
-                      icon: <Shield className="w-4 h-4" />,
-                      label: "10 Year Warranty"
-                    }, {
-                      icon: <Award className="w-4 h-4" />,
-                      label: "Premium Quality"
-                    }, {
-                      icon: <Truck className="w-4 h-4" />,
-                      label: "Expert Install"
-                    }].map(b => <div key={b.label} className="flex flex-col items-center gap-1 text-[9px] text-background/60">
+                          icon: <Shield className="w-4 h-4" />,
+                          label: "10 Year Warranty"
+                        }, {
+                          icon: <Award className="w-4 h-4" />,
+                          label: "Premium Quality"
+                        }, {
+                          icon: <Truck className="w-4 h-4" />,
+                          label: "Expert Install"
+                        }].map(b => (
+                          <div key={b.label} className="flex flex-col items-center gap-1.5 text-[10px] text-background/60">
                             <span className="text-accent">{b.icon}</span>{b.label}
-                          </div>)}
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-[10px] text-background/40 text-center mt-3">Note: Final quote based on selection & site condition.</p>
+                      <p className="text-[10px] text-background/40 text-center mt-4">
+                        Note: Final quote based on selection & site condition.
+                      </p>
                     </div>
                   </div>}
 
-                {/* STEP 7: Schedule */}
-                {step === 7 && <div>
+                {/* STEP 6: Schedule */}
+                {step === 6 && <div>
                     <h3 className="font-bold text-xl md:text-2xl text-foreground mb-1.5">Schedule a Visit</h3>
                     <p className="text-sm text-muted-foreground mb-8">Book a time for our floor advisor to visit you</p>
 
@@ -681,8 +637,8 @@ const CategoryCalculator = () => {
                     </div>
                   </div>}
 
-                {/* STEP 8: Confirmation */}
-                {step === 8 && <div>
+                {/* STEP 7: Confirmation */}
+                {step === 7 && <div>
                     <div className="text-center mb-8">
                       <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 shadow-md">
                         <CheckCircle2 className="w-8 h-8 text-green-600" />
@@ -707,7 +663,6 @@ const CategoryCalculator = () => {
                         {shade && <div><span className="text-muted-foreground">Type:</span> <span className="font-bold text-foreground">{shade.name}</span></div>}
                         {selectedPattern && <div><span className="text-muted-foreground">Pattern:</span> <span className="font-bold text-foreground">{selectedPattern.name}</span></div>}
                         {selectedShadeOption && <div><span className="text-muted-foreground">Shade:</span> <span className="font-bold text-foreground">{selectedShadeOption}</span></div>}
-                        <div><span className="text-muted-foreground">Grade:</span> <span className="font-bold text-foreground">{pkg?.name}</span></div>
                         <div><span className="text-muted-foreground">Area:</span> <span className="font-bold text-foreground">{areaSqft} sqft</span></div>
                       </div>
                     </div>
@@ -793,7 +748,6 @@ const CategoryCalculator = () => {
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-background/60">Material Cost</span><span className="font-semibold">AED {Math.round(materialCost).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-background/60">Add-ons</span><span className="font-semibold">AED {Math.round(optionsCost).toLocaleString()}</span></div>
               <div className="flex justify-between"><span className="text-background/60">Subtotal</span><span className="font-semibold">AED {Math.round(subtotal).toLocaleString()}</span></div>
               <div className="flex justify-between text-accent"><span>First Order (10% Off)</span><span className="font-semibold">- AED {discount.toLocaleString()}</span></div>
               <div className="flex justify-between"><span className="text-background/60">VAT (5%)</span><span className="font-semibold">AED {vat.toLocaleString()}</span></div>
